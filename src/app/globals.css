@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --yobell-primary: #1e3a5f;
+  --yobell-primary-light: #2d5a8e;
+  --yobell-accent: #00b4a0;
+  --yobell-accent-hover: #009688;
+  --yobell-surface: #f8fafc;
+  --yobell-card: #ffffff;
+  --yobell-text: #1a2332;
+  --yobell-muted: #64748b;
+  --yobell-border: #e2e8f0;
+  --yobell-danger: #ef4444;
+  --yobell-warning: #f59e0b;
+  --yobell-success: #10b981;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  color: var(--yobell-text);
+  background: var(--yobell-surface);
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+@layer components {
+  .kiosk-btn {
+    @apply flex items-center justify-center rounded-2xl font-bold transition-all duration-200 active:scale-[0.97] select-none;
+    min-height: 5rem;
+    font-size: 1.5rem;
+    padding: 1.25rem 2rem;
+  }
+
+  .kiosk-btn-primary {
+    @apply kiosk-btn text-white shadow-lg;
+    background: linear-gradient(135deg, var(--yobell-accent), #00897b);
+  }
+
+  .kiosk-btn-primary:hover {
+    background: linear-gradient(135deg, var(--yobell-accent-hover), #00796b);
+    box-shadow: 0 8px 25px rgba(0, 180, 160, 0.35);
+  }
+
+  .kiosk-btn-secondary {
+    @apply kiosk-btn border-2 bg-white;
+    border-color: var(--yobell-border);
+    color: var(--yobell-text);
+  }
+
+  .kiosk-btn-secondary:hover {
+    border-color: var(--yobell-accent);
+    background: #f0fdfa;
+  }
+
+  .kiosk-card {
+    @apply rounded-3xl border bg-white shadow-sm transition-all duration-200;
+    border-color: var(--yobell-border);
+  }
+
+  .kiosk-card-interactive {
+    @apply kiosk-card cursor-pointer active:scale-[0.98];
+  }
+
+  .kiosk-card-interactive:hover {
+    border-color: var(--yobell-accent);
+    box-shadow: 0 8px 30px rgba(0, 180, 160, 0.15);
+  }
+
+  .kiosk-input {
+    @apply w-full rounded-xl border-2 bg-white px-5 py-4 text-xl outline-none transition-colors;
+    border-color: var(--yobell-border);
+    min-height: 4rem;
+  }
+
+  .kiosk-input:focus {
+    border-color: var(--yobell-accent);
+    box-shadow: 0 0 0 3px rgba(0, 180, 160, 0.15);
+  }
+
+  .kiosk-heading {
+    @apply font-bold tracking-tight;
+    color: var(--yobell-primary);
+  }
+
+  .admin-input {
+    @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-teal-500;
+    border-color: var(--yobell-border);
+  }
+
+  .admin-btn {
+    @apply rounded-lg px-4 py-2 text-sm font-medium transition-colors;
+  }
+
+  .admin-btn-primary {
+    @apply admin-btn bg-teal-600 text-white hover:bg-teal-700;
+  }
+
+  .admin-btn-danger {
+    @apply admin-btn bg-red-500 text-white hover:bg-red-600;
+  }
+
+  .admin-btn-secondary {
+    @apply admin-btn border bg-white hover:bg-gray-50;
+    border-color: var(--yobell-border);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s ease-out forwards;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}

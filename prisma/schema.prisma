@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Company {
+  id             String  @id @default(cuid())
+  name           String
+  logoUrl        String?
+  welcomeMessage String?
+  staff          Staff[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Staff {
+  id                 String  @id @default(cuid())
+  companyId          String
+  company            Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name               String
+  department         String
+  role               String
+  email              String?
+  phone              String?
+  notificationMethod String  @default("dashboard")
+  active             Boolean @default(true)
+  visits             Visit[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Visit {
+  id             String    @id @default(cuid())
+  visitorName    String
+  visitorCompany String?
+  visitorPhone   String?
+  purpose        String?
+  visitorType    String
+  hostStaffId    String
+  hostStaff      Staff     @relation(fields: [hostStaffId], references: [id])
+  status         String    @default("pending")
+  photoData      String?
+  createdAt      DateTime  @default(now())
+  respondedAt    DateTime?
+  updatedAt      DateTime  @updatedAt
+}
+
+model KioskSetting {
+  id              String @id @default("default")
+  languageDefault String @default("ja")
+  retentionDays   Int    @default(30)
+  privacyNotice   String @default("入力された情報は受付対応および来訪記録のために利用されます。")
+  fallbackMessage String @default("担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。")
+  brandName       String @default("YOBELL")
+  tagline         String @default("内線電話のないオフィス受付")
+  logoUrl         String?
+  welcomeMessage  String @default("ご来社ありがとうございます")
+}
