@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  nameKana  String?
+  slug      String   @unique
+  active    Boolean  @default(true)
+  staff     Staff[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Staff {
+  id         String   @id @default(cuid())
+  name       String
+  department String?
+  title      String?
+  email      String?
+  phone      String?
+  active     Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  companyId  String
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  visits     Visit[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Visit {
+  id             String    @id @default(cuid())
+  visitorName    String
+  visitorCompany String?
+  visitorType    String    @default("APPOINTMENT")
+  purpose        String?
+  partySize      Int       @default(1)
+  status         String    @default("WAITING")
+  photoData      String?
+  responseNote   String?
+  staffId        String?
+  staff          Staff?    @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  respondedAt    DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
