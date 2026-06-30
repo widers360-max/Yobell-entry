@@ -20,7 +20,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env
+# NOTE: .env is intentionally committed — it only holds the non-secret
+# local SQLite path (DATABASE_URL="file:./dev.db") needed for dev/build.
 .env*.local
 
 # typescript
