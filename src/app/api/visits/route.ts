@@ -78,12 +78,19 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (!body.visitorName?.trim() || !body.hostStaffId || !body.visitorType) {
+    if (!body.visitorName || !body.hostStaffId || !body.visitorType) {
       return NextResponse.json(
         { error: "必須項目が不足しています" },
         { status: 400 }
       );
     }
+
+    const inputMethod =
+      body.inputMethod === "quick" ||
+      body.inputMethod === "manual" ||
+      body.inputMethod === "business_card"
+        ? body.inputMethod
+        : "manual";
 
     const visit = await prisma.visit.create({
       data: {
@@ -94,6 +101,7 @@ export async function POST(request: NextRequest) {
         visitorType: body.visitorType,
         hostStaffId: body.hostStaffId,
         photoData: body.photoData ?? null,
+        inputMethod,
         status: "pending",
       },
       include: {

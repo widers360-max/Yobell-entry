@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { KioskLayout } from "@/components/KioskLayout";
 import { KioskHomeScreen } from "@/components/KioskHomeScreen";
+import { CallMethodScreen } from "@/components/CallMethodScreen";
 import { CameraCapture } from "@/components/CameraCapture";
 import {
   INITIAL_KIOSK_STATE,
@@ -11,12 +12,15 @@ import {
   type Language,
   type VisitorType,
   type VisitorCardRecord,
+  type InputMethod,
 } from "@/lib/types";
+import { VISIT_PLACEHOLDER } from "@/lib/visit-constants";
 import { t, visitorTypeLabel, waitingMessage } from "@/lib/i18n";
 
 type Step =
   | "idle"
   | "host"
+  | "callMethod"
   | "visitorInfo"
   | "photo"
   | "confirm"
@@ -148,25 +152,91 @@ export default function KioskPage() {
     setState((s) => ({ ...s, language: lang }));
   }
 
-  async function submitVisit() {
+  async function submitVisit(overrides?: {
+    visitorName?: string;
+    visitorCompany?: string | null;
+    visitorPhone?: string | null;
+    purpose?: string | null;
+    photoData?: string | null;
+    inputMethod?: InputMethod;
+  }) {
     const res = await fetch("/api/visits", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        visitorName: state.visitorName,
-        visitorCompany: state.visitorCompany || null,
-        visitorPhone: state.visitorPhone || null,
-        purpose: state.purpose || null,
+        visitorName: overrides?.visitorName ?? state.visitorName,
+        visitorCompany:
+          overrides?.visitorCompany !== undefined
+            ? overrides.visitorCompany
+            : state.visitorCompany || null,
+        visitorPhone:
+          overrides?.visitorPhone !== undefined
+            ? overrides.visitorPhone
+            : state.visitorPhone || null,
+        purpose:
+          overrides?.purpose !== undefined
+            ? overrides.purpose
+            : state.purpose || null,
         visitorType: state.visitorType,
         hostStaffId: state.hostStaffId,
-        photoData: state.photoData,
+        photoData:
+          overrides?.photoData !== undefined
+            ? overrides.photoData
+            : state.photoData,
+        inputMethod: overrides?.inputMethod ?? state.inputMethod ?? "manual",
       }),
     });
     const visit = await res.json();
+    if (!res.ok) return;
     setState((s) => ({ ...s, visitId: visit.id }));
     setStep("waiting");
     setWaitSeconds(0);
     setVisitStatus("pending");
+  }
+
+  function handleSelectCallMethod(method: InputMethod) {
+    setState((s) => ({ ...s, inputMethod: method }));
+
+    if (method === "quick") {
+      void submitVisit({
+        visitorName: VISIT_PLACEHOLDER.NOT_ENTERED,
+        visitorCompany: VISIT_PLACEHOLDER.NOT_ENTERED,
+        visitorPhone: "",
+        purpose: "",
+        photoData: null,
+        inputMethod: "quick",
+      });
+      return;
+    }
+
+    if (method === "business_card") {
+      setStep("photo");
+      return;
+    }
+
+    setStep("visitorInfo");
+  }
+
+  function submitBusinessCardVisit(photoData: string | null) {
+    void submitVisit({
+      visitorName: VISIT_PLACEHOLDER.BUSINESS_CARD,
+      visitorCompany: VISIT_PLACEHOLDER.BUSINESS_CARD,
+      visitorPhone: "",
+      purpose: "",
+      photoData,
+      inputMethod: "business_card",
+    });
+  }
+
+  function submitManualWithoutInput() {
+    void submitVisit({
+      visitorName: VISIT_PLACEHOLDER.NOT_ENTERED,
+      visitorCompany: VISIT_PLACEHOLDER.NOT_ENTERED,
+      visitorPhone: "",
+      purpose: "",
+      photoData: null,
+      inputMethod: "manual",
+    });
   }
 
   function handleSelectPurpose(type: VisitorType) {
@@ -230,7 +300,7 @@ export default function KioskPage() {
                       hostStaffName: member.name,
                       hostCompanyName: member.company.name,
                     }));
-                    setStep("visitorInfo");
+                    setStep("callMethod");
                   }}
                   className="kiosk-card-interactive flex flex-col items-start gap-2 p-6 text-left"
                 >
@@ -255,6 +325,14 @@ export default function KioskPage() {
         </div>
       )}
 
+      {step === "callMethod" && (
+        <CallMethodScreen
+          language={lang}
+          onSelect={handleSelectCallMethod}
+          onBack={() => setStep("host")}
+        />
+      )}
+
       {step === "visitorInfo" && (
         <div className="flex flex-col gap-6">
           <h2 className="kiosk-heading text-center text-4xl">
@@ -276,7 +354,7 @@ export default function KioskPage() {
             </div>
             <div>
               <label className="mb-2 block text-lg font-semibold">
-                {t(lang, "yourName")} *
+                {t(lang, "yourName")}
               </label>
               <input
                 type="text"
@@ -335,31 +413,32 @@ export default function KioskPage() {
               <p className="text-center text-lg text-red-500">{formError}</p>
             )}
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setStep("callMethod")}
+                className="kiosk-btn-secondary flex-1"
+              >
+                {t(lang, "back")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormError("");
+                  setStep("photo");
+                }}
+                className="kiosk-btn-primary flex-1"
+              >
+                {t(lang, "next")}
+              </button>
+            </div>
             <button
               type="button"
-              onClick={() => setStep("host")}
-              className="kiosk-btn-secondary flex-1"
+              onClick={submitManualWithoutInput}
+              className="kiosk-btn-secondary w-full"
             >
-              {t(lang, "back")}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (!state.visitorName.trim()) {
-                  setFormError(t(lang, "required"));
-                  return;
-                }
-                if (!state.privacyConsent) {
-                  setFormError(t(lang, "privacyConsent"));
-                  return;
-                }
-                setFormError("");
-                setStep("photo");
-              }}
-              className="kiosk-btn-primary flex-1"
-            >
-              {t(lang, "next")}
+              {t(lang, "skipManualInput")}
             </button>
           </div>
         </div>
@@ -368,11 +447,22 @@ export default function KioskPage() {
       {step === "photo" && (
         <CameraCapture
           language={lang}
+          mode={state.inputMethod === "business_card" ? "business_card" : "visitor"}
           onCapture={(photoData) => {
+            if (state.inputMethod === "business_card") {
+              submitBusinessCardVisit(photoData);
+              return;
+            }
             setState((s) => ({ ...s, photoData }));
             setStep("confirm");
           }}
-          onSkip={() => setStep("confirm")}
+          onSkip={() => {
+            if (state.inputMethod === "business_card") {
+              submitBusinessCardVisit(null);
+              return;
+            }
+            setStep("confirm");
+          }}
         />
       )}
 
@@ -406,14 +496,16 @@ export default function KioskPage() {
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => setStep("visitorInfo")}
+              onClick={() =>
+                setStep(state.inputMethod === "business_card" ? "callMethod" : "visitorInfo")
+              }
               className="kiosk-btn-secondary flex-1"
             >
               {t(lang, "back")}
             </button>
             <button
               type="button"
-              onClick={submitVisit}
+              onClick={() => void submitVisit()}
               className="kiosk-btn-primary flex-1"
             >
               {t(lang, "callHost")}

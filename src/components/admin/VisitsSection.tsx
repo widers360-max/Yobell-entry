@@ -7,6 +7,7 @@ import { useAdminI18n } from "./AdminI18nProvider";
 import {
   getStatusLabel,
   getVisitorTypeLabel,
+  getInputMethodLabel,
   formatPurgeConfirm,
   formatPurgeSuccess,
 } from "@/lib/admin-i18n";
@@ -15,7 +16,9 @@ interface Visit {
   id: string;
   visitorName: string;
   visitorCompany: string | null;
+  visitorPhone: string | null;
   visitorType: string;
+  inputMethod: string;
   status: string;
   photoData: string | null;
   createdAt: string;
@@ -173,6 +176,7 @@ export function VisitsSection({
                 <th className="pb-3 pr-3 font-medium">{t("col_visitor")}</th>
                 <th className="pb-3 pr-3 font-medium">{t("col_company")}</th>
                 <th className="pb-3 pr-3 font-medium">{t("col_type")}</th>
+                <th className="pb-3 pr-3 font-medium">{t("col_inputMethod")}</th>
                 <th className="pb-3 pr-3 font-medium">{t("col_host")}</th>
                 <th className="pb-3 font-medium">{t("col_status")}</th>
               </tr>
@@ -201,6 +205,11 @@ export function VisitsSection({
                     <td className="py-3 pr-3 font-medium">{v.visitorName}</td>
                     <td className="py-3 pr-3">{v.visitorCompany ?? "—"}</td>
                     <td className="py-3 pr-3">{getVisitorTypeLabel(lang, v.visitorType)}</td>
+                    <td className="py-3 pr-3">
+                      <span className="font-medium text-slate-700">
+                        {getInputMethodLabel(lang, v.inputMethod ?? "manual")}
+                      </span>
+                    </td>
                     <td className="py-3 pr-3">{v.hostStaff.name}</td>
                     <td className="py-3">
                       <Badge color={st.color}>{st.label}</Badge>
@@ -210,7 +219,7 @@ export function VisitsSection({
               })}
               {visits.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                  <td colSpan={8} className="py-12 text-center text-slate-400">
                     {t("visits_noResults")}
                   </td>
                 </tr>

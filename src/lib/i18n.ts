@@ -1,6 +1,6 @@
 import type { Language, VisitorType } from "./types";
 
-type TranslationKey =
+export type TranslationKey =
   | "tagline"
   | "welcome"
   | "startReception"
@@ -33,6 +33,18 @@ type TranslationKey =
   | "auth_cancel"
   | "auth_invalidPassword"
   | "auth_logout"
+  | "selectCallMethod"
+  | "callQuick"
+  | "callQuickSub"
+  | "callBusinessCard"
+  | "callBusinessCardSub"
+  | "callManual"
+  | "callManualSub"
+  | "businessCardCapture"
+  | "businessCardInstruction"
+  | "skipBusinessCard"
+  | "skipManualInput"
+  | "cameraStarting"
   | "selectHost"
   | "searchPlaceholder"
   | "noResults"
@@ -105,6 +117,18 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     auth_cancel: "キャンセル",
     auth_invalidPassword: "パスワードが正しくありません",
     auth_logout: "ログアウト",
+    selectCallMethod: "呼び出し方法をお選びください",
+    callQuick: "すぐに呼び出す",
+    callQuickSub: "お名前を入力せずに担当者を呼び出します",
+    callBusinessCard: "名刺を撮影して呼び出す",
+    callBusinessCardSub: "名刺写真を担当者に送ります",
+    callManual: "お名前を入力して呼び出す",
+    callManualSub: "会社名・お名前を入力します",
+    businessCardCapture: "名刺を撮影してください",
+    businessCardInstruction: "名刺がはっきり写るように撮影してください",
+    skipBusinessCard: "撮影せずに呼び出す",
+    skipManualInput: "入力せずに呼び出す",
+    cameraStarting: "カメラを起動中...",
     selectHost: "担当者をお選びください",
     searchPlaceholder: "名前・部署・会社名で検索",
     noResults: "該当する担当者が見つかりません",
@@ -181,6 +205,18 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     auth_cancel: "Cancel",
     auth_invalidPassword: "Incorrect password",
     auth_logout: "Log out",
+    selectCallMethod: "How would you like to call the host?",
+    callQuick: "Call immediately",
+    callQuickSub: "Call the host without entering your name",
+    callBusinessCard: "Scan business card",
+    callBusinessCardSub: "Send a photo of your business card to the host",
+    callManual: "Enter your name",
+    callManualSub: "Enter your company and name",
+    businessCardCapture: "Please photograph your business card",
+    businessCardInstruction: "Make sure your business card is clearly visible",
+    skipBusinessCard: "Call without photographing",
+    skipManualInput: "Call without entering details",
+    cameraStarting: "Starting camera...",
     selectHost: "Please select your host",
     searchPlaceholder: "Search by name, department, or company",
     noResults: "No staff members found",
@@ -257,6 +293,18 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     auth_cancel: "취소",
     auth_invalidPassword: "비밀번호가 올바르지 않습니다",
     auth_logout: "로그아웃",
+    selectCallMethod: "호출 방법을 선택해 주세요",
+    callQuick: "바로 호출",
+    callQuickSub: "이름 입력 없이 담당자를 호출합니다",
+    callBusinessCard: "명함 촬영 후 호출",
+    callBusinessCardSub: "명함 사진을 담당자에게 전송합니다",
+    callManual: "이름 입력 후 호출",
+    callManualSub: "회사명·이름을 입력합니다",
+    businessCardCapture: "명함을 촬영해 주세요",
+    businessCardInstruction: "명함이 선명하게 보이도록 촬영해 주세요",
+    skipBusinessCard: "촬영 없이 호출",
+    skipManualInput: "입력 없이 호출",
+    cameraStarting: "카메라 시작 중...",
     selectHost: "담당자를 선택해 주세요",
     searchPlaceholder: "이름·부서·회사명으로 검색",
     noResults: "해당 담당자를 찾을 수 없습니다",
