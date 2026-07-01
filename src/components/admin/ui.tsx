@@ -188,17 +188,11 @@ export function Toast({
   );
 }
 
-export const STATUS_LABELS: Record<string, { label: string; color: "gray" | "green" | "amber" | "red" | "blue" }> = {
-  pending: { label: "未対応", color: "amber" },
-  accepted: { label: "対応中", color: "green" },
-  please_wait: { label: "お待ちください", color: "blue" },
-  declined: { label: "対応不可", color: "red" },
-  no_response: { label: "無応答", color: "gray" },
-  completed: { label: "完了", color: "green" },
-};
+import type { Language } from "@/lib/types";
 
-export function formatDate(iso: string) {
-  return new Date(iso).toLocaleString("ja-JP", {
+export function formatDate(iso: string, lang: Language = "ja") {
+  const locale = lang === "ko" ? "ko-KR" : lang === "en" ? "en-US" : "ja-JP";
+  return new Date(iso).toLocaleString(locale, {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

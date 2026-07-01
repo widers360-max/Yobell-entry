@@ -4,7 +4,24 @@ import { useState, useEffect } from "react";
 import { Save } from "lucide-react";
 import { AdminCard, AdminInput, AdminTextarea, Btn } from "./ui";
 import { KioskPreview } from "./KioskPreview";
+import { useAdminI18n } from "./AdminI18nProvider";
+import type { AdminTranslationKey } from "@/lib/admin-i18n";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
+
+const FIELD_KEYS: { key: keyof KioskSettings; labelKey: AdminTranslationKey; type?: string }[] = [
+  { key: "companyDisplayName", labelKey: "field_companyDisplayName" },
+  { key: "brandName", labelKey: "field_brandName" },
+  { key: "logoUrl", labelKey: "field_logoUrl" },
+  { key: "heroImageUrl", labelKey: "field_heroImageUrl" },
+  { key: "heroVideoUrl", labelKey: "field_heroVideoUrl" },
+  { key: "heroTitle", labelKey: "field_heroTitle" },
+  { key: "heroSubtitle", labelKey: "field_heroSubtitle" },
+  { key: "primaryColor", labelKey: "field_primaryColor", type: "color" },
+  { key: "accentColor", labelKey: "field_accentColor", type: "color" },
+  { key: "fallbackMessage", labelKey: "field_fallbackMessage" },
+  { key: "privacyNotice", labelKey: "field_privacyNotice" },
+  { key: "retentionDays", labelKey: "field_retentionDays", type: "number" },
+];
 
 export function BrandingSection({
   settings,
@@ -15,6 +32,7 @@ export function BrandingSection({
   cards: VisitorCardRecord[];
   onSave: (data: Partial<KioskSettings>) => Promise<void>;
 }) {
+  const { t } = useAdminI18n();
   const [form, setForm] = useState(settings);
   const [saving, setSaving] = useState(false);
 
@@ -28,38 +46,23 @@ export function BrandingSection({
     setSaving(false);
   }
 
-  const fields: { key: keyof KioskSettings; label: string; type?: string }[] = [
-    { key: "companyDisplayName", label: "会社表示名" },
-    { key: "brandName", label: "ブランド名" },
-    { key: "logoUrl", label: "ロゴ URL" },
-    { key: "heroImageUrl", label: "ヒーロー画像 URL" },
-    { key: "heroVideoUrl", label: "ヒーロー動画 URL" },
-    { key: "heroTitle", label: "ヒーロータイトル" },
-    { key: "heroSubtitle", label: "ヒーローサブタイトル" },
-    { key: "primaryColor", label: "プライマリカラー", type: "color" },
-    { key: "accentColor", label: "アクセントカラー", type: "color" },
-    { key: "fallbackMessage", label: "フォールバックメッセージ" },
-    { key: "privacyNotice", label: "プライバシー通知文" },
-    { key: "retentionDays", label: "ログ保持日数", type: "number" },
-  ];
-
   return (
     <div className="grid gap-6 xl:grid-cols-2">
       <AdminCard
-        title="キオスクブランディング設定"
+        title={t("branding_title")}
         action={
           <Btn onClick={handleSave} disabled={saving} size="sm">
             <Save className="h-4 w-4" />
-            {saving ? "保存中..." : "保存"}
+            {saving ? t("saving") : t("save")}
           </Btn>
         }
       >
         <div className="space-y-4">
-          {fields.map((f) =>
+          {FIELD_KEYS.map((f) =>
             f.key === "fallbackMessage" || f.key === "privacyNotice" || f.key === "heroSubtitle" ? (
               <AdminTextarea
                 key={f.key}
-                label={f.label}
+                label={t(f.labelKey)}
                 rows={2}
                 value={String(form[f.key] ?? "")}
                 onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
@@ -67,16 +70,14 @@ export function BrandingSection({
             ) : (
               <AdminInput
                 key={f.key}
-                label={f.label}
+                label={t(f.labelKey)}
                 type={f.type ?? "text"}
                 value={String(form[f.key] ?? "")}
                 onChange={(e) =>
                   setForm({
                     ...form,
                     [f.key]:
-                      f.type === "number"
-                        ? Number(e.target.value)
-                        : e.target.value,
+                      f.type === "number" ? Number(e.target.value) : e.target.value,
                   })
                 }
               />

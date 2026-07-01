@@ -24,6 +24,8 @@ type TranslationKey =
   | "footerHelp"
   | "footerHelpSub"
   | "smartReception"
+  | "nav_admin"
+  | "nav_staff"
   | "selectHost"
   | "searchPlaceholder"
   | "noResults"
@@ -87,6 +89,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "お困りの方はスタッフまで",
     footerHelpSub: "内線 100 または受付までお声がけください",
     smartReception: "SMART RECEPTION",
+    nav_admin: "管理",
+    nav_staff: "スタッフ",
     selectHost: "担当者をお選びください",
     searchPlaceholder: "名前・部署・会社名で検索",
     noResults: "該当する担当者が見つかりません",
@@ -154,6 +158,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "Need assistance?",
     footerHelpSub: "Extension 100 or speak to reception",
     smartReception: "SMART RECEPTION",
+    nav_admin: "Admin",
+    nav_staff: "Staff",
     selectHost: "Please select your host",
     searchPlaceholder: "Search by name, department, or company",
     noResults: "No staff members found",
@@ -221,6 +227,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "도움이 필요하신 분",
     footerHelpSub: "내선 100 또는 접수대로 문의해 주세요",
     smartReception: "SMART RECEPTION",
+    nav_admin: "관리",
+    nav_staff: "스태프",
     selectHost: "담당자를 선택해 주세요",
     searchPlaceholder: "이름·부서·회사명으로 검색",
     noResults: "해당 담당자를 찾을 수 없습니다",

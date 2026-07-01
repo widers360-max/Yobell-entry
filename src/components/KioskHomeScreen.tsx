@@ -2,6 +2,7 @@
 
 import { Phone, QrCode } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
+import { KioskTopBar } from "./KioskTopBar";
 import { getIcon } from "@/lib/icon-utils";
 import { t } from "@/lib/i18n";
 import type { KioskSettings, Language, VisitorCardRecord, VisitorType } from "@/lib/types";
@@ -42,6 +43,7 @@ export function KioskHomeScreen({
       className="kiosk-portrait flex min-h-screen flex-col bg-white"
       style={cssVars}
     >
+      <KioskTopBar language={language} />
       <header className="flex shrink-0 items-center justify-between px-8 pb-4 pt-6">
         <div className="flex items-center gap-4">
           {settings.logoUrl ? (

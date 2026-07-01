@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { AdminShell, type AdminSection } from "@/components/admin/AdminShell";
+import { AdminI18nProvider, useAdminI18n } from "@/components/admin/AdminI18nProvider";
 import { DashboardSection } from "@/components/admin/DashboardSection";
 import { BrandingSection } from "@/components/admin/BrandingSection";
 import { CompaniesSection } from "@/components/admin/CompaniesSection";
@@ -11,6 +11,7 @@ import { VisitorCardsSection } from "@/components/admin/VisitorCardsSection";
 import { SystemSection } from "@/components/admin/SystemSection";
 import { Toast } from "@/components/admin/ui";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
+import { useState, useEffect, useCallback } from "react";
 
 const DEFAULT_SETTINGS: KioskSettings = {
   brandName: "YOBELL",
@@ -76,6 +77,15 @@ async function safeJson<T>(res: Response, fallback: T): Promise<T> {
 }
 
 export default function AdminPage() {
+  return (
+    <AdminI18nProvider>
+      <AdminPageContent />
+    </AdminI18nProvider>
+  );
+}
+
+function AdminPageContent() {
+  const { t } = useAdminI18n();
   const [section, setSection] = useState<AdminSection>("dashboard");
   const [dashboard, setDashboard] = useState<typeof DEFAULT_DASHBOARD | null>(null);
   const [companies, setCompanies] = useState<
@@ -149,11 +159,11 @@ export default function AdminPage() {
     });
     const updated = await safeJson(res, null as KioskSettings | null);
     if (!res.ok || !updated || "error" in (updated as object)) {
-      showMessage("保存に失敗しました", "error");
+      showMessage(t("msg_saveFailed"), "error");
       return;
     }
     setSettings({ ...DEFAULT_SETTINGS, ...updated });
-    showMessage("ブランディング設定を保存しました");
+    showMessage(t("msg_brandingSaved"));
   }
 
   async function saveCards(updated: VisitorCardRecord[]) {
@@ -164,7 +174,7 @@ export default function AdminPage() {
     });
     const saved = await safeJson(res, [] as VisitorCardRecord[]);
     if (!res.ok || !Array.isArray(saved)) {
-      showMessage("保存に失敗しました", "error");
+      showMessage(t("msg_saveFailed"), "error");
       return;
     }
     setCards(saved);
@@ -176,9 +186,7 @@ export default function AdminPage() {
     <AdminShell section={section} onSectionChange={setSection}>
       <Toast message={message} type={messageType} />
 
-      {section === "dashboard" && (
-        <DashboardSection data={dashboard} />
-      )}
+      {section === "dashboard" && <DashboardSection data={dashboard} />}
       {section === "branding" && (
         <BrandingSection settings={settings} cards={cards} onSave={saveSettings} />
       )}
