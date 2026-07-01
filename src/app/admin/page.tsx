@@ -30,11 +30,78 @@ const DEFAULT_SETTINGS: KioskSettings = {
   retentionDays: 30,
 };
 
+const DEFAULT_DASHBOARD = {
+  stats: {
+    todayVisits: 0,
+    pending: 0,
+    responded: 0,
+    staffCount: 0,
+    companyCount: 0,
+  },
+  latestVisits: [] as Array<{
+    id: string;
+    visitorName: string;
+    visitorCompany: string | null;
+    visitorType: string;
+    status: string;
+    createdAt: string;
+    hostStaff: { name: string };
+  }>,
+  kioskStatus: {
+    online: false,
+    database: "disconnected",
+    camera: "browser camera",
+    company: "—",
+  },
+};
+
+async function safeJson<T>(res: Response, fallback: T): Promise<T> {
+  try {
+    const text = await res.text();
+    if (!text.trim()) {
+      if (!res.ok) {
+        console.error(`[admin] Empty response from ${res.url} (status ${res.status})`);
+      }
+      return fallback;
+    }
+    const parsed = JSON.parse(text) as T;
+    if (!res.ok) {
+      console.error(`[admin] Error response from ${res.url}:`, parsed);
+    }
+    return parsed;
+  } catch (error) {
+    console.error(`[admin] Failed to parse JSON from ${res.url}:`, error);
+    return fallback;
+  }
+}
+
 export default function AdminPage() {
   const [section, setSection] = useState<AdminSection>("dashboard");
-  const [dashboard, setDashboard] = useState<unknown>(null);
-  const [companies, setCompanies] = useState([]);
-  const [staff, setStaff] = useState([]);
+  const [dashboard, setDashboard] = useState<typeof DEFAULT_DASHBOARD | null>(null);
+  const [companies, setCompanies] = useState<
+    Array<{
+      id: string;
+      name: string;
+      logoUrl: string | null;
+      welcomeMessage: string | null;
+      active: boolean;
+      _count: { staff: number };
+    }>
+  >([]);
+  const [staff, setStaff] = useState<
+    Array<{
+      id: string;
+      name: string;
+      department: string;
+      role: string;
+      email: string | null;
+      phone: string | null;
+      notificationMethod: string;
+      active: boolean;
+      companyId: string;
+      company: { name: string };
+    }>
+  >([]);
   const [settings, setSettings] = useState<KioskSettings>(DEFAULT_SETTINGS);
   const [cards, setCards] = useState<VisitorCardRecord[]>([]);
   const [message, setMessage] = useState("");
@@ -54,12 +121,20 @@ export default function AdminPage() {
       fetch("/api/settings"),
       fetch("/api/visitor-cards"),
     ]);
-    setDashboard(await dashRes.json());
-    setCompanies(await compRes.json());
-    setStaff(await staffRes.json());
-    const s = await settingsRes.json();
-    setSettings({ ...DEFAULT_SETTINGS, ...s });
-    setCards(await cardsRes.json());
+
+    const [dash, comps, staffList, settingsData, cardsList] = await Promise.all([
+      safeJson(dashRes, DEFAULT_DASHBOARD),
+      safeJson(compRes, [] as typeof companies),
+      safeJson(staffRes, [] as typeof staff),
+      safeJson(settingsRes, DEFAULT_SETTINGS),
+      safeJson(cardsRes, [] as VisitorCardRecord[]),
+    ]);
+
+    setDashboard(dash);
+    setCompanies(Array.isArray(comps) ? comps : []);
+    setStaff(Array.isArray(staffList) ? staffList : []);
+    setSettings({ ...DEFAULT_SETTINGS, ...settingsData });
+    setCards(Array.isArray(cardsList) ? cardsList : []);
   }, []);
 
   useEffect(() => {
@@ -72,11 +147,11 @@ export default function AdminPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    if (!res.ok) {
+    const updated = await safeJson(res, null as KioskSettings | null);
+    if (!res.ok || !updated || "error" in (updated as object)) {
       showMessage("保存に失敗しました", "error");
       return;
     }
-    const updated = await res.json();
     setSettings({ ...DEFAULT_SETTINGS, ...updated });
     showMessage("ブランディング設定を保存しました");
   }
@@ -87,24 +162,22 @@ export default function AdminPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updated),
     });
-    if (!res.ok) {
+    const saved = await safeJson(res, [] as VisitorCardRecord[]);
+    if (!res.ok || !Array.isArray(saved)) {
       showMessage("保存に失敗しました", "error");
       return;
     }
-    setCards(await res.json());
+    setCards(saved);
   }
 
-  const dbStatus =
-  dashboard && typeof dashboard === "object" && "kioskStatus" in dashboard
-    ? (dashboard as { kioskStatus: { database: string } }).kioskStatus.database
-    : "unknown";
+  const dbStatus = dashboard?.kioskStatus?.database ?? "unknown";
 
   return (
     <AdminShell section={section} onSectionChange={setSection}>
       <Toast message={message} type={messageType} />
 
       {section === "dashboard" && (
-        <DashboardSection data={dashboard as Parameters<typeof DashboardSection>[0]["data"]} />
+        <DashboardSection data={dashboard} />
       )}
       {section === "branding" && (
         <BrandingSection settings={settings} cards={cards} onSave={saveSettings} />
