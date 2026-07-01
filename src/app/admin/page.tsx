@@ -10,6 +10,7 @@ import { VisitsSection } from "@/components/admin/VisitsSection";
 import { VisitorCardsSection } from "@/components/admin/VisitorCardsSection";
 import { SystemSection } from "@/components/admin/SystemSection";
 import { Toast } from "@/components/admin/ui";
+import { PasswordGate } from "@/components/PasswordGate";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
 import { useState, useEffect, useCallback } from "react";
 
@@ -78,9 +79,11 @@ async function safeJson<T>(res: Response, fallback: T): Promise<T> {
 
 export default function AdminPage() {
   return (
-    <AdminI18nProvider>
-      <AdminPageContent />
-    </AdminI18nProvider>
+    <PasswordGate role="admin">
+      <AdminI18nProvider>
+        <AdminPageContent />
+      </AdminI18nProvider>
+    </PasswordGate>
   );
 }
 

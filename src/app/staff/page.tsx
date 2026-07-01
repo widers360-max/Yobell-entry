@@ -2,6 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
+import { PasswordGate } from "@/components/PasswordGate";
+import { clearUnlock } from "@/lib/auth-session";
+import { t } from "@/lib/i18n";
 
 interface Visit {
   id: string;
@@ -40,8 +45,22 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export default function StaffPage() {
+  return (
+    <PasswordGate role="staff">
+      <StaffPageContent />
+    </PasswordGate>
+  );
+}
+
+function StaffPageContent() {
+  const router = useRouter();
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
+
+  function handleLogout() {
+    clearUnlock("staff");
+    router.push("/");
+  }
 
   const fetchVisits = useCallback(async () => {
     try {
@@ -97,6 +116,14 @@ export default function StaffPage() {
             <Link href="/admin" className="admin-btn-secondary">
               管理画面
             </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="admin-btn-secondary flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              {t("ja", "auth_logout")}
+            </button>
           </div>
         </div>
       </header>
