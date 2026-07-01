@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { LanguageToggle } from "./LanguageToggle";
+import { KioskTopBar } from "./KioskTopBar";
 import type { Language } from "@/lib/types";
 
 interface KioskLayoutProps {
@@ -25,6 +26,7 @@ export function KioskLayout({
 }: KioskLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-white via-[var(--yobell-cream)] to-white">
+      <KioskTopBar language={language} />
       <header className="flex items-center justify-between px-8 py-5">
         <div className="flex items-center gap-4">
           {logoUrl ? (

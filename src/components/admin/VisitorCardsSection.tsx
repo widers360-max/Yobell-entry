@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Save, ChevronUp, ChevronDown } from "lucide-react";
 import { ICON_OPTIONS, getIcon } from "@/lib/icon-utils";
 import { AdminCard, AdminInput, AdminSelect, Btn, Badge } from "./ui";
+import { useAdminI18n } from "./AdminI18nProvider";
 import type { VisitorCardRecord } from "@/lib/types";
 
 export function VisitorCardsSection({
@@ -15,6 +16,7 @@ export function VisitorCardsSection({
   onSave: (cards: VisitorCardRecord[]) => Promise<void>;
   onMessage: (msg: string, type?: "success" | "error") => void;
 }) {
+  const { t } = useAdminI18n();
   const [form, setForm] = useState(cards);
   const [saving, setSaving] = useState(false);
 
@@ -43,24 +45,22 @@ export function VisitorCardsSection({
     const withOrder = form.map((c, i) => ({ ...c, sortOrder: i }));
     await onSave(withOrder);
     setSaving(false);
-    onMessage("用件カードを保存しました");
+    onMessage(t("msg_cardsSaved"));
   }
 
   const sorted = [...form].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <AdminCard
-      title="来訪用件カード設定"
+      title={t("cards_title")}
       action={
         <Btn onClick={handleSave} disabled={saving} size="sm">
           <Save className="h-4 w-4" />
-          {saving ? "保存中..." : "一括保存"}
+          {saving ? t("saving") : t("saveAll")}
         </Btn>
       }
     >
-      <p className="mb-6 text-sm text-slate-500">
-        キオスクホーム画面に表示される7枚のカードを編集できます。非アクティブにすると非表示になります。
-      </p>
+      <p className="mb-6 text-sm text-slate-500">{t("cards_desc")}</p>
       <div className="space-y-4">
         {sorted.map((card, index) => {
           const Icon = getIcon(card.iconKey);
@@ -74,22 +74,24 @@ export function VisitorCardsSection({
               </div>
               <div className="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <AdminInput
-                  label="タイトル"
+                  label={t("field_title")}
                   value={card.title}
                   onChange={(e) => updateCard(card.id, { title: e.target.value })}
                 />
                 <AdminInput
-                  label="サブタイトル"
+                  label={t("field_subtitle")}
                   value={card.subtitle}
                   onChange={(e) => updateCard(card.id, { subtitle: e.target.value })}
                 />
                 <AdminSelect
-                  label="アイコン"
+                  label={t("field_icon")}
                   value={card.iconKey}
                   onChange={(e) => updateCard(card.id, { iconKey: e.target.value })}
                 >
                   {ICON_OPTIONS.map((k) => (
-                    <option key={k} value={k}>{k}</option>
+                    <option key={k} value={k}>
+                      {k}
+                    </option>
                   ))}
                 </AdminSelect>
                 <div className="flex items-end gap-3 pb-1">
@@ -100,18 +102,28 @@ export function VisitorCardsSection({
                       onChange={(e) => updateCard(card.id, { active: e.target.checked })}
                       className="h-4 w-4 rounded"
                     />
-                    表示
+                    {t("show")}
                   </label>
                   <Badge color={card.active ? "green" : "gray"}>
-                    {card.active ? "有効" : "無効"}
+                    {card.active ? t("active") : t("inactive")}
                   </Badge>
                 </div>
               </div>
               <div className="flex flex-col gap-1">
-                <Btn variant="ghost" size="sm" onClick={() => moveCard(index, -1)} disabled={index === 0}>
+                <Btn
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => moveCard(index, -1)}
+                  disabled={index === 0}
+                >
                   <ChevronUp className="h-4 w-4" />
                 </Btn>
-                <Btn variant="ghost" size="sm" onClick={() => moveCard(index, 1)} disabled={index === sorted.length - 1}>
+                <Btn
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => moveCard(index, 1)}
+                  disabled={index === sorted.length - 1}
+                >
                   <ChevronDown className="h-4 w-4" />
                 </Btn>
               </div>

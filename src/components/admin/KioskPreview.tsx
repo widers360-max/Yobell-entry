@@ -1,6 +1,8 @@
 "use client";
 
 import { getIcon } from "@/lib/icon-utils";
+import { getLangDisplay } from "@/lib/admin-i18n";
+import { useAdminI18n } from "./AdminI18nProvider";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
 
 export function KioskPreview({
@@ -10,6 +12,7 @@ export function KioskPreview({
   settings: Partial<KioskSettings>;
   cards: VisitorCardRecord[];
 }) {
+  const { lang, t } = useAdminI18n();
   const primary = settings.primaryColor ?? "#1a2b4b";
   const accent = settings.accentColor ?? "#c9a227";
   const activeCards = cards.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
@@ -22,10 +25,9 @@ export function KioskPreview({
       style={{ "--preview-primary": primary, "--preview-accent": accent } as React.CSSProperties}
     >
       <div className="bg-slate-100 px-3 py-2 text-center text-xs font-medium text-slate-500">
-        ライブプレビュー
+        {t("branding_preview")}
       </div>
       <div className="flex flex-col bg-white" style={{ minHeight: 480 }}>
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             {settings.logoUrl ? (
@@ -42,33 +44,38 @@ export function KioskPreview({
               {settings.brandName ?? "YOBELL"}
             </span>
           </div>
-          <div className="rounded-full border px-3 py-1 text-xs text-slate-500">日本語 ▾</div>
+          <div className="rounded-full border px-3 py-1 text-xs text-slate-500">
+            {getLangDisplay(lang)} ▾
+          </div>
         </div>
 
-        {/* Hero */}
         <div className="relative mx-4 h-28 overflow-hidden rounded-xl">
           {settings.heroVideoUrl ? (
-            <div className="absolute inset-0 bg-slate-800 flex items-center justify-center text-xs text-white/60">▶ 動画</div>
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-800 text-xs text-white/60">
+              {t("preview_video")}
+            </div>
           ) : settings.heroImageUrl ? (
             <img src={settings.heroImageUrl} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${primary}, #2a4570)` }} />
+            <div
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(135deg, ${primary}, #2a4570)` }}
+            />
           )}
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
           <div className="absolute bottom-3 left-3 right-3">
-            <p className="text-xs font-bold text-white leading-tight">
+            <p className="text-xs font-bold leading-tight text-white">
               {settings.heroTitle ?? "ようこそ、株式会社YOBELLへ"}
             </p>
-            <p className="text-[10px] text-white/80 mt-0.5">
+            <p className="mt-0.5 text-[10px] text-white/80">
               {settings.heroSubtitle ?? "快適なオフィス環境を、すべての人に。"}
             </p>
           </div>
         </div>
 
-        {/* Cards */}
         <div className="flex-1 px-4 py-3">
           <p className="mb-2 text-center text-xs font-bold" style={{ color: primary }}>
-            ご用件をお選びください
+            {t("preview_selectPurpose")}
           </p>
           <div className="grid grid-cols-3 gap-1.5">
             {mainCards.map((card) => {
@@ -79,10 +86,15 @@ export function KioskPreview({
                   className="flex flex-col items-center gap-1 rounded-lg border border-slate-100 bg-white p-2 shadow-sm"
                 >
                   <Icon className="h-4 w-4" style={{ color: primary }} strokeWidth={1.75} />
-                  <span className="text-[9px] font-bold text-center leading-tight" style={{ color: primary }}>
+                  <span
+                    className="text-center text-[9px] font-bold leading-tight"
+                    style={{ color: primary }}
+                  >
                     {card.title}
                   </span>
-                  <span className="text-[7px] text-slate-400 text-center leading-tight">{card.subtitle}</span>
+                  <span className="text-center text-[7px] leading-tight text-slate-400">
+                    {card.subtitle}
+                  </span>
                 </div>
               );
             })}
@@ -90,14 +102,18 @@ export function KioskPreview({
           {otherCard && (
             <div className="mt-1.5 flex justify-center">
               <div className="w-1/3 rounded-lg border border-slate-100 bg-white p-2 text-center shadow-sm">
-                <span className="text-[9px] font-bold" style={{ color: primary }}>{otherCard.title}</span>
+                <span className="text-[9px] font-bold" style={{ color: primary }}>
+                  {otherCard.title}
+                </span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="border-t px-4 py-2 text-center text-[8px] text-white" style={{ background: primary }}>
+        <div
+          className="border-t px-4 py-2 text-center text-[8px] text-white"
+          style={{ background: primary }}
+        >
           © {settings.companyDisplayName ?? "YOBELL Co., Ltd."}
         </div>
       </div>

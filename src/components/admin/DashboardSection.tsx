@@ -1,6 +1,8 @@
 "use client";
 
-import { AdminCard, StatCard, Badge, formatDate, STATUS_LABELS } from "./ui";
+import { AdminCard, StatCard, Badge, formatDate } from "./ui";
+import { useAdminI18n } from "./AdminI18nProvider";
+import { getStatusLabel } from "@/lib/admin-i18n";
 
 interface DashboardData {
   stats: {
@@ -28,8 +30,10 @@ interface DashboardData {
 }
 
 export function DashboardSection({ data }: { data: DashboardData | null }) {
+  const { lang, t } = useAdminI18n();
+
   if (!data) {
-    return <p className="text-slate-500">読み込み中...</p>;
+    return <p className="text-slate-500">{t("loading")}</p>;
   }
 
   const { stats, latestVisits, kioskStatus } = data;
@@ -37,45 +41,57 @@ export function DashboardSection({ data }: { data: DashboardData | null }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="今日の来訪数" value={stats.todayVisits} accent="navy" />
-        <StatCard label="未対応" value={stats.pending} accent="amber" />
-        <StatCard label="対応済み" value={stats.responded} accent="green" />
-        <StatCard label="登録スタッフ数" value={stats.staffCount} accent="blue" />
+        <StatCard label={t("dash_todayVisits")} value={stats.todayVisits} accent="navy" />
+        <StatCard label={t("dash_pending")} value={stats.pending} accent="amber" />
+        <StatCard label={t("dash_responded")} value={stats.responded} accent="green" />
+        <StatCard label={t("dash_staffCount")} value={stats.staffCount} accent="blue" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <AdminCard title="キオスクステータス" className="lg:col-span-1">
+        <AdminCard title={t("dash_kioskStatus")} className="lg:col-span-1">
           <dl className="space-y-3 text-sm">
-            <StatusRow label="オンライン" value={kioskStatus.online ? "Online" : "Offline"} ok={kioskStatus.online} />
-            <StatusRow label="データベース" value={kioskStatus.database} ok={kioskStatus.database === "connected"} />
-            <StatusRow label="カメラ設定" value={kioskStatus.camera} ok />
-            <StatusRow label="表示会社名" value={kioskStatus.company} ok />
+            <StatusRow
+              label={t("dash_online")}
+              value={kioskStatus.online ? t("dash_online") : t("dash_offline")}
+              ok={kioskStatus.online}
+            />
+            <StatusRow
+              label={t("dash_database")}
+              value={kioskStatus.database}
+              ok={kioskStatus.database === "connected"}
+            />
+            <StatusRow label={t("dash_camera")} value={kioskStatus.camera} ok />
+            <StatusRow label={t("dash_company")} value={kioskStatus.company} ok />
           </dl>
         </AdminCard>
 
-        <AdminCard title="最新の来訪（10件）" className="lg:col-span-2">
+        <AdminCard title={t("dash_latestVisits")} className="lg:col-span-2">
           {latestVisits.length === 0 ? (
-            <p className="py-8 text-center text-sm text-slate-400">来訪記録はまだありません</p>
+            <p className="py-8 text-center text-sm text-slate-400">{t("dash_noVisits")}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 text-left text-slate-500">
-                    <th className="pb-3 pr-4 font-medium">日時</th>
-                    <th className="pb-3 pr-4 font-medium">来訪者</th>
-                    <th className="pb-3 pr-4 font-medium">担当者</th>
-                    <th className="pb-3 font-medium">状態</th>
+                    <th className="pb-3 pr-4 font-medium">{t("col_datetime")}</th>
+                    <th className="pb-3 pr-4 font-medium">{t("col_visitor")}</th>
+                    <th className="pb-3 pr-4 font-medium">{t("col_host")}</th>
+                    <th className="pb-3 font-medium">{t("col_status")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {latestVisits.map((v) => {
-                    const st = STATUS_LABELS[v.status] ?? { label: v.status, color: "gray" as const };
+                    const st = getStatusLabel(lang, v.status);
                     return (
                       <tr key={v.id} className="border-b border-slate-50">
-                        <td className="py-3 pr-4 whitespace-nowrap text-slate-500">{formatDate(v.createdAt)}</td>
+                        <td className="py-3 pr-4 whitespace-nowrap text-slate-500">
+                          {formatDate(v.createdAt, lang)}
+                        </td>
                         <td className="py-3 pr-4 font-medium">{v.visitorName}</td>
                         <td className="py-3 pr-4 text-slate-600">{v.hostStaff.name}</td>
-                        <td className="py-3"><Badge color={st.color}>{st.label}</Badge></td>
+                        <td className="py-3">
+                          <Badge color={st.color}>{st.label}</Badge>
+                        </td>
                       </tr>
                     );
                   })}
