@@ -24,7 +24,7 @@ export function KioskLayout({
   logoUrl,
 }: KioskLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 via-white to-teal-50/30">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-white via-[var(--yobell-cream)] to-white">
       <header className="flex items-center justify-between px-8 py-5">
         <div className="flex items-center gap-4">
           {logoUrl ? (
@@ -34,12 +34,12 @@ export function KioskLayout({
               className="h-14 w-auto object-contain"
             />
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--yobell-primary)] text-2xl font-black text-white shadow-lg">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--yobell-navy)] text-2xl font-black text-[var(--yobell-gold)] shadow-lg">
               Y
             </div>
           )}
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-[var(--yobell-primary)]">
+            <h1 className="text-2xl font-black tracking-tight text-[var(--yobell-navy)]">
               {brandName}
             </h1>
             {tagline && (

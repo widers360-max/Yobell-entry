@@ -44,13 +44,20 @@ interface Settings {
   retentionDays: number;
   privacyNotice: string;
   fallbackMessage: string;
+  heroImageUrl: string | null;
+  heroVideoUrl: string | null;
+  companyDisplayName: string;
+  heroTitle: string;
+  heroSubtitle: string;
 }
 
 const VISITOR_TYPE_LABELS: Record<string, string> = {
   meeting: "打ち合わせ",
-  delivery: "配達",
-  interview: "面接",
+  delivery: "配達・宅配",
+  interview: "面接・面談",
   maintenance: "工事・点検",
+  reception: "ご案内・受付",
+  tour: "会社見学",
   other: "その他",
 };
 
@@ -535,8 +542,13 @@ function SettingsTab({
 
   const fields: { key: keyof Settings; label: string; type?: string }[] = [
     { key: "brandName", label: "ブランド名" },
+    { key: "companyDisplayName", label: "会社表示名" },
     { key: "tagline", label: "タグライン" },
     { key: "welcomeMessage", label: "ウェルカムメッセージ" },
+    { key: "heroTitle", label: "ヒーロータイトル" },
+    { key: "heroSubtitle", label: "ヒーローサブタイトル" },
+    { key: "heroImageUrl", label: "ヒーロー画像URL" },
+    { key: "heroVideoUrl", label: "ヒーロー動画URL" },
     { key: "logoUrl", label: "ロゴURL" },
     { key: "languageDefault", label: "デフォルト言語 (ja/en/ko)" },
     { key: "retentionDays", label: "ログ保持日数", type: "number" },
@@ -553,7 +565,9 @@ function SettingsTab({
             <label className="mb-1 block text-sm font-medium text-gray-600">
               {f.label}
             </label>
-            {f.key === "privacyNotice" || f.key === "fallbackMessage" ? (
+            {f.key === "privacyNotice" ||
+            f.key === "fallbackMessage" ||
+            f.key === "heroSubtitle" ? (
               <textarea
                 value={String(form[f.key] ?? "")}
                 onChange={(e) =>

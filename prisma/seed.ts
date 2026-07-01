@@ -109,6 +109,11 @@ async function main() {
       brandName: "YOBELL",
       tagline: "内線電話のないオフィス受付",
       welcomeMessage: "ご来社ありがとうございます",
+      companyDisplayName: "YOBELL Co., Ltd.",
+      heroTitle: "ようこそ、株式会社YOBELLへ",
+      heroSubtitle: "快適なオフィス環境を、すべての人に。",
+      heroImageUrl: null,
+      heroVideoUrl: null,
     },
   });
 

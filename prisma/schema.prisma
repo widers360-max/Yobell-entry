@@ -50,13 +50,18 @@ model Visit {
 }
 
 model KioskSetting {
-  id              String @id @default("default")
-  languageDefault String @default("ja")
-  retentionDays   Int    @default(30)
-  privacyNotice   String @default("入力された情報は受付対応および来訪記録のために利用されます。")
-  fallbackMessage String @default("担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。")
-  brandName       String @default("YOBELL")
-  tagline         String @default("内線電話のないオフィス受付")
-  logoUrl         String?
-  welcomeMessage  String @default("ご来社ありがとうございます")
+  id                 String  @id @default("default")
+  languageDefault    String  @default("ja")
+  retentionDays      Int     @default(30)
+  privacyNotice      String  @default("入力された情報は受付対応および来訪記録のために利用されます。")
+  fallbackMessage    String  @default("担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。")
+  brandName          String  @default("YOBELL")
+  tagline            String  @default("内線電話のないオフィス受付")
+  logoUrl            String?
+  welcomeMessage     String  @default("ご来社ありがとうございます")
+  heroImageUrl       String?
+  heroVideoUrl       String?
+  companyDisplayName String  @default("株式会社YOBELL")
+  heroTitle          String  @default("ようこそ、株式会社YOBELLへ")
+  heroSubtitle       String  @default("快適なオフィス環境を、すべての人に。")
 }

@@ -3,11 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --yobell-primary: #1e3a5f;
-  --yobell-primary-light: #2d5a8e;
-  --yobell-accent: #00b4a0;
-  --yobell-accent-hover: #009688;
-  --yobell-surface: #f8fafc;
+  --yobell-navy: #1a2b4b;
+  --yobell-navy-light: #2a4570;
+  --yobell-gold: #c9a227;
+  --yobell-gold-light: #e8c84a;
+  --yobell-primary: #1a2b4b;
+  --yobell-primary-light: #2a4570;
+  --yobell-accent: #c9a227;
+  --yobell-accent-hover: #b08d1f;
+  --yobell-cream: #fdf8f3;
+  --yobell-surface: #ffffff;
   --yobell-card: #ffffff;
   --yobell-text: #1a2332;
   --yobell-muted: #64748b;
@@ -34,6 +39,14 @@ body {
   overflow-x: hidden;
 }
 
+/* Portrait kiosk optimization (1080×1920) */
+@media (orientation: portrait) {
+  .kiosk-portrait {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+}
+
 @layer components {
   .kiosk-btn {
     @apply flex items-center justify-center rounded-2xl font-bold transition-all duration-200 active:scale-[0.97] select-none;
@@ -44,12 +57,12 @@ body {
 
   .kiosk-btn-primary {
     @apply kiosk-btn text-white shadow-lg;
-    background: linear-gradient(135deg, var(--yobell-accent), #00897b);
+    background: linear-gradient(135deg, var(--yobell-navy), var(--yobell-navy-light));
   }
 
   .kiosk-btn-primary:hover {
-    background: linear-gradient(135deg, var(--yobell-accent-hover), #00796b);
-    box-shadow: 0 8px 25px rgba(0, 180, 160, 0.35);
+    background: linear-gradient(135deg, #152238, var(--yobell-navy));
+    box-shadow: 0 8px 25px rgba(26, 43, 75, 0.35);
   }
 
   .kiosk-btn-secondary {
@@ -59,8 +72,8 @@ body {
   }
 
   .kiosk-btn-secondary:hover {
-    border-color: var(--yobell-accent);
-    background: #f0fdfa;
+    border-color: var(--yobell-gold);
+    background: var(--yobell-cream);
   }
 
   .kiosk-card {
@@ -73,8 +86,8 @@ body {
   }
 
   .kiosk-card-interactive:hover {
-    border-color: var(--yobell-accent);
-    box-shadow: 0 8px 30px rgba(0, 180, 160, 0.15);
+    border-color: var(--yobell-gold);
+    box-shadow: 0 8px 30px rgba(26, 43, 75, 0.12);
   }
 
   .kiosk-input {
@@ -84,17 +97,17 @@ body {
   }
 
   .kiosk-input:focus {
-    border-color: var(--yobell-accent);
-    box-shadow: 0 0 0 3px rgba(0, 180, 160, 0.15);
+    border-color: var(--yobell-gold);
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.15);
   }
 
   .kiosk-heading {
     @apply font-bold tracking-tight;
-    color: var(--yobell-primary);
+    color: var(--yobell-navy);
   }
 
   .admin-input {
-    @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-teal-500;
+    @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-amber-500;
     border-color: var(--yobell-border);
   }
 
@@ -103,7 +116,7 @@ body {
   }
 
   .admin-btn-primary {
-    @apply admin-btn bg-teal-600 text-white hover:bg-teal-700;
+    @apply admin-btn bg-[var(--yobell-navy)] text-white hover:opacity-90;
   }
 
   .admin-btn-danger {

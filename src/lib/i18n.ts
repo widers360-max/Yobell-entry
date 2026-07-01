@@ -9,7 +9,21 @@ type TranslationKey =
   | "visitorType_delivery"
   | "visitorType_interview"
   | "visitorType_maintenance"
+  | "visitorType_reception"
+  | "visitorType_tour"
   | "visitorType_other"
+  | "purpose_meeting"
+  | "purpose_delivery"
+  | "purpose_interview"
+  | "purpose_maintenance"
+  | "purpose_reception"
+  | "purpose_tour"
+  | "purpose_other"
+  | "footerPreregister"
+  | "footerPreregisterSub"
+  | "footerHelp"
+  | "footerHelpSub"
+  | "smartReception"
   | "selectHost"
   | "searchPlaceholder"
   | "noResults"
@@ -55,10 +69,24 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     startReception: "受付を開始する",
     selectVisitorType: "ご用件をお選びください",
     visitorType_meeting: "打ち合わせ",
-    visitorType_delivery: "配達",
-    visitorType_interview: "面接",
+    visitorType_delivery: "配達・宅配",
+    visitorType_interview: "面接・面談",
     visitorType_maintenance: "工事・点検",
+    visitorType_reception: "ご案内・受付",
+    visitorType_tour: "会社見学",
     visitorType_other: "その他",
+    purpose_meeting: "担当者との打ち合わせ",
+    purpose_delivery: "荷物のお預かり・お届け",
+    purpose_interview: "採用面接・各種面談",
+    purpose_maintenance: "業者様はこちら",
+    purpose_reception: "総合案内・受付",
+    purpose_tour: "見学希望の方はこちら",
+    purpose_other: "上記以外のご用件",
+    footerPreregister: "事前登録はこちら",
+    footerPreregisterSub: "スムーズにご案内できます",
+    footerHelp: "お困りの方はスタッフまで",
+    footerHelpSub: "内線 100 または受付までお声がけください",
+    smartReception: "SMART RECEPTION",
     selectHost: "担当者をお選びください",
     searchPlaceholder: "名前・部署・会社名で検索",
     noResults: "該当する担当者が見つかりません",
@@ -73,7 +101,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     next: "次へ",
     back: "戻る",
     photoCapture: "写真撮影",
-    photoInstruction: "セキュリティのため、来訪記録用の写真を撮影できます（任意）",
+    photoInstruction:
+      "セキュリティのため、来訪記録用の写真を撮影できます（任意）",
     takePhoto: "写真を撮影する",
     skipPhoto: "写真なしで進む",
     retakePhoto: "撮り直す",
@@ -89,8 +118,10 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     waitingPending: "担当者を呼び出しています。少々お待ちください。",
     waitingAccepted: "担当者がお迎えに向かっています。少々お待ちください。",
     waitingPleaseWait: "担当者より「少々お待ちください」との返答がありました。",
-    waitingDeclined: "本日は対応できないとのことです。お手数ですがお電話でご連絡ください。",
-    waitingNoResponse: "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
+    waitingDeclined:
+      "本日は対応できないとのことです。お手数ですがお電話でご連絡ください。",
+    waitingNoResponse:
+      "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
     waitingFallback:
       "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
     returnHome: "トップに戻る",
@@ -107,8 +138,22 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     visitorType_meeting: "Meeting",
     visitorType_delivery: "Delivery",
     visitorType_interview: "Interview",
-    visitorType_maintenance: "Maintenance / Inspection",
+    visitorType_maintenance: "Maintenance",
+    visitorType_reception: "Reception",
+    visitorType_tour: "Company Tour",
     visitorType_other: "Other",
+    purpose_meeting: "Meeting with staff",
+    purpose_delivery: "Package drop-off / pickup",
+    purpose_interview: "Job interview / consultation",
+    purpose_maintenance: "Contractors & vendors",
+    purpose_reception: "General information",
+    purpose_tour: "Company tour visitors",
+    purpose_other: "Other inquiries",
+    footerPreregister: "Pre-register here",
+    footerPreregisterSub: "Faster check-in experience",
+    footerHelp: "Need assistance?",
+    footerHelpSub: "Extension 100 or speak to reception",
+    smartReception: "SMART RECEPTION",
     selectHost: "Please select your host",
     searchPlaceholder: "Search by name, department, or company",
     noResults: "No staff members found",
@@ -158,10 +203,24 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     startReception: "접수 시작",
     selectVisitorType: "방문 목적을 선택해 주세요",
     visitorType_meeting: "미팅",
-    visitorType_delivery: "배달",
-    visitorType_interview: "면접",
+    visitorType_delivery: "배달·택배",
+    visitorType_interview: "면접·면담",
     visitorType_maintenance: "공사·점검",
+    visitorType_reception: "안내·접수",
+    visitorType_tour: "회사 견학",
     visitorType_other: "기타",
+    purpose_meeting: "담당자와의 미팅",
+    purpose_delivery: "물품 보관·배달",
+    purpose_interview: "채용 면접·각종 면담",
+    purpose_maintenance: "협력업체 방문",
+    purpose_reception: "종합 안내·접수",
+    purpose_tour: "견학 희망자",
+    purpose_other: "기타 문의",
+    footerPreregister: "사전 등록",
+    footerPreregisterSub: "원활한 안내가 가능합니다",
+    footerHelp: "도움이 필요하신 분",
+    footerHelpSub: "내선 100 또는 접수대로 문의해 주세요",
+    smartReception: "SMART RECEPTION",
     selectHost: "담당자를 선택해 주세요",
     searchPlaceholder: "이름·부서·회사명으로 검색",
     noResults: "해당 담당자를 찾을 수 없습니다",
@@ -211,17 +270,18 @@ export function t(lang: Language, key: TranslationKey): string {
   return translations[lang][key] ?? translations.ja[key];
 }
 
-export function visitorTypeLabel(
-  lang: Language,
-  type: VisitorType
-): string {
+export function visitorTypeLabel(lang: Language, type: VisitorType): string {
   return t(lang, `visitorType_${type}` as TranslationKey);
 }
 
-export function waitingMessage(
+export function purposeSubtitle(
   lang: Language,
-  status: string
+  subtitleKey: string
 ): string {
+  return t(lang, subtitleKey as TranslationKey);
+}
+
+export function waitingMessage(lang: Language, status: string): string {
   const map: Record<string, TranslationKey> = {
     pending: "waitingPending",
     accepted: "waitingAccepted",
