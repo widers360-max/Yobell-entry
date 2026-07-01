@@ -26,6 +26,13 @@ type TranslationKey =
   | "smartReception"
   | "nav_admin"
   | "nav_staff"
+  | "auth_adminTitle"
+  | "auth_staffTitle"
+  | "auth_passwordLabel"
+  | "auth_confirm"
+  | "auth_cancel"
+  | "auth_invalidPassword"
+  | "auth_logout"
   | "selectHost"
   | "searchPlaceholder"
   | "noResults"
@@ -91,6 +98,13 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     smartReception: "SMART RECEPTION",
     nav_admin: "管理",
     nav_staff: "スタッフ",
+    auth_adminTitle: "管理者パスワード",
+    auth_staffTitle: "スタッフパスワード",
+    auth_passwordLabel: "パスワード",
+    auth_confirm: "確認",
+    auth_cancel: "キャンセル",
+    auth_invalidPassword: "パスワードが正しくありません",
+    auth_logout: "ログアウト",
     selectHost: "担当者をお選びください",
     searchPlaceholder: "名前・部署・会社名で検索",
     noResults: "該当する担当者が見つかりません",
@@ -160,6 +174,13 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     smartReception: "SMART RECEPTION",
     nav_admin: "Admin",
     nav_staff: "Staff",
+    auth_adminTitle: "Admin Password",
+    auth_staffTitle: "Staff Password",
+    auth_passwordLabel: "Password",
+    auth_confirm: "Confirm",
+    auth_cancel: "Cancel",
+    auth_invalidPassword: "Incorrect password",
+    auth_logout: "Log out",
     selectHost: "Please select your host",
     searchPlaceholder: "Search by name, department, or company",
     noResults: "No staff members found",
@@ -229,6 +250,13 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     smartReception: "SMART RECEPTION",
     nav_admin: "관리",
     nav_staff: "스태프",
+    auth_adminTitle: "관리자 비밀번호",
+    auth_staffTitle: "스태프 비밀번호",
+    auth_passwordLabel: "비밀번호",
+    auth_confirm: "확인",
+    auth_cancel: "취소",
+    auth_invalidPassword: "비밀번호가 올바르지 않습니다",
+    auth_logout: "로그아웃",
     selectHost: "담당자를 선택해 주세요",
     searchPlaceholder: "이름·부서·회사명으로 검색",
     noResults: "해당 담당자를 찾을 수 없습니다",

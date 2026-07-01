@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Palette,
@@ -10,11 +11,13 @@ import {
   Grid3x3,
   Settings,
   ExternalLink,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useAdminI18n } from "./AdminI18nProvider";
 import { ADMIN_NAV_I18N, ADMIN_NAV_KEYS } from "@/lib/admin-i18n";
+import { clearUnlock } from "@/lib/auth-session";
 
 export type AdminSection =
   | "dashboard"
@@ -44,7 +47,13 @@ export function AdminShell({
   onSectionChange: (s: AdminSection) => void;
   children: ReactNode;
 }) {
+  const router = useRouter();
   const { lang, setLang, t } = useAdminI18n();
+
+  function handleLogout() {
+    clearUnlock("admin");
+    router.push("/");
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -59,6 +68,14 @@ export function AdminShell({
           <div className="mt-3 scale-90 origin-left">
             <LanguageToggle language={lang} onChange={setLang} variant="premium" />
           </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="mt-3 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            {t("auth_logout")}
+          </button>
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">

@@ -12,6 +12,7 @@ export type AdminTranslationKey =
   | "link_kiosk"
   | "link_staffNotify"
   | "link_health"
+  | "auth_logout"
   | "loading"
   | "save"
   | "saving"
@@ -165,6 +166,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     link_kiosk: "キオスクを開く",
     link_staffNotify: "スタッフ通知",
     link_health: "ヘルスチェック",
+    auth_logout: "ログアウト",
     loading: "読み込み中...",
     save: "保存",
     saving: "保存中...",
@@ -317,6 +319,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     link_kiosk: "Open Kiosk",
     link_staffNotify: "Staff Notifications",
     link_health: "Health Check",
+    auth_logout: "Log out",
     loading: "Loading...",
     save: "Save",
     saving: "Saving...",
@@ -469,6 +472,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     link_kiosk: "키오스크 열기",
     link_staffNotify: "스태프 알림",
     link_health: "헬스 체크",
+    auth_logout: "로그아웃",
     loading: "불러오는 중...",
     save: "저장",
     saving: "저장 중...",
