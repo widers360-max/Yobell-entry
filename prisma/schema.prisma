@@ -12,6 +12,7 @@ model Company {
   name           String
   logoUrl        String?
   welcomeMessage String?
+  active         Boolean @default(true)
   staff          Staff[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -64,4 +65,16 @@ model KioskSetting {
   companyDisplayName String  @default("株式会社YOBELL")
   heroTitle          String  @default("ようこそ、株式会社YOBELLへ")
   heroSubtitle       String  @default("快適なオフィス環境を、すべての人に。")
+  primaryColor       String  @default("#1a2b4b")
+  accentColor        String  @default("#c9a227")
+}
+
+model VisitorCard {
+  id        String  @id @default(cuid())
+  typeKey   String  @unique
+  title     String
+  subtitle  String
+  iconKey   String  @default("Users")
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
 }

@@ -10,11 +10,13 @@ import {
 } from "lucide-react";
 import type { VisitorType } from "./types";
 
+/** @deprecated Use API visitor cards. Kept for fallback. */
 export interface VisitorPurposeCard {
   type: VisitorType;
   icon: LucideIcon;
   subtitleKey: string;
 }
+
 
 export const VISITOR_PURPOSE_CARDS: VisitorPurposeCard[] = [
   { type: "meeting", icon: Users, subtitleKey: "purpose_meeting" },

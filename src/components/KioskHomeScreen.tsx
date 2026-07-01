@@ -2,18 +2,15 @@
 
 import { Phone, QrCode } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
-import {
-  MAIN_GRID_CARDS,
-  OTHER_CARD,
-  type VisitorPurposeCard,
-} from "@/lib/visitor-cards";
-import { t, visitorTypeLabel, purposeSubtitle } from "@/lib/i18n";
-import type { KioskSettings, Language, VisitorType } from "@/lib/types";
+import { getIcon } from "@/lib/icon-utils";
+import { t } from "@/lib/i18n";
+import type { KioskSettings, Language, VisitorCardRecord, VisitorType } from "@/lib/types";
 
 interface KioskHomeScreenProps {
   language: Language;
   onLanguageChange: (lang: Language) => void;
   settings: KioskSettings;
+  visitorCards: VisitorCardRecord[];
   onSelectPurpose: (type: VisitorType) => void;
 }
 
@@ -21,31 +18,54 @@ export function KioskHomeScreen({
   language,
   onLanguageChange,
   settings,
+  visitorCards,
   onSelectPurpose,
 }: KioskHomeScreenProps) {
-  const heroTitle = settings.heroTitle;
-  const heroSubtitle = settings.heroSubtitle;
-  const brandName = settings.brandName;
+  const primary = settings.primaryColor ?? "#1a2b4b";
+  const accent = settings.accentColor ?? "#c9a227";
+
+  const activeCards = visitorCards
+    .filter((c) => c.active)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+  const mainCards = activeCards.filter((c) => c.typeKey !== "other").slice(0, 6);
+  const otherCard = activeCards.find((c) => c.typeKey === "other");
+
+  const cssVars = {
+    "--yobell-navy": primary,
+    "--yobell-gold": accent,
+    "--yobell-primary": primary,
+    "--yobell-accent": accent,
+  } as React.CSSProperties;
 
   return (
-    <div className="kiosk-portrait flex min-h-screen flex-col bg-white">
-      {/* Header */}
+    <div
+      className="kiosk-portrait flex min-h-screen flex-col bg-white"
+      style={cssVars}
+    >
       <header className="flex shrink-0 items-center justify-between px-8 pb-4 pt-6">
         <div className="flex items-center gap-4">
           {settings.logoUrl ? (
             <img
               src={settings.logoUrl}
-              alt={brandName}
+              alt={settings.brandName}
               className="h-16 w-auto object-contain"
             />
           ) : (
             <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--yobell-navy)] shadow-md">
-                <span className="text-2xl font-black text-[var(--yobell-gold)]">Y</span>
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-xl shadow-md"
+                style={{ background: primary }}
+              >
+                <span className="text-2xl font-black" style={{ color: accent }}>
+                  Y
+                </span>
               </div>
               <div>
-                <p className="text-3xl font-black tracking-tight text-[var(--yobell-navy)]">
-                  {brandName}
+                <p
+                  className="text-3xl font-black tracking-tight"
+                  style={{ color: primary }}
+                >
+                  {settings.brandName}
                 </p>
                 <p className="text-xs font-semibold tracking-[0.2em] text-[var(--yobell-muted)]">
                   {t(language, "smartReception")}
@@ -61,53 +81,59 @@ export function KioskHomeScreen({
         />
       </header>
 
-      {/* Hero */}
       <section className="shrink-0 px-8">
         <HeroMedia
           videoUrl={settings.heroVideoUrl}
           imageUrl={settings.heroImageUrl}
-          title={heroTitle}
-          subtitle={heroSubtitle}
+          title={settings.heroTitle}
+          subtitle={settings.heroSubtitle}
+          primary={primary}
+          accent={accent}
         />
       </section>
 
-      {/* Purpose cards */}
       <section className="flex flex-1 flex-col px-8 pb-4 pt-6">
-        <h2 className="mb-5 text-center text-2xl font-bold text-[var(--yobell-navy)]">
+        <h2
+          className="mb-5 text-center text-2xl font-bold"
+          style={{ color: primary }}
+        >
           {t(language, "selectVisitorType")}
         </h2>
 
         <div className="grid grid-cols-3 gap-4">
-          {MAIN_GRID_CARDS.map((card) => (
+          {mainCards.map((card) => (
             <PurposeCard
-              key={card.type}
+              key={card.id}
               card={card}
-              language={language}
+              primary={primary}
+              accent={accent}
               onSelect={onSelectPurpose}
             />
           ))}
         </div>
 
-        <div className="mt-4 flex justify-center">
-          <div className="w-1/3 min-w-[200px]">
-            <PurposeCard
-              card={OTHER_CARD}
-              language={language}
-              onSelect={onSelectPurpose}
-            />
+        {otherCard && (
+          <div className="mt-4 flex justify-center">
+            <div className="w-1/3 min-w-[200px]">
+              <PurposeCard
+                card={otherCard}
+                primary={primary}
+                accent={accent}
+                onSelect={onSelectPurpose}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
-      {/* Footer */}
       <footer className="shrink-0">
         <div className="flex items-center gap-6 bg-[var(--yobell-cream)] px-8 py-5">
           <div className="flex flex-1 items-center gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-[var(--yobell-border)] bg-white">
-              <QrCode className="h-8 w-8 text-[var(--yobell-navy)]" strokeWidth={1.5} />
+              <QrCode className="h-8 w-8" style={{ color: primary }} strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-lg font-bold text-[var(--yobell-navy)]">
+              <p className="text-lg font-bold" style={{ color: primary }}>
                 {t(language, "footerPreregister")}
               </p>
               <p className="text-sm text-[var(--yobell-muted)]">
@@ -119,11 +145,14 @@ export function KioskHomeScreen({
           <div className="h-14 w-px bg-[var(--yobell-border)]" />
 
           <div className="flex flex-1 items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--yobell-navy)]">
+            <div
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full"
+              style={{ background: primary }}
+            >
               <Phone className="h-6 w-6 text-white" strokeWidth={1.75} />
             </div>
             <div>
-              <p className="text-lg font-bold text-[var(--yobell-navy)]">
+              <p className="text-lg font-bold" style={{ color: primary }}>
                 {t(language, "footerHelp")}
               </p>
               <p className="text-sm text-[var(--yobell-muted)]">
@@ -133,7 +162,10 @@ export function KioskHomeScreen({
           </div>
         </div>
 
-        <div className="bg-[var(--yobell-navy)] py-3 text-center text-sm text-white/80">
+        <div
+          className="py-3 text-center text-sm text-white/80"
+          style={{ background: primary }}
+        >
           © {settings.companyDisplayName}
         </div>
       </footer>
@@ -146,11 +178,15 @@ function HeroMedia({
   imageUrl,
   title,
   subtitle,
+  primary,
+  accent,
 }: {
   videoUrl: string | null;
   imageUrl: string | null;
   title: string;
   subtitle: string;
+  primary: string;
+  accent: string;
 }) {
   return (
     <div className="relative h-[280px] overflow-hidden rounded-2xl shadow-[0_8px_32px_rgba(26,43,75,0.18)]">
@@ -171,9 +207,18 @@ function HeroMedia({
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--yobell-navy)] via-[#2a4570] to-[#1a3050]">
-          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_30%_20%,rgba(201,162,39,0.4),transparent_60%)]" />
-          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(135deg, ${primary}, #2a4570)`,
+          }}
+        >
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              background: `radial-gradient(ellipse at 30% 20%, ${accent}66, transparent 60%)`,
+            }}
+          />
         </div>
       )}
 
@@ -197,32 +242,44 @@ function HeroMedia({
 
 function PurposeCard({
   card,
-  language,
+  primary,
+  accent,
   onSelect,
 }: {
-  card: VisitorPurposeCard;
-  language: Language;
+  card: VisitorCardRecord;
+  primary: string;
+  accent: string;
   onSelect: (type: VisitorType) => void;
 }) {
-  const Icon = card.icon;
+  const Icon = getIcon(card.iconKey);
 
   return (
     <button
       type="button"
-      onClick={() => onSelect(card.type)}
-      className="purpose-card group flex min-h-[130px] flex-col items-center justify-center gap-2 rounded-2xl border border-[var(--yobell-border)] bg-white p-4 shadow-[0_4px_16px_rgba(26,43,75,0.08)] transition-all duration-200 active:scale-[0.97] hover:border-[var(--yobell-gold)] hover:shadow-[0_8px_24px_rgba(26,43,75,0.14)]"
+      onClick={() => onSelect(card.typeKey as VisitorType)}
+      className="group flex min-h-[130px] flex-col items-center justify-center gap-2 rounded-2xl border border-[var(--yobell-border)] bg-white p-4 shadow-[0_4px_16px_rgba(26,43,75,0.08)] transition-all duration-200 active:scale-[0.97] hover:shadow-[0_8px_24px_rgba(26,43,75,0.14)]"
+      style={{ ["--hover-border" as string]: accent }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = accent;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "";
+      }}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--yobell-navy)]/5 transition-colors group-hover:bg-[var(--yobell-navy)]/10">
-        <Icon
-          className="h-7 w-7 text-[var(--yobell-navy)]"
-          strokeWidth={1.75}
-        />
+      <div
+        className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors"
+        style={{ background: `${primary}0d` }}
+      >
+        <Icon className="h-7 w-7" style={{ color: primary }} strokeWidth={1.75} />
       </div>
-      <span className="text-center text-lg font-bold leading-tight text-[var(--yobell-navy)]">
-        {visitorTypeLabel(language, card.type)}
+      <span
+        className="text-center text-lg font-bold leading-tight"
+        style={{ color: primary }}
+      >
+        {card.title}
       </span>
       <span className="text-center text-xs leading-snug text-[var(--yobell-muted)]">
-        {purposeSubtitle(language, card.subtitleKey)}
+        {card.subtitle}
       </span>
     </button>
   );
