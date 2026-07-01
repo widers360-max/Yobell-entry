@@ -155,7 +155,11 @@ export type AdminTranslationKey =
   | "col_inputMethod"
   | "inputMethod_quick"
   | "inputMethod_manual"
-  | "inputMethod_business_card";
+  | "inputMethod_business_card"
+  | "col_notification"
+  | "notification_sent"
+  | "notification_failed"
+  | "notification_no_email";
 
 const translations: Record<Language, Record<AdminTranslationKey, string>> = {
   ja: {
@@ -314,6 +318,10 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     inputMethod_quick: "すぐに呼び出し",
     inputMethod_manual: "入力あり",
     inputMethod_business_card: "名刺撮影",
+    col_notification: "通知",
+    notification_sent: "送信済み",
+    notification_failed: "送信失敗",
+    notification_no_email: "メールなし",
   },
   en: {
     adminConsole: "Admin Console v0.3",
@@ -471,6 +479,10 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     inputMethod_quick: "Quick call",
     inputMethod_manual: "Manual entry",
     inputMethod_business_card: "Business card",
+    col_notification: "Notification",
+    notification_sent: "Sent",
+    notification_failed: "Failed",
+    notification_no_email: "No email",
   },
   ko: {
     adminConsole: "Admin Console v0.3",
@@ -628,6 +640,10 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     inputMethod_quick: "바로 호출",
     inputMethod_manual: "직접 입력",
     inputMethod_business_card: "명함 촬영",
+    col_notification: "알림",
+    notification_sent: "전송됨",
+    notification_failed: "전송 실패",
+    notification_no_email: "이메일 없음",
   },
 };
 
