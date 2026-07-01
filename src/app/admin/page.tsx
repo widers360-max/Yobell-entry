@@ -9,6 +9,7 @@ import { StaffSection } from "@/components/admin/StaffSection";
 import { VisitsSection } from "@/components/admin/VisitsSection";
 import { VisitorCardsSection } from "@/components/admin/VisitorCardsSection";
 import { SystemSection } from "@/components/admin/SystemSection";
+import { NotificationSection } from "@/components/admin/NotificationSection";
 import { Toast } from "@/components/admin/ui";
 import { PasswordGate } from "@/components/PasswordGate";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
@@ -204,6 +205,9 @@ function AdminPageContent() {
       )}
       {section === "cards" && (
         <VisitorCardsSection cards={cards} onSave={saveCards} onMessage={showMessage} />
+      )}
+      {section === "notification" && (
+        <NotificationSection onMessage={showMessage} />
       )}
       {section === "system" && (
         <SystemSection dbStatus={dbStatus} onMessage={showMessage} onRefresh={loadData} />

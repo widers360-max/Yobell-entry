@@ -8,6 +8,7 @@ export type AdminTranslationKey =
   | "nav_staff"
   | "nav_visits"
   | "nav_cards"
+  | "nav_notification"
   | "nav_system"
   | "link_kiosk"
   | "link_staffNotify"
@@ -159,7 +160,24 @@ export type AdminTranslationKey =
   | "col_notification"
   | "notification_sent"
   | "notification_failed"
-  | "notification_no_email";
+  | "notification_no_email"
+  | "notify_settingsTitle"
+  | "notify_testTitle"
+  | "notify_testRecipient"
+  | "notify_testSend"
+  | "notify_testSending"
+  | "notify_testSuccess"
+  | "notify_testFailed"
+  | "notify_testFallback"
+  | "notify_testEmailRequired"
+  | "notify_testDesc"
+  | "notify_configuredYes"
+  | "notify_configuredNo"
+  | "notify_smtpReady"
+  | "notify_envHint"
+  | "notify_loadFailed"
+  | "notify_aboutTitle"
+  | "notify_aboutDesc";
 
 const translations: Record<Language, Record<AdminTranslationKey, string>> = {
   ja: {
@@ -170,6 +188,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     nav_staff: "スタッフ管理",
     nav_visits: "来訪ログ",
     nav_cards: "用件カード設定",
+    nav_notification: "メール通知",
     nav_system: "システム設定",
     link_kiosk: "キオスクを開く",
     link_staffNotify: "スタッフ通知",
@@ -322,6 +341,24 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     notification_sent: "送信済み",
     notification_failed: "送信失敗",
     notification_no_email: "メールなし",
+    notify_settingsTitle: "SMTP設定ステータス",
+    notify_testTitle: "テストメール送信",
+    notify_testRecipient: "送信先メールアドレス",
+    notify_testSend: "テストメールを送信",
+    notify_testSending: "送信中...",
+    notify_testSuccess: "テストメールを送信しました",
+    notify_testFailed: "テストメールの送信に失敗しました",
+    notify_testFallback: "SMTP未設定のためコンソールにログ出力しました",
+    notify_testEmailRequired: "送信先メールアドレスを入力してください",
+    notify_testDesc: "件名: 【YOBELL】テストメール / 本文: YOBELLのメール通知設定テストです。",
+    notify_configuredYes: "設定済み",
+    notify_configuredNo: "未設定",
+    notify_smtpReady: "メール送信可能",
+    notify_envHint: "SMTP_PASSはセキュリティのため表示されません。環境変数で設定してください。",
+    notify_loadFailed: "設定の読み込みに失敗しました",
+    notify_aboutTitle: "来訪通知メールについて",
+    notify_aboutDesc:
+      "来訪者が担当者を呼び出すと、担当スタッフのメールアドレスに通知が送信されます。メール内のリンクから「今行きます」「少々お待ちください」「本日は対応できません」を選択できます。",
   },
   en: {
     adminConsole: "Admin Console v0.3",
@@ -331,6 +368,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     nav_staff: "Staff",
     nav_visits: "Visit Logs",
     nav_cards: "Purpose Cards",
+    nav_notification: "Email Notifications",
     nav_system: "System",
     link_kiosk: "Open Kiosk",
     link_staffNotify: "Staff Notifications",
@@ -483,6 +521,24 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     notification_sent: "Sent",
     notification_failed: "Failed",
     notification_no_email: "No email",
+    notify_settingsTitle: "SMTP Configuration Status",
+    notify_testTitle: "Send Test Email",
+    notify_testRecipient: "Recipient email",
+    notify_testSend: "Send test email",
+    notify_testSending: "Sending...",
+    notify_testSuccess: "Test email sent successfully",
+    notify_testFailed: "Failed to send test email",
+    notify_testFallback: "SMTP not configured — logged to console",
+    notify_testEmailRequired: "Please enter a recipient email",
+    notify_testDesc: "Subject: 【YOBELL】テストメール / Body: YOBELLのメール通知設定テストです。",
+    notify_configuredYes: "Configured",
+    notify_configuredNo: "Not set",
+    notify_smtpReady: "Email ready",
+    notify_envHint: "SMTP_PASS is hidden for security. Set it via environment variables.",
+    notify_loadFailed: "Failed to load settings",
+    notify_aboutTitle: "About visit notifications",
+    notify_aboutDesc:
+      "When a visitor calls a host, an email is sent to the staff member's address. They can respond via links: Accept, Please wait, or Declined.",
   },
   ko: {
     adminConsole: "Admin Console v0.3",
@@ -492,6 +548,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     nav_staff: "스태프 관리",
     nav_visits: "방문 로그",
     nav_cards: "용건 카드 설정",
+    nav_notification: "이메일 알림",
     nav_system: "시스템 설정",
     link_kiosk: "키오스크 열기",
     link_staffNotify: "스태프 알림",
@@ -644,6 +701,24 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     notification_sent: "전송됨",
     notification_failed: "전송 실패",
     notification_no_email: "이메일 없음",
+    notify_settingsTitle: "SMTP 설정 상태",
+    notify_testTitle: "테스트 메일 보내기",
+    notify_testRecipient: "수신 이메일",
+    notify_testSend: "테스트 메일 보내기",
+    notify_testSending: "전송 중...",
+    notify_testSuccess: "테스트 메일을 보냈습니다",
+    notify_testFailed: "테스트 메일 전송에 실패했습니다",
+    notify_testFallback: "SMTP 미설정 — 콘솔에 로그 출력됨",
+    notify_testEmailRequired: "수신 이메일을 입력하세요",
+    notify_testDesc: "제목: 【YOBELL】テストメール / 본문: YOBELLのメール通知設定テストです。",
+    notify_configuredYes: "설정됨",
+    notify_configuredNo: "미설정",
+    notify_smtpReady: "메일 전송 가능",
+    notify_envHint: "보안상 SMTP_PASS는 표시되지 않습니다. 환경 변수로 설정하세요.",
+    notify_loadFailed: "설정을 불러오지 못했습니다",
+    notify_aboutTitle: "방문 알림 메일 안내",
+    notify_aboutDesc:
+      "방문자가 담당자를 호출하면 담당 스태프 이메일로 알림이 전송됩니다. 메일 링크에서 대응을 선택할 수 있습니다.",
   },
 };
 
@@ -688,6 +763,7 @@ export const ADMIN_NAV_KEYS = [
   "staff",
   "visits",
   "cards",
+  "notification",
   "system",
 ] as const;
 
@@ -724,5 +800,6 @@ export const ADMIN_NAV_I18N: Record<(typeof ADMIN_NAV_KEYS)[number], AdminTransl
   staff: "nav_staff",
   visits: "nav_visits",
   cards: "nav_cards",
+  notification: "nav_notification",
   system: "nav_system",
 };
