@@ -151,7 +151,11 @@ export type AdminTranslationKey =
   | "preview_selectPurpose"
   | "preview_video"
   | "visits_statusFilter"
-  | "visits_typeFilter";
+  | "visits_typeFilter"
+  | "col_inputMethod"
+  | "inputMethod_quick"
+  | "inputMethod_manual"
+  | "inputMethod_business_card";
 
 const translations: Record<Language, Record<AdminTranslationKey, string>> = {
   ja: {
@@ -306,6 +310,10 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     preview_video: "▶ 動画",
     visits_statusFilter: "ステータス",
     visits_typeFilter: "来訪種別",
+    col_inputMethod: "呼び出し方法",
+    inputMethod_quick: "すぐに呼び出し",
+    inputMethod_manual: "入力あり",
+    inputMethod_business_card: "名刺撮影",
   },
   en: {
     adminConsole: "Admin Console v0.3",
@@ -459,6 +467,10 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     preview_video: "▶ Video",
     visits_statusFilter: "Status",
     visits_typeFilter: "Visit Type",
+    col_inputMethod: "Call Method",
+    inputMethod_quick: "Quick call",
+    inputMethod_manual: "Manual entry",
+    inputMethod_business_card: "Business card",
   },
   ko: {
     adminConsole: "Admin Console v0.3",
@@ -612,6 +624,10 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     preview_video: "▶ 영상",
     visits_statusFilter: "상태",
     visits_typeFilter: "방문 유형",
+    col_inputMethod: "호출 방법",
+    inputMethod_quick: "바로 호출",
+    inputMethod_manual: "직접 입력",
+    inputMethod_business_card: "명함 촬영",
   },
 };
 
@@ -658,6 +674,16 @@ export const ADMIN_NAV_KEYS = [
   "cards",
   "system",
 ] as const;
+
+export function getInputMethodLabel(lang: Language, method: string): string {
+  const map: Record<string, AdminTranslationKey> = {
+    quick: "inputMethod_quick",
+    manual: "inputMethod_manual",
+    business_card: "inputMethod_business_card",
+  };
+  const k = map[method];
+  return k ? at(lang, k) : method;
+}
 
 export function getLangDisplay(lang: Language): string {
   const labels: Record<Language, string> = { ja: "日本語", en: "English", ko: "한국어" };

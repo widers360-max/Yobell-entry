@@ -1,17 +1,19 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { t } from "@/lib/i18n";
+import { t, type TranslationKey } from "@/lib/i18n";
 import type { Language } from "@/lib/types";
 
 interface CameraCaptureProps {
   language: Language;
+  mode?: "visitor" | "business_card";
   onCapture: (photoData: string) => void;
   onSkip: () => void;
 }
 
 export function CameraCapture({
   language,
+  mode = "visitor",
   onCapture,
   onSkip,
 }: CameraCaptureProps) {
@@ -21,6 +23,17 @@ export function CameraCapture({
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
+
+  const isBusinessCard = mode === "business_card";
+  const titleKey: TranslationKey = isBusinessCard
+    ? "businessCardCapture"
+    : "photoCapture";
+  const instructionKey: TranslationKey = isBusinessCard
+    ? "businessCardInstruction"
+    : "photoInstruction";
+  const skipKey: TranslationKey = isBusinessCard
+    ? "skipBusinessCard"
+    : "skipPhoto";
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -36,14 +49,14 @@ export function CameraCapture({
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: "user",
+            facingMode: isBusinessCard ? "environment" : "user",
             width: { ideal: 1280 },
             height: { ideal: 720 },
           },
           audio: false,
         });
         if (!mounted) {
-          stream.getTracks().forEach((t) => t.stop());
+          stream.getTracks().forEach((track) => track.stop());
           return;
         }
         streamRef.current = stream;
@@ -67,7 +80,7 @@ export function CameraCapture({
       mounted = false;
       stopCamera();
     };
-  }, [preview, language, stopCamera]);
+  }, [preview, language, stopCamera, isBusinessCard]);
 
   function takePhoto() {
     const video = videoRef.current;
@@ -99,10 +112,10 @@ export function CameraCapture({
   return (
     <div className="flex flex-col items-center gap-8">
       <h2 className="kiosk-heading text-center text-4xl">
-        {t(language, "photoCapture")}
+        {t(language, titleKey)}
       </h2>
       <p className="max-w-2xl text-center text-xl text-[var(--yobell-muted)]">
-        {t(language, "photoInstruction")}
+        {t(language, instructionKey)}
       </p>
 
       {error ? (
@@ -128,8 +141,8 @@ export function CameraCapture({
           )}
           <canvas ref={canvasRef} className="hidden" />
           {!cameraReady && !preview && !error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-xl">
-              カメラを起動中...
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-xl text-white">
+              {t(language, "cameraStarting")}
             </div>
           )}
         </div>
@@ -139,7 +152,7 @@ export function CameraCapture({
         {preview ? (
           <>
             <button type="button" onClick={confirm} className="kiosk-btn-primary">
-              {t(language, "next")}
+              {isBusinessCard ? t(language, "callHost") : t(language, "next")}
             </button>
             <button
               type="button"
@@ -160,7 +173,7 @@ export function CameraCapture({
               {t(language, "takePhoto")}
             </button>
             <button type="button" onClick={onSkip} className="kiosk-btn-secondary">
-              {t(language, "skipPhoto")}
+              {t(language, skipKey)}
             </button>
           </>
         )}

@@ -45,6 +45,7 @@ model Visit {
   hostStaff      Staff     @relation(fields: [hostStaffId], references: [id])
   status         String    @default("pending")
   photoData      String?
+  inputMethod    String    @default("manual")
   createdAt      DateTime  @default(now())
   respondedAt    DateTime?
   updatedAt      DateTime  @updatedAt

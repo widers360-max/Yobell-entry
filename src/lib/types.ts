@@ -1,5 +1,7 @@
 export type Language = "ja" | "en" | "ko";
 
+export type InputMethod = "quick" | "manual" | "business_card";
+
 export type VisitorType =
   | "meeting"
   | "delivery"
@@ -30,6 +32,7 @@ export interface KioskState {
   privacyConsent: boolean;
   photoData: string | null;
   visitId: string | null;
+  inputMethod: InputMethod | null;
 }
 
 export const VISITOR_TYPE_KEYS: VisitorType[] = [
@@ -55,6 +58,7 @@ export const INITIAL_KIOSK_STATE: KioskState = {
   privacyConsent: false,
   photoData: null,
   visitId: null,
+  inputMethod: null,
 };
 
 export interface KioskSettings {
