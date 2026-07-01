@@ -21,8 +21,26 @@ interface Visit {
   inputMethod: string;
   status: string;
   photoData: string | null;
+  notificationSent: boolean;
+  notificationError: string | null;
   createdAt: string;
   hostStaff: { name: string; company: { name: string } };
+}
+
+function notificationLabel(
+  t: (key: import("@/lib/admin-i18n").AdminTranslationKey) => string,
+  visit: Visit
+): { label: string; color: "green" | "amber" | "gray" | "red" } {
+  if (visit.notificationSent) {
+    return { label: t("notification_sent"), color: "green" };
+  }
+  if (visit.notificationError === "Staff email not set") {
+    return { label: t("notification_no_email"), color: "gray" };
+  }
+  if (visit.notificationError) {
+    return { label: t("notification_failed"), color: "red" };
+  }
+  return { label: t("notification_failed"), color: "amber" };
 }
 
 const VISITOR_TYPES = [
@@ -178,12 +196,14 @@ export function VisitsSection({
                 <th className="pb-3 pr-3 font-medium">{t("col_type")}</th>
                 <th className="pb-3 pr-3 font-medium">{t("col_inputMethod")}</th>
                 <th className="pb-3 pr-3 font-medium">{t("col_host")}</th>
+                <th className="pb-3 pr-3 font-medium">{t("col_notification")}</th>
                 <th className="pb-3 font-medium">{t("col_status")}</th>
               </tr>
             </thead>
             <tbody>
               {visits.map((v) => {
                 const st = getStatusLabel(lang, v.status);
+                const notify = notificationLabel(t, v);
                 return (
                   <tr key={v.id} className="border-b border-slate-50">
                     <td className="py-3 pr-3 whitespace-nowrap text-slate-500">
@@ -211,6 +231,14 @@ export function VisitsSection({
                       </span>
                     </td>
                     <td className="py-3 pr-3">{v.hostStaff.name}</td>
+                    <td className="py-3 pr-3">
+                      <Badge color={notify.color}>{notify.label}</Badge>
+                      {v.notificationError && !v.notificationSent && (
+                        <p className="mt-1 max-w-[140px] truncate text-xs text-slate-400" title={v.notificationError}>
+                          {v.notificationError}
+                        </p>
+                      )}
+                    </td>
                     <td className="py-3">
                       <Badge color={st.color}>{st.label}</Badge>
                     </td>
@@ -219,7 +247,7 @@ export function VisitsSection({
               })}
               {visits.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400">
+                  <td colSpan={9} className="py-12 text-center text-slate-400">
                     {t("visits_noResults")}
                   </td>
                 </tr>

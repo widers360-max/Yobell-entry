@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyHostStaffForVisit } from "@/lib/visit-notify";
 
 export async function GET(request: NextRequest) {
   try {
@@ -109,7 +110,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(visit, { status: 201 });
+    try {
+      await notifyHostStaffForVisit(visit);
+    } catch (notifyError) {
+      console.error("[visits POST] notification failed:", notifyError);
+    }
+
+    const updated = await prisma.visit.findUnique({
+      where: { id: visit.id },
+      include: {
+        hostStaff: { include: { company: true } },
+      },
+    });
+
+    return NextResponse.json(updated ?? visit, { status: 201 });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "来訪記録の作成に失敗しました" },
