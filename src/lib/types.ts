@@ -32,7 +32,6 @@ export interface KioskState {
   visitId: string | null;
 }
 
-/** Grid order: 3×2 then centered「その他」 */
 export const VISITOR_TYPE_KEYS: VisitorType[] = [
   "meeting",
   "delivery",
@@ -71,4 +70,19 @@ export interface KioskSettings {
   companyDisplayName: string;
   heroTitle: string;
   heroSubtitle: string;
+  primaryColor: string;
+  accentColor: string;
+  retentionDays: number;
 }
+
+export interface VisitorCardRecord {
+  id: string;
+  typeKey: string;
+  title: string;
+  subtitle: string;
+  iconKey: string;
+  sortOrder: number;
+  active: boolean;
+}
+
+export const APP_VERSION = "0.3.0";

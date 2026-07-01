@@ -1,6 +1,7 @@
 import path from "node:path";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { DEFAULT_VISITOR_CARDS } from "../src/lib/icon-utils";
 import "dotenv/config";
 
 const dbUrl = process.env.DATABASE_URL ?? "file:./dev.db";
@@ -16,6 +17,7 @@ async function main() {
   await prisma.visit.deleteMany();
   await prisma.staff.deleteMany();
   await prisma.company.deleteMany();
+  await prisma.visitorCard.deleteMany();
   await prisma.kioskSetting.deleteMany();
 
   const widers = await prisma.company.create({
@@ -23,6 +25,7 @@ async function main() {
       name: "株式会社WIDERS",
       logoUrl: null,
       welcomeMessage: "ご来社ありがとうございます",
+      active: true,
     },
   });
 
@@ -31,6 +34,7 @@ async function main() {
       name: "株式会社大建",
       logoUrl: null,
       welcomeMessage: "ご来社ありがとうございます",
+      active: true,
     },
   });
 
@@ -39,6 +43,7 @@ async function main() {
       name: "株式会社共立防災設備",
       logoUrl: null,
       welcomeMessage: "ご来社ありがとうございます",
+      active: true,
     },
   });
 
@@ -114,8 +119,14 @@ async function main() {
       heroSubtitle: "快適なオフィス環境を、すべての人に。",
       heroImageUrl: null,
       heroVideoUrl: null,
+      primaryColor: "#1a2b4b",
+      accentColor: "#c9a227",
     },
   });
+
+  for (const card of DEFAULT_VISITOR_CARDS) {
+    await prisma.visitorCard.create({ data: card });
+  }
 
   console.log("Seed completed successfully");
 }

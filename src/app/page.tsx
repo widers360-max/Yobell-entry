@@ -10,6 +10,7 @@ import {
   type KioskSettings,
   type Language,
   type VisitorType,
+  type VisitorCardRecord,
 } from "@/lib/types";
 import { t, visitorTypeLabel, waitingMessage } from "@/lib/i18n";
 
@@ -44,12 +45,16 @@ const DEFAULT_SETTINGS: KioskSettings = {
   companyDisplayName: "株式会社YOBELL",
   heroTitle: "ようこそ、株式会社YOBELLへ",
   heroSubtitle: "快適なオフィス環境を、すべての人に。",
+  primaryColor: "#1a2b4b",
+  accentColor: "#c9a227",
+  retentionDays: 30,
 };
 
 export default function KioskPage() {
   const [step, setStep] = useState<Step>("idle");
   const [state, setState] = useState<KioskState>(INITIAL_KIOSK_STATE);
   const [settings, setSettings] = useState<KioskSettings | null>(null);
+  const [visitorCards, setVisitorCards] = useState<VisitorCardRecord[]>([]);
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [visitStatus, setVisitStatus] = useState("pending");
@@ -57,13 +62,16 @@ export default function KioskPage() {
   const [formError, setFormError] = useState("");
 
   useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((data: KioskSettings) => {
-        setSettings({ ...DEFAULT_SETTINGS, ...data });
+    Promise.all([
+      fetch("/api/settings").then((r) => r.json()),
+      fetch("/api/visitor-cards").then((r) => r.json()),
+    ])
+      .then(([settingsData, cardsData]: [KioskSettings, VisitorCardRecord[]]) => {
+        setSettings({ ...DEFAULT_SETTINGS, ...settingsData });
+        setVisitorCards(cardsData);
         setState((s) => ({
           ...s,
-          language: (data.languageDefault as Language) || "ja",
+          language: (settingsData.languageDefault as Language) || "ja",
         }));
       })
       .catch(() => {});
@@ -178,6 +186,7 @@ export default function KioskPage() {
         language={lang}
         onLanguageChange={setLanguage}
         settings={kioskSettings}
+        visitorCards={visitorCards}
         onSelectPurpose={handleSelectPurpose}
       />
     );
