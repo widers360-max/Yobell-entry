@@ -23,9 +23,11 @@ interface Visit {
 
 const VISITOR_TYPE_LABELS: Record<string, string> = {
   meeting: "打ち合わせ",
-  delivery: "配達",
-  interview: "面接",
+  delivery: "配達・宅配",
+  interview: "面接・面談",
   maintenance: "工事・点検",
+  reception: "ご案内・受付",
+  tour: "会社見学",
   other: "その他",
 };
 

@@ -2,18 +2,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { KioskLayout } from "@/components/KioskLayout";
+import { KioskHomeScreen } from "@/components/KioskHomeScreen";
 import { CameraCapture } from "@/components/CameraCapture";
 import {
   INITIAL_KIOSK_STATE,
-  VISITOR_TYPE_KEYS,
   type KioskState,
+  type KioskSettings,
   type Language,
+  type VisitorType,
 } from "@/lib/types";
 import { t, visitorTypeLabel, waitingMessage } from "@/lib/i18n";
 
 type Step =
   | "idle"
-  | "visitorType"
   | "host"
   | "visitorInfo"
   | "photo"
@@ -28,20 +29,27 @@ interface StaffMember {
   company: { id: string; name: string };
 }
 
-interface Settings {
-  brandName: string;
-  tagline: string;
-  logoUrl: string | null;
-  welcomeMessage: string;
-  languageDefault: string;
-  fallbackMessage: string;
-  privacyNotice: string;
-}
+const DEFAULT_SETTINGS: KioskSettings = {
+  brandName: "YOBELL",
+  tagline: "内線電話のないオフィス受付",
+  logoUrl: null,
+  welcomeMessage: "ご来社ありがとうございます",
+  languageDefault: "ja",
+  fallbackMessage:
+    "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
+  privacyNotice:
+    "入力された情報は受付対応および来訪記録のために利用されます。",
+  heroImageUrl: null,
+  heroVideoUrl: null,
+  companyDisplayName: "株式会社YOBELL",
+  heroTitle: "ようこそ、株式会社YOBELLへ",
+  heroSubtitle: "快適なオフィス環境を、すべての人に。",
+};
 
 export default function KioskPage() {
   const [step, setStep] = useState<Step>("idle");
   const [state, setState] = useState<KioskState>(INITIAL_KIOSK_STATE);
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const [settings, setSettings] = useState<KioskSettings | null>(null);
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [visitStatus, setVisitStatus] = useState("pending");
@@ -51,8 +59,8 @@ export default function KioskPage() {
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
-      .then((data: Settings) => {
-        setSettings(data);
+      .then((data: KioskSettings) => {
+        setSettings({ ...DEFAULT_SETTINGS, ...data });
         setState((s) => ({
           ...s,
           language: (data.languageDefault as Language) || "ja",
@@ -153,88 +161,37 @@ export default function KioskPage() {
     setVisitStatus("pending");
   }
 
+  function handleSelectPurpose(type: VisitorType) {
+    setState((s) => ({ ...s, visitorType: type }));
+    setStep("host");
+  }
+
   const lang = state.language;
-  const welcomeText = settings?.welcomeMessage ?? t(lang, "welcome");
-  const tagline = settings?.tagline ?? t(lang, "tagline");
-  const privacyNotice = settings?.privacyNotice ?? t(lang, "privacyNotice");
-  const fallbackMsg = settings?.fallbackMessage ?? t(lang, "waitingFallback");
+  const kioskSettings = settings ?? DEFAULT_SETTINGS;
+  const tagline = kioskSettings.tagline ?? t(lang, "tagline");
+  const privacyNotice = kioskSettings.privacyNotice ?? t(lang, "privacyNotice");
+  const fallbackMsg = kioskSettings.fallbackMessage ?? t(lang, "waitingFallback");
+
+  if (step === "idle") {
+    return (
+      <KioskHomeScreen
+        language={lang}
+        onLanguageChange={setLanguage}
+        settings={kioskSettings}
+        onSelectPurpose={handleSelectPurpose}
+      />
+    );
+  }
 
   return (
     <KioskLayout
       language={lang}
       onLanguageChange={setLanguage}
-      showLanguageToggle={step === "idle"}
-      brandName={settings?.brandName ?? "YOBELL"}
+      showLanguageToggle={false}
+      brandName={kioskSettings.brandName}
       tagline={tagline}
-      logoUrl={settings?.logoUrl}
+      logoUrl={kioskSettings.logoUrl}
     >
-      {step === "idle" && (
-        <div className="flex flex-col items-center gap-12 py-8 text-center">
-          <div className="space-y-4">
-            <p className="text-lg font-medium uppercase tracking-widest text-[var(--yobell-accent)]">
-              {tagline}
-            </p>
-            <h2 className="kiosk-heading text-6xl leading-tight">
-              {welcomeText}
-            </h2>
-          </div>
-
-          <div className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-teal-600 shadow-2xl animate-pulse-ring">
-            <svg
-              className="h-16 w-16 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-              />
-            </svg>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setStep("visitorType")}
-            className="kiosk-btn-primary w-full max-w-lg text-2xl"
-          >
-            {t(lang, "startReception")}
-          </button>
-        </div>
-      )}
-
-      {step === "visitorType" && (
-        <div className="flex flex-col gap-8">
-          <h2 className="kiosk-heading text-center text-4xl">
-            {t(lang, "selectVisitorType")}
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {VISITOR_TYPE_KEYS.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => {
-                  setState((s) => ({ ...s, visitorType: type }));
-                  setStep("host");
-                }}
-                className="kiosk-card-interactive flex min-h-[7rem] items-center justify-center p-6 text-2xl font-bold"
-              >
-                {visitorTypeLabel(lang, type)}
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => setStep("idle")}
-            className="kiosk-btn-secondary mx-auto w-full max-w-xs"
-          >
-            {t(lang, "back")}
-          </button>
-        </div>
-      )}
-
       {step === "host" && (
         <div className="flex flex-col gap-6">
           <h2 className="kiosk-heading text-center text-4xl">
@@ -281,7 +238,7 @@ export default function KioskPage() {
           </div>
           <button
             type="button"
-            onClick={() => setStep("visitorType")}
+            onClick={() => setStep("idle")}
             className="kiosk-btn-secondary mx-auto w-full max-w-xs"
           >
             {t(lang, "back")}
