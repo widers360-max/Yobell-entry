@@ -15,7 +15,11 @@ import {
   type InputMethod,
 } from "@/lib/types";
 import { VISIT_PLACEHOLDER } from "@/lib/visit-constants";
-import { YOBELL_DEFAULT_ACCENT, YOBELL_DEFAULT_PRIMARY } from "@/lib/design-system";
+import {
+  KIOSK_SHOWROOM_DEFAULTS,
+  YOBELL_DEFAULT_ACCENT,
+  YOBELL_DEFAULT_PRIMARY,
+} from "@/lib/design-system";
 import { t, visitorTypeLabel, waitingMessage } from "@/lib/i18n";
 
 type Step =
@@ -36,10 +40,10 @@ interface StaffMember {
 }
 
 const DEFAULT_SETTINGS: KioskSettings = {
-  brandName: "YOBELL",
-  tagline: "内線電話のないオフィス受付",
+  brandName: KIOSK_SHOWROOM_DEFAULTS.brandName,
+  tagline: KIOSK_SHOWROOM_DEFAULTS.tagline,
   logoUrl: null,
-  welcomeMessage: "ご来社ありがとうございます",
+  welcomeMessage: KIOSK_SHOWROOM_DEFAULTS.welcomeMessage,
   languageDefault: "ja",
   fallbackMessage:
     "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
@@ -47,9 +51,9 @@ const DEFAULT_SETTINGS: KioskSettings = {
     "入力された情報は受付対応および来訪記録のために利用されます。",
   heroImageUrl: null,
   heroVideoUrl: null,
-  companyDisplayName: "株式会社YOBELL",
-  heroTitle: "ようこそ、株式会社YOBELLへ",
-  heroSubtitle: "快適なオフィス環境を、すべての人に。",
+  companyDisplayName: KIOSK_SHOWROOM_DEFAULTS.companyDisplayName,
+  heroTitle: KIOSK_SHOWROOM_DEFAULTS.heroTitle,
+  heroSubtitle: KIOSK_SHOWROOM_DEFAULTS.heroSubtitle,
   primaryColor: YOBELL_DEFAULT_PRIMARY,
   accentColor: YOBELL_DEFAULT_ACCENT,
   retentionDays: 30,

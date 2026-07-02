@@ -34,3 +34,19 @@ export const YOBELL_GRID = 8;
 
 export const YOBELL_DEFAULT_PRIMARY = YOBELL_COLORS.navy;
 export const YOBELL_DEFAULT_ACCENT = YOBELL_COLORS.gold;
+
+/** Showroom / kiosk defaults when admin settings are empty */
+export const KIOSK_SHOWROOM_DEFAULTS = {
+  brandName: "YOBELL",
+  companyDisplayName: "株式会社WIDERS",
+  welcomeLine: "ようこそ",
+  heroTitle: "ようこそ",
+  heroSubtitle: "Smart Reception by YOBELL",
+  tagline: "内線電話のないオフィス受付",
+  welcomeMessage: "ご来社ありがとうございます",
+} as const;
+
+export function poweredByLabel(companyDisplayName: string): string {
+  const short = companyDisplayName.replace(/^株式会社\s*/, "").trim() || "WIDERS";
+  return `Powered by ${short}`;
+}

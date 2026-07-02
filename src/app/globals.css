@@ -239,3 +239,72 @@ body {
 .animate-pulse-ring {
   animation: pulse-ring 2s ease-in-out infinite;
 }
+
+/* ─── Kiosk showroom animations ─── */
+@keyframes kioskGradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes kioskIdleGlow {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes kioskRevealUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kiosk-showroom-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--yobell-navy-dark) 0%,
+    var(--yobell-navy) 35%,
+    var(--yobell-navy-light) 65%,
+    color-mix(in srgb, var(--yobell-gold) 35%, var(--yobell-navy)) 100%
+  );
+  background-size: 220% 220%;
+  animation: kioskGradientShift 14s ease-in-out infinite;
+}
+
+.kiosk-idle-welcome {
+  animation: kioskIdleGlow 5s ease-in-out infinite;
+}
+
+.kiosk-reveal-panel {
+  animation: kioskRevealUp var(--yobell-duration-slow) cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+}
+
+.kiosk-purpose-card {
+  @apply yobell-card-premium flex flex-col items-center justify-center gap-g1 border-yobell-border p-g2 text-center transition-all duration-fast ease-yobell;
+  min-height: 7.5rem;
+}
+
+.kiosk-purpose-card:active {
+  @apply yobell-card-selected scale-[0.96];
+}
+
+.kiosk-purpose-card:hover {
+  border-color: var(--yobell-gold);
+  box-shadow: var(--yobell-shadow-glass-lg);
+}

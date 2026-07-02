@@ -24,6 +24,8 @@ export type TranslationKey =
   | "footerHelp"
   | "footerHelpSub"
   | "smartReception"
+  | "home_touchHint"
+  | "home_companySuffix"
   | "nav_admin"
   | "nav_staff"
   | "auth_adminTitle"
@@ -108,6 +110,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "お困りの方はスタッフまで",
     footerHelpSub: "内線 100 または受付までお声がけください",
     smartReception: "SMART RECEPTION",
+    home_touchHint: "画面をタップして受付を開始",
+    home_companySuffix: "へ",
     nav_admin: "管理",
     nav_staff: "スタッフ",
     auth_adminTitle: "管理者パスワード",
@@ -196,6 +200,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "Need assistance?",
     footerHelpSub: "Extension 100 or speak to reception",
     smartReception: "SMART RECEPTION",
+    home_touchHint: "Tap the screen to begin reception",
+    home_companySuffix: "",
     nav_admin: "Admin",
     nav_staff: "Staff",
     auth_adminTitle: "Admin Password",
@@ -284,6 +290,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "도움이 필요하신 분",
     footerHelpSub: "내선 100 또는 접수대로 문의해 주세요",
     smartReception: "SMART RECEPTION",
+    home_touchHint: "화면을 터치하여 접수를 시작하세요",
+    home_companySuffix: "",
     nav_admin: "관리",
     nav_staff: "스태프",
     auth_adminTitle: "관리자 비밀번호",

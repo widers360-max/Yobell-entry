@@ -150,6 +150,7 @@ export type AdminTranslationKey =
   | "type_tour"
   | "type_other"
   | "preview_selectPurpose"
+  | "preview_preregister"
   | "preview_video"
   | "visits_statusFilter"
   | "visits_typeFilter"
@@ -330,6 +331,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     type_tour: "会社見学",
     type_other: "その他",
     preview_selectPurpose: "ご用件をお選びください",
+    preview_preregister: "事前登録はこちら",
     preview_video: "▶ 動画",
     visits_statusFilter: "ステータス",
     visits_typeFilter: "来訪種別",
@@ -510,6 +512,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     type_tour: "Company Tour",
     type_other: "Other",
     preview_selectPurpose: "Please select your visit purpose",
+    preview_preregister: "Pre-register here",
     preview_video: "▶ Video",
     visits_statusFilter: "Status",
     visits_typeFilter: "Visit Type",
@@ -690,6 +693,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     type_tour: "회사 견학",
     type_other: "기타",
     preview_selectPurpose: "방문 목적을 선택해 주세요",
+    preview_preregister: "사전 등록",
     preview_video: "▶ 영상",
     visits_statusFilter: "상태",
     visits_typeFilter: "방문 유형",
