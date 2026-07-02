@@ -34,6 +34,26 @@ export type TranslationKey =
   | "kiosk_retry"
   | "kiosk_submitFailed"
   | "kiosk_bootstrapFailed"
+  | "staff_title"
+  | "staff_subtitle"
+  | "staff_linkKiosk"
+  | "staff_linkAdmin"
+  | "staff_newVisitors"
+  | "staff_recentHistory"
+  | "staff_emptyTitle"
+  | "staff_emptyDesc"
+  | "staff_hostLabel"
+  | "staff_respondAccept"
+  | "staff_respondWait"
+  | "staff_respondDecline"
+  | "staff_respondSending"
+  | "staff_respondFailed"
+  | "visitStatus_pending"
+  | "visitStatus_accepted"
+  | "visitStatus_please_wait"
+  | "visitStatus_declined"
+  | "visitStatus_no_response"
+  | "visitStatus_completed"
   | "nav_admin"
   | "nav_staff"
   | "auth_adminTitle"
@@ -159,6 +179,26 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     kiosk_retry: "再試行",
     kiosk_submitFailed: "呼び出しを送信できませんでした。もう一度お試しください。",
     kiosk_bootstrapFailed: "設定を読み込めませんでした。ネットワークをご確認ください。",
+    staff_title: "YOBELL Entry — スタッフ通知",
+    staff_subtitle: "来訪者の呼び出しをリアルタイムで確認・対応",
+    staff_linkKiosk: "キオスク",
+    staff_linkAdmin: "管理画面",
+    staff_newVisitors: "新しい来訪者",
+    staff_recentHistory: "最近の対応",
+    staff_emptyTitle: "現在、待機中の来訪者はいません",
+    staff_emptyDesc: "3秒ごとに自動更新されます",
+    staff_hostLabel: "担当",
+    staff_respondAccept: "今行きます",
+    staff_respondWait: "少々お待ちください",
+    staff_respondDecline: "本日は対応できません",
+    staff_respondSending: "送信中",
+    staff_respondFailed: "送信に失敗しました。もう一度お試しください。",
+    visitStatus_pending: "未対応",
+    visitStatus_accepted: "対応中",
+    visitStatus_please_wait: "お待ちください",
+    visitStatus_declined: "対応不可",
+    visitStatus_no_response: "無応答",
+    visitStatus_completed: "完了",
     nav_admin: "管理",
     nav_staff: "スタッフ",
     auth_adminTitle: "管理者パスワード",
@@ -286,6 +326,26 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     kiosk_retry: "Retry",
     kiosk_submitFailed: "Could not send the call request. Please try again.",
     kiosk_bootstrapFailed: "Could not load settings. Please check your network.",
+    staff_title: "YOBELL Entry — Staff Notifications",
+    staff_subtitle: "Review and respond to visitor calls in real time",
+    staff_linkKiosk: "Kiosk",
+    staff_linkAdmin: "Admin",
+    staff_newVisitors: "New visitors",
+    staff_recentHistory: "Recent responses",
+    staff_emptyTitle: "No visitors waiting right now",
+    staff_emptyDesc: "Auto-refreshes every 3 seconds",
+    staff_hostLabel: "Host",
+    staff_respondAccept: "On my way",
+    staff_respondWait: "Please wait",
+    staff_respondDecline: "Unavailable today",
+    staff_respondSending: "Sending",
+    staff_respondFailed: "Could not send response. Please try again.",
+    visitStatus_pending: "Pending",
+    visitStatus_accepted: "Accepted",
+    visitStatus_please_wait: "Please wait",
+    visitStatus_declined: "Declined",
+    visitStatus_no_response: "No response",
+    visitStatus_completed: "Completed",
     nav_admin: "Admin",
     nav_staff: "Staff",
     auth_adminTitle: "Admin Password",
@@ -414,6 +474,26 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     kiosk_retry: "다시 시도",
     kiosk_submitFailed: "호출을 전송하지 못했습니다. 다시 시도해 주세요.",
     kiosk_bootstrapFailed: "설정을 불러오지 못했습니다. 네트워크를 확인해 주세요.",
+    staff_title: "YOBELL Entry — 스태프 알림",
+    staff_subtitle: "방문자 호출을 실시간으로 확인하고 대응합니다",
+    staff_linkKiosk: "키오스크",
+    staff_linkAdmin: "관리 화면",
+    staff_newVisitors: "새 방문자",
+    staff_recentHistory: "최근 대응",
+    staff_emptyTitle: "대기 중인 방문자가 없습니다",
+    staff_emptyDesc: "3초마다 자동 새로고침",
+    staff_hostLabel: "담당",
+    staff_respondAccept: "지금 갑니다",
+    staff_respondWait: "잠시만 기다려 주세요",
+    staff_respondDecline: "오늘은 대응 어려움",
+    staff_respondSending: "전송 중",
+    staff_respondFailed: "전송에 실패했습니다. 다시 시도해 주세요.",
+    visitStatus_pending: "미대응",
+    visitStatus_accepted: "대응 중",
+    visitStatus_please_wait: "잠시 대기",
+    visitStatus_declined: "대응 불가",
+    visitStatus_no_response: "무응답",
+    visitStatus_completed: "완료",
     nav_admin: "관리",
     nav_staff: "스태프",
     auth_adminTitle: "관리자 비밀번호",
@@ -526,6 +606,34 @@ export function t(
 
 export function visitorTypeLabel(lang: Language, type: VisitorType): string {
   return t(lang, `visitorType_${type}` as TranslationKey);
+}
+
+export function visitStatusLabel(lang: Language, status: string): string {
+  const key = `visitStatus_${status}` as TranslationKey;
+  const labels: TranslationKey[] = [
+    "visitStatus_pending",
+    "visitStatus_accepted",
+    "visitStatus_please_wait",
+    "visitStatus_declined",
+    "visitStatus_no_response",
+    "visitStatus_completed",
+  ];
+  if (labels.includes(key)) {
+    return t(lang, key);
+  }
+  return status;
+}
+
+export function visitStatusBadgeColor(status: string): string {
+  const map: Record<string, string> = {
+    pending: "admin-badge-amber",
+    accepted: "admin-badge-green",
+    please_wait: "admin-badge-blue",
+    declined: "admin-badge-red",
+    no_response: "admin-badge-gray",
+    completed: "admin-badge-gray",
+  };
+  return map[status] ?? "admin-badge-gray";
 }
 
 export function purposeSubtitle(

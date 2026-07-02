@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
     const host = searchParams.get("host")?.trim();
+    const summary = searchParams.get("summary") === "true";
 
     const dateFilter: { gte?: Date; lte?: Date } = {};
     if (from) dateFilter.gte = new Date(from);
@@ -21,49 +22,80 @@ export async function GET(request: NextRequest) {
       dateFilter.lte = end;
     }
 
-    const visits = await prisma.visit.findMany({
-      where: {
-        ...(status ? { status } : {}),
-        ...(pending === "true" ? { status: "pending" } : {}),
-        ...(visitorType ? { visitorType } : {}),
-        ...(Object.keys(dateFilter).length ? { createdAt: dateFilter } : {}),
-        ...(q || host
-          ? {
-              AND: [
-                ...(q
-                  ? [
-                      {
-                        OR: [
-                          { visitorName: { contains: q } },
-                          { visitorCompany: { contains: q } },
-                          { purpose: { contains: q } },
-                        ],
-                      },
-                    ]
-                  : []),
-                ...(host
-                  ? [
-                      {
-                        OR: [
-                          { hostStaff: { name: { contains: host } } },
-                          {
-                            hostStaff: {
-                              company: { name: { contains: host } },
-                            },
+    const whereClause = {
+      ...(status ? { status } : {}),
+      ...(pending === "true" ? { status: "pending" } : {}),
+      ...(visitorType ? { visitorType } : {}),
+      ...(Object.keys(dateFilter).length ? { createdAt: dateFilter } : {}),
+      ...(q || host
+        ? {
+            AND: [
+              ...(q
+                ? [
+                    {
+                      OR: [
+                        { visitorName: { contains: q } },
+                        { visitorCompany: { contains: q } },
+                        { purpose: { contains: q } },
+                      ],
+                    },
+                  ]
+                : []),
+              ...(host
+                ? [
+                    {
+                      OR: [
+                        { hostStaff: { name: { contains: host } } },
+                        {
+                          hostStaff: {
+                            company: { name: { contains: host } },
                           },
-                        ],
-                      },
-                    ]
-                  : []),
-              ],
-            }
-          : {}),
-      },
+                        },
+                      ],
+                    },
+                  ]
+                : []),
+            ],
+          }
+        : {}),
+    };
+
+    const take = pending === "true" ? 50 : summary ? 200 : 500;
+
+    if (summary) {
+      const visits = await prisma.visit.findMany({
+        where: whereClause,
+        select: {
+          id: true,
+          visitorName: true,
+          visitorCompany: true,
+          visitorPhone: true,
+          purpose: true,
+          visitorType: true,
+          status: true,
+          createdAt: true,
+          hostStaff: {
+            select: {
+              id: true,
+              name: true,
+              department: true,
+              company: { select: { name: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take,
+      });
+      return NextResponse.json(visits.map((v) => ({ ...v, photoData: null })));
+    }
+
+    const visits = await prisma.visit.findMany({
+      where: whereClause,
       include: {
         hostStaff: { include: { company: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: pending === "true" ? 50 : 500,
+      take,
     });
 
     return NextResponse.json(visits);
