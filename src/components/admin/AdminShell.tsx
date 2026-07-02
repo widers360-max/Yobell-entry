@@ -10,6 +10,7 @@ import {
   ClipboardList,
   Grid3x3,
   Settings,
+  Mail,
   ExternalLink,
   LogOut,
 } from "lucide-react";
@@ -26,6 +27,7 @@ export type AdminSection =
   | "staff"
   | "visits"
   | "cards"
+  | "notification"
   | "system";
 
 const NAV_ICONS = {
@@ -35,6 +37,7 @@ const NAV_ICONS = {
   staff: Users,
   visits: ClipboardList,
   cards: Grid3x3,
+  notification: Mail,
   system: Settings,
 };
 

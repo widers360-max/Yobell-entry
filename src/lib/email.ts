@@ -25,6 +25,72 @@ export function isEmailConfigured(): boolean {
   );
 }
 
+export function getSmtpStatus() {
+  return {
+    smtpHostConfigured: !!process.env.SMTP_HOST?.trim(),
+    smtpUserConfigured: !!process.env.SMTP_USER?.trim(),
+    smtpFromConfigured: !!process.env.SMTP_FROM?.trim(),
+    appBaseUrl: getAppBaseUrl(),
+    smtpReady: isEmailConfigured(),
+  };
+}
+
+function createTransporter() {
+  const port = Number(process.env.SMTP_PORT) || 587;
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
+async function deliverEmail(options: {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+}): Promise<{ sent: boolean; error?: string }> {
+  if (!isEmailConfigured()) {
+    return { sent: false, error: "SMTP not configured" };
+  }
+
+  try {
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM?.trim() || process.env.SMTP_USER,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text,
+    });
+    return { sent: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Email send failed";
+    console.error("[YOBELL email]", message);
+    return { sent: false, error: message };
+  }
+}
+
+export async function sendTestEmail(
+  to: string
+): Promise<{ sent: boolean; fallback: boolean; error?: string }> {
+  const subject = "【YOBELL】テストメール";
+  const text = "YOBELLのメール通知設定テストです。";
+  const html = `<p>${text}</p>`;
+
+  if (!isEmailConfigured()) {
+    console.log("[YOBELL email fallback] Test email:", { to, subject, body: text });
+    return { sent: false, fallback: true, error: "SMTP not configured" };
+  }
+
+  const result = await deliverEmail({ to, subject, html, text });
+  return { sent: result.sent, fallback: false, error: result.error };
+}
+
 function buildResponseUrl(visitId: string, status: string): string {
   const base = getAppBaseUrl().replace(/\/$/, "");
   return `${base}/api/visits/respond?id=${encodeURIComponent(visitId)}&status=${encodeURIComponent(status)}`;
@@ -100,31 +166,7 @@ export async function sendVisitNotificationEmail(
     return { sent: false, error: "SMTP not configured" };
   }
 
-  try {
-    const port = Number(process.env.SMTP_PORT) || 587;
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port,
-      secure: port === 465,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM?.trim() || process.env.SMTP_USER,
-      to: payload.to,
-      subject,
-      html,
-    });
-
-    return { sent: true };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Email send failed";
-    console.error("[YOBELL email]", message, payload);
-    return { sent: false, error: message };
-  }
+  return deliverEmail({ to: payload.to, subject, html });
 }
 
 export function buildRespondSuccessHtml(): string {
