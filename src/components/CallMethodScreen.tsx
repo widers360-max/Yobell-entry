@@ -1,6 +1,7 @@
 "use client";
 
 import { PhoneCall, Camera, PenLine } from "lucide-react";
+import { KioskActionBar, PremiumCard, StepHeader } from "@/components/kiosk";
 import { t } from "@/lib/i18n";
 import type { Language } from "@/lib/types";
 import type { InputMethod } from "@/lib/visit-constants";
@@ -43,41 +44,24 @@ export function CallMethodScreen({
   onBack,
 }: CallMethodScreenProps) {
   return (
-    <div className="flex flex-col gap-8">
-      <h2 className="kiosk-heading text-center text-4xl">
-        {t(language, "selectCallMethod")}
-      </h2>
+    <div className="flex flex-col gap-g3">
+      <StepHeader title={t(language, "selectCallMethod")} />
 
-      <div className="grid grid-cols-1 gap-5">
-        {OPTIONS.map(({ method, titleKey, subtitleKey, icon: Icon }) => (
-          <button
+      <div className="grid grid-cols-1 gap-g2">
+        {OPTIONS.map(({ method, titleKey, subtitleKey, icon }) => (
+          <PremiumCard
             key={method}
-            type="button"
+            layout="horizontal"
+            title={t(language, titleKey)}
+            subtitle={t(language, subtitleKey)}
+            icon={icon}
             onClick={() => onSelect(method)}
-            className="kiosk-card-interactive flex min-h-[140px] items-center gap-6 p-8 text-left"
-          >
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-yobell-sm bg-yobell-navy text-white shadow-glass">
-              <Icon className="h-10 w-10" strokeWidth={1.75} />
-            </div>
-            <div className="flex-1">
-              <p className="text-3xl font-bold text-yobell-navy">
-                {t(language, titleKey)}
-              </p>
-              <p className="mt-g1 text-xl leading-relaxed text-yobell-muted">
-                {t(language, subtitleKey)}
-              </p>
-            </div>
-          </button>
+            minHeight="8.75rem"
+          />
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={onBack}
-        className="kiosk-btn-secondary mx-auto w-full max-w-xs"
-      >
-        {t(language, "back")}
-      </button>
+      <KioskActionBar backLabel={t(language, "back")} onBack={onBack} />
     </div>
   );
 }

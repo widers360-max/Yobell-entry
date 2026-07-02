@@ -6,6 +6,13 @@ import { KioskHomeScreen } from "@/components/KioskHomeScreen";
 import { CallMethodScreen } from "@/components/CallMethodScreen";
 import { CameraCapture } from "@/components/CameraCapture";
 import {
+  KioskActionBar,
+  KioskStepTransition,
+  PremiumButton,
+  PremiumCard,
+  StepHeader,
+} from "@/components/kiosk";
+import {
   INITIAL_KIOSK_STATE,
   type KioskState,
   type KioskSettings,
@@ -276,11 +283,10 @@ export default function KioskPage() {
       tagline={tagline}
       logoUrl={kioskSettings.logoUrl}
     >
+      <KioskStepTransition stepKey={step}>
       {step === "host" && (
-        <div className="flex flex-col gap-6">
-          <h2 className="kiosk-heading text-center text-4xl">
-            {t(lang, "selectHost")}
-          </h2>
+        <div className="flex flex-col gap-g3">
+          <StepHeader title={t(lang, "selectHost")} />
           <input
             type="text"
             value={searchQuery}
@@ -288,16 +294,19 @@ export default function KioskPage() {
             placeholder={t(lang, "searchPlaceholder")}
             className="kiosk-input"
           />
-          <div className="grid max-h-[50vh] grid-cols-1 gap-4 overflow-y-auto pr-2 sm:grid-cols-2">
+          <div className="grid max-h-[50vh] grid-cols-1 gap-g2 overflow-y-auto pr-2 sm:grid-cols-2">
             {staff.length === 0 ? (
-              <p className="col-span-full py-12 text-center text-xl text-[var(--yobell-muted)]">
+              <p className="col-span-full py-g6 text-center text-xl text-yobell-muted">
                 {t(lang, "noResults")}
               </p>
             ) : (
               staff.map((member) => (
-                <button
+                <PremiumCard
                   key={member.id}
-                  type="button"
+                  layout="horizontal"
+                  title={member.name}
+                  subtitle={member.company.name}
+                  meta={`${member.department} · ${member.role}`}
                   onClick={() => {
                     setState((s) => ({
                       ...s,
@@ -307,26 +316,12 @@ export default function KioskPage() {
                     }));
                     setStep("callMethod");
                   }}
-                  className="kiosk-card-interactive flex flex-col items-start gap-2 p-6 text-left"
-                >
-                  <span className="text-2xl font-bold">{member.name}</span>
-                  <span className="text-lg text-[var(--yobell-muted)]">
-                    {member.company.name}
-                  </span>
-                  <span className="text-base text-[var(--yobell-accent)]">
-                    {member.department} · {member.role}
-                  </span>
-                </button>
+                  minHeight="7.5rem"
+                />
               ))
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setStep("idle")}
-            className="kiosk-btn-secondary mx-auto w-full max-w-xs"
-          >
-            {t(lang, "back")}
-          </button>
+          <KioskActionBar backLabel={t(lang, "back")} onBack={() => setStep("idle")} />
         </div>
       )}
 
@@ -339,11 +334,9 @@ export default function KioskPage() {
       )}
 
       {step === "visitorInfo" && (
-        <div className="flex flex-col gap-6">
-          <h2 className="kiosk-heading text-center text-4xl">
-            {t(lang, "visitorInfo")}
-          </h2>
-          <div className="kiosk-card space-y-5 p-8">
+        <div className="flex flex-col gap-g3">
+          <StepHeader title={t(lang, "visitorInfo")} />
+          <div className="kiosk-card space-y-g3 p-g4">
             <div>
               <label className="mb-2 block text-lg font-semibold">
                 {t(lang, "companyName")}
@@ -396,14 +389,14 @@ export default function KioskPage() {
                 className="kiosk-input"
               />
             </div>
-            <label className="flex cursor-pointer items-start gap-4 rounded-xl border-2 border-[var(--yobell-border)] p-5">
+            <label className="premium-consent-row flex cursor-pointer items-start gap-g2 rounded-yobell-sm border-2 border-yobell-border p-g3 transition-colors duration-touch hover:border-yobell-gold">
               <input
                 type="checkbox"
                 checked={state.privacyConsent}
                 onChange={(e) =>
                   setState((s) => ({ ...s, privacyConsent: e.target.checked }))
                 }
-                className="mt-1 h-6 w-6 shrink-0 accent-teal-600"
+                className="mt-1 h-6 w-6 shrink-0 accent-yobell-gold"
               />
               <div>
                 <span className="text-lg font-semibold">
@@ -418,34 +411,18 @@ export default function KioskPage() {
               <p className="text-center text-lg text-red-500">{formError}</p>
             )}
           </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setStep("callMethod")}
-                className="kiosk-btn-secondary flex-1"
-              >
-                {t(lang, "back")}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setFormError("");
-                  setStep("photo");
-                }}
-                className="kiosk-btn-primary flex-1"
-              >
-                {t(lang, "next")}
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={submitManualWithoutInput}
-              className="kiosk-btn-secondary w-full"
-            >
-              {t(lang, "skipManualInput")}
-            </button>
-          </div>
+          <KioskActionBar
+            backLabel={t(lang, "back")}
+            onBack={() => setStep("callMethod")}
+            primaryLabel={t(lang, "next")}
+            onPrimary={() => {
+              setFormError("");
+              setStep("photo");
+            }}
+            secondaryLabel={t(lang, "skipManualInput")}
+            onSecondary={submitManualWithoutInput}
+            layout="stack"
+          />
         </div>
       )}
 
@@ -472,11 +449,9 @@ export default function KioskPage() {
       )}
 
       {step === "confirm" && (
-        <div className="flex flex-col gap-8">
-          <h2 className="kiosk-heading text-center text-4xl">
-            {t(lang, "confirmTitle")}
-          </h2>
-          <div className="kiosk-card divide-y divide-[var(--yobell-border)] p-8 text-xl">
+        <div className="flex flex-col gap-g4">
+          <StepHeader title={t(lang, "confirmTitle")} />
+          <div className="kiosk-card divide-y divide-yobell-border p-g4 text-xl">
             <ConfirmRow label={t(lang, "confirmType")} value={state.visitorType ? visitorTypeLabel(lang, state.visitorType) : ""} />
             <ConfirmRow label={t(lang, "confirmHost")} value={state.hostStaffName ?? ""} />
             <ConfirmRow label={t(lang, "confirmCompany")} value={state.visitorCompany || "—"} />
@@ -498,56 +473,46 @@ export default function KioskPage() {
               </div>
             )}
           </div>
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() =>
-                setStep(state.inputMethod === "business_card" ? "callMethod" : "visitorInfo")
-              }
-              className="kiosk-btn-secondary flex-1"
-            >
-              {t(lang, "back")}
-            </button>
-            <button
-              type="button"
-              onClick={() => void submitVisit()}
-              className="kiosk-btn-primary flex-1"
-            >
-              {t(lang, "callHost")}
-            </button>
-          </div>
+          <KioskActionBar
+            backLabel={t(lang, "back")}
+            onBack={() =>
+              setStep(state.inputMethod === "business_card" ? "callMethod" : "visitorInfo")
+            }
+            primaryLabel={t(lang, "callHost")}
+            onPrimary={() => void submitVisit()}
+          />
         </div>
       )}
 
       {step === "waiting" && (
-        <div className="flex flex-col items-center gap-10 py-8 text-center">
+        <div className="flex flex-col items-center gap-g4 py-g3 text-center">
           <StatusIcon status={visitStatus} />
-          <div className="space-y-4">
-            <h2 className="kiosk-heading text-4xl">
-              {t(lang, "waitingTitle")}
-            </h2>
-            <p className="max-w-2xl text-2xl leading-relaxed text-[var(--yobell-muted)]">
-              {visitStatus === "no_response"
+          <StepHeader
+            title={t(lang, "waitingTitle")}
+            subtitle={
+              visitStatus === "no_response"
                 ? fallbackMsg
-                : waitingMessage(lang, visitStatus)}
-            </p>
-          </div>
+                : waitingMessage(lang, visitStatus)
+            }
+          />
           {visitStatus === "pending" && (
-            <div className="text-lg text-[var(--yobell-muted)]">
+            <div className="text-lg tabular-nums text-yobell-muted">
               {Math.max(0, 60 - waitSeconds)}s
             </div>
           )}
           {(visitStatus !== "pending" || waitSeconds >= 60) && (
-            <button
-              type="button"
+            <PremiumButton
+              fullWidth
+              className="max-w-lg"
+              variant={visitStatus === "accepted" ? "success" : "primary"}
               onClick={resetKiosk}
-              className="kiosk-btn-primary w-full max-w-lg"
             >
               {t(lang, "returnHome")}
-            </button>
+            </PremiumButton>
           )}
         </div>
       )}
+      </KioskStepTransition>
     </KioskLayout>
   );
 }

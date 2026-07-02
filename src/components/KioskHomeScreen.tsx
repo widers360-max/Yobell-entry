@@ -6,6 +6,7 @@ import { LanguageToggle } from "./LanguageToggle";
 import { KioskTopBar } from "./KioskTopBar";
 import { getIcon } from "@/lib/icon-utils";
 import { t } from "@/lib/i18n";
+import { PremiumCard } from "@/components/kiosk";
 import {
   KIOSK_SHOWROOM_DEFAULTS,
   YOBELL_DEFAULT_ACCENT,
@@ -43,7 +44,6 @@ export function KioskHomeScreen({
   onSelectPurpose,
 }: KioskHomeScreenProps) {
   const [isActive, setIsActive] = useState(false);
-  const [pressedCard, setPressedCard] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
 
   const primary = settings.primaryColor ?? YOBELL_DEFAULT_PRIMARY;
@@ -200,29 +200,32 @@ export function KioskHomeScreen({
           </div>
 
           <div className="grid flex-1 grid-cols-3 gap-g2 content-start">
-            {mainCards.map((card) => (
-              <PurposeCard
-                key={card.id}
-                card={card}
-                primary={primary}
-                pressed={pressedCard === card.id}
-                onPressStart={() => setPressedCard(card.id)}
-                onPressEnd={() => setPressedCard(null)}
-                onSelect={onSelectPurpose}
-              />
-            ))}
+            {mainCards.map((card) => {
+              const Icon = getIcon(card.iconKey);
+              return (
+                <PremiumCard
+                  key={card.id}
+                  layout="vertical"
+                  title={card.title}
+                  subtitle={card.subtitle}
+                  icon={Icon}
+                  primaryColor={primary}
+                  onClick={() => onSelectPurpose(card.typeKey as VisitorType)}
+                />
+              );
+            })}
           </div>
 
           {otherCard && (
             <div className="mt-g2 flex justify-center">
               <div className="w-1/3 min-w-[180px]">
-                <PurposeCard
-                  card={otherCard}
-                  primary={primary}
-                  pressed={pressedCard === otherCard.id}
-                  onPressStart={() => setPressedCard(otherCard.id)}
-                  onPressEnd={() => setPressedCard(null)}
-                  onSelect={onSelectPurpose}
+                <PremiumCard
+                  layout="vertical"
+                  title={otherCard.title}
+                  subtitle={otherCard.subtitle}
+                  icon={getIcon(otherCard.iconKey)}
+                  primaryColor={primary}
+                  onClick={() => onSelectPurpose(otherCard.typeKey as VisitorType)}
                 />
               </div>
             </div>
@@ -309,45 +312,5 @@ function HeroBackdrop({
         }}
       />
     </div>
-  );
-}
-
-function PurposeCard({
-  card,
-  primary,
-  pressed,
-  onPressStart,
-  onPressEnd,
-  onSelect,
-}: {
-  card: VisitorCardRecord;
-  primary: string;
-  pressed: boolean;
-  onPressStart: () => void;
-  onPressEnd: () => void;
-  onSelect: (type: VisitorType) => void;
-}) {
-  const Icon = getIcon(card.iconKey);
-
-  return (
-    <button
-      type="button"
-      onClick={() => onSelect(card.typeKey as VisitorType)}
-      onPointerDown={onPressStart}
-      onPointerUp={onPressEnd}
-      onPointerLeave={onPressEnd}
-      className={`kiosk-purpose-card ${pressed ? "yobell-card-selected scale-[0.96]" : ""}`}
-    >
-      <div
-        className="flex h-11 w-11 items-center justify-center rounded-yobell-sm transition-colors duration-fast"
-        style={{ background: `${primary}12` }}
-      >
-        <Icon className="h-6 w-6" style={{ color: primary }} strokeWidth={1.75} />
-      </div>
-      <span className="text-base font-bold leading-tight text-yobell-navy">{card.title}</span>
-      <span className="line-clamp-2 text-[11px] leading-snug text-yobell-muted">
-        {card.subtitle}
-      </span>
-    </button>
   );
 }
