@@ -79,7 +79,7 @@ export function WaitingScreen({
     <div className="waiting-screen flex flex-col items-center gap-g4 py-g2">
       <WaitingPulse status={visitStatus} />
 
-      <div className="waiting-status-copy text-center" key={visitStatus}>
+      <div className="waiting-status-copy text-center" key={visitStatus} role="status" aria-live="polite">
         <h2 className="kiosk-heading text-3xl md:text-4xl">
           {t(language, titleKey)}
         </h2>

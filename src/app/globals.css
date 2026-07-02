@@ -1461,6 +1461,29 @@ body {
   animation: healthPulse 2s ease-in-out infinite;
 }
 
+.staff-response-grid {
+  @apply grid gap-0;
+}
+
+@media (max-width: 640px) {
+  .staff-page-header {
+    @apply flex-col items-stretch;
+  }
+
+  .staff-page-actions {
+    @apply w-full justify-between;
+  }
+
+  .staff-response-btn {
+    min-height: 3.5rem;
+    @apply border-b border-yobell-border;
+  }
+
+  .staff-response-btn:last-child {
+    @apply border-b-0;
+  }
+}
+
 @keyframes healthPulse {
   0%,
   100% {
