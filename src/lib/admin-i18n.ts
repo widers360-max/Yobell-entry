@@ -31,6 +31,7 @@ export type AdminTranslationKey =
   | "selectPlaceholder"
   | "msg_saveSuccess"
   | "msg_saveFailed"
+  | "msg_loadFailed"
   | "msg_deleteSuccess"
   | "msg_deleteFailed"
   | "msg_companyRequired"
@@ -234,6 +235,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     selectPlaceholder: "選択してください",
     msg_saveSuccess: "保存しました",
     msg_saveFailed: "保存に失敗しました",
+    msg_loadFailed: "データの読み込みに失敗しました",
     msg_deleteSuccess: "削除しました",
     msg_deleteFailed: "削除に失敗しました",
     msg_companyRequired: "会社名は必須です",
@@ -437,6 +439,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     selectPlaceholder: "Please select",
     msg_saveSuccess: "Saved successfully",
     msg_saveFailed: "Failed to save",
+    msg_loadFailed: "Failed to load data",
     msg_deleteSuccess: "Deleted successfully",
     msg_deleteFailed: "Failed to delete",
     msg_companyRequired: "Company name is required",
@@ -599,7 +602,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     notify_testFailed: "Failed to send test email",
     notify_testFallback: "SMTP not configured — logged to console",
     notify_testEmailRequired: "Please enter a recipient email",
-    notify_testDesc: "Subject: 【YOBELL】テストメール / Body: YOBELLのメール通知設定テストです。",
+    notify_testDesc: "Subject: 【YOBELL】Test email / Body: This is a YOBELL email notification test.",
     notify_configuredYes: "Configured",
     notify_configuredNo: "Not set",
     notify_smtpReady: "Email ready",
@@ -640,6 +643,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     selectPlaceholder: "선택하세요",
     msg_saveSuccess: "저장되었습니다",
     msg_saveFailed: "저장에 실패했습니다",
+    msg_loadFailed: "데이터를 불러오지 못했습니다",
     msg_deleteSuccess: "삭제되었습니다",
     msg_deleteFailed: "삭제에 실패했습니다",
     msg_companyRequired: "회사명은 필수입니다",
@@ -802,7 +806,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     notify_testFailed: "테스트 메일 전송에 실패했습니다",
     notify_testFallback: "SMTP 미설정 — 콘솔에 로그 출력됨",
     notify_testEmailRequired: "수신 이메일을 입력하세요",
-    notify_testDesc: "제목: 【YOBELL】テストメール / 본문: YOBELLのメール通知設定テストです。",
+    notify_testDesc: "제목: 【YOBELL】테스트 메일 / 본문: YOBELL 이메일 알림 설정 테스트입니다.",
     notify_configuredYes: "설정됨",
     notify_configuredNo: "미설정",
     notify_smtpReady: "메일 전송 가능",

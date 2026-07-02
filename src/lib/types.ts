@@ -96,4 +96,4 @@ export interface VisitorCardRecord {
   active: boolean;
 }
 
-export const APP_VERSION = "0.3.0";
+export const APP_VERSION = "0.8.0";

@@ -1,69 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notifyHostStaffForVisit } from "@/lib/visit-notify";
+import { buildVisitWhereClause, getVisitSearchParams } from "@/lib/visit-query";
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+    const searchParams = getVisitSearchParams(request);
     const pending = searchParams.get("pending");
-    const q = searchParams.get("q")?.trim();
-    const visitorType = searchParams.get("visitorType");
-    const from = searchParams.get("from");
-    const to = searchParams.get("to");
-    const host = searchParams.get("host")?.trim();
+    const summary = searchParams.get("summary") === "true";
+    const whereClause = buildVisitWhereClause(searchParams);
+    const take = pending === "true" ? 50 : summary ? 200 : 500;
 
-    const dateFilter: { gte?: Date; lte?: Date } = {};
-    if (from) dateFilter.gte = new Date(from);
-    if (to) {
-      const end = new Date(to);
-      end.setHours(23, 59, 59, 999);
-      dateFilter.lte = end;
+    if (summary) {
+      const visits = await prisma.visit.findMany({
+        where: whereClause,
+        select: {
+          id: true,
+          visitorName: true,
+          visitorCompany: true,
+          visitorPhone: true,
+          purpose: true,
+          visitorType: true,
+          status: true,
+          createdAt: true,
+          hostStaff: {
+            select: {
+              id: true,
+              name: true,
+              department: true,
+              company: { select: { name: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take,
+      });
+      return NextResponse.json(visits.map((v) => ({ ...v, photoData: null })));
     }
 
     const visits = await prisma.visit.findMany({
-      where: {
-        ...(status ? { status } : {}),
-        ...(pending === "true" ? { status: "pending" } : {}),
-        ...(visitorType ? { visitorType } : {}),
-        ...(Object.keys(dateFilter).length ? { createdAt: dateFilter } : {}),
-        ...(q || host
-          ? {
-              AND: [
-                ...(q
-                  ? [
-                      {
-                        OR: [
-                          { visitorName: { contains: q } },
-                          { visitorCompany: { contains: q } },
-                          { purpose: { contains: q } },
-                        ],
-                      },
-                    ]
-                  : []),
-                ...(host
-                  ? [
-                      {
-                        OR: [
-                          { hostStaff: { name: { contains: host } } },
-                          {
-                            hostStaff: {
-                              company: { name: { contains: host } },
-                            },
-                          },
-                        ],
-                      },
-                    ]
-                  : []),
-              ],
-            }
-          : {}),
-      },
+      where: whereClause,
       include: {
         hostStaff: { include: { company: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: pending === "true" ? 50 : 500,
+      take,
     });
 
     return NextResponse.json(visits);

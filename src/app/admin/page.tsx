@@ -12,32 +12,11 @@ import { SystemSection } from "@/components/admin/SystemSection";
 import { NotificationSection } from "@/components/admin/NotificationSection";
 import { Toast } from "@/components/admin/ui";
 import { PasswordGate } from "@/components/PasswordGate";
-import {
-  KIOSK_SHOWROOM_DEFAULTS,
-  YOBELL_DEFAULT_ACCENT,
-  YOBELL_DEFAULT_PRIMARY,
-} from "@/lib/design-system";
+import { mergeKioskSettings } from "@/lib/kiosk-defaults";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
 import { useState, useEffect, useCallback } from "react";
 
-const DEFAULT_SETTINGS: KioskSettings = {
-  brandName: KIOSK_SHOWROOM_DEFAULTS.brandName,
-  tagline: KIOSK_SHOWROOM_DEFAULTS.tagline,
-  logoUrl: null,
-  welcomeMessage: KIOSK_SHOWROOM_DEFAULTS.welcomeMessage,
-  languageDefault: "ja",
-  fallbackMessage: "担当者が応答できません。",
-  privacyNotice: "入力された情報は受付対応および来訪記録のために利用されます。",
-  heroImageUrl: null,
-  heroVideoUrl: null,
-  companyDisplayName: KIOSK_SHOWROOM_DEFAULTS.companyDisplayName,
-  heroTitle: KIOSK_SHOWROOM_DEFAULTS.heroTitle,
-  heroSubtitle: KIOSK_SHOWROOM_DEFAULTS.heroSubtitle,
-  primaryColor: YOBELL_DEFAULT_PRIMARY,
-  accentColor: YOBELL_DEFAULT_ACCENT,
-  retentionDays: 30,
-  idleTimeoutSeconds: KIOSK_SHOWROOM_DEFAULTS.idleTimeoutSeconds,
-};
+const DEFAULT_SETTINGS = mergeKioskSettings(null);
 
 const DEFAULT_DASHBOARD = {
   stats: {
@@ -157,7 +136,7 @@ function AdminPageContent() {
     setDashboard(dash);
     setCompanies(Array.isArray(comps) ? comps : []);
     setStaff(Array.isArray(staffList) ? staffList : []);
-    setSettings({ ...DEFAULT_SETTINGS, ...settingsData });
+    setSettings(mergeKioskSettings(settingsData));
     setCards(Array.isArray(cardsList) ? cardsList : []);
   }, []);
 
@@ -176,7 +155,7 @@ function AdminPageContent() {
       showMessage(t("msg_saveFailed"), "error");
       return;
     }
-    setSettings({ ...DEFAULT_SETTINGS, ...updated });
+    setSettings(mergeKioskSettings(updated));
     showMessage(t("msg_brandingSaved"));
   }
 

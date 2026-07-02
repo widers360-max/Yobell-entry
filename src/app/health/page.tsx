@@ -46,8 +46,20 @@ export default function HealthPage() {
 
   useEffect(() => {
     void check();
-    const interval = setInterval(() => void check(true), 10000);
-    return () => clearInterval(interval);
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") void check(true);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") void check(true);
+    }, 10000);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      clearInterval(interval);
+    };
   }, [check]);
 
   const healthy = data?.status === "healthy";

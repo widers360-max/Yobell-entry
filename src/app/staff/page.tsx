@@ -5,9 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell, LogOut, Loader2 } from "lucide-react";
 import { PasswordGate } from "@/components/PasswordGate";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { PremiumSpinner } from "@/components/kiosk";
 import { clearUnlock } from "@/lib/auth-session";
-import { t } from "@/lib/i18n";
+import {
+  t,
+  visitorTypeLabel,
+  visitStatusLabel,
+  visitStatusBadgeColor,
+} from "@/lib/i18n";
+import type { Language, VisitorType } from "@/lib/types";
 
 interface Visit {
   id: string;
@@ -27,24 +34,6 @@ interface Visit {
   };
 }
 
-const VISITOR_TYPE_LABELS: Record<string, string> = {
-  meeting: "打ち合わせ",
-  delivery: "配達・宅配",
-  interview: "面接・面談",
-  maintenance: "工事・点検",
-  reception: "ご案内・受付",
-  tour: "会社見学",
-  other: "その他",
-};
-
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: "未対応", color: "admin-badge-amber" },
-  accepted: { label: "対応中", color: "admin-badge-green" },
-  please_wait: { label: "お待ちください", color: "admin-badge-blue" },
-  declined: { label: "対応不可", color: "admin-badge-red" },
-  no_response: { label: "無応答", color: "admin-badge-gray" },
-};
-
 export default function StaffPage() {
   return (
     <PasswordGate role="staff">
@@ -55,10 +44,12 @@ export default function StaffPage() {
 
 function StaffPageContent() {
   const router = useRouter();
+  const [language, setLanguage] = useState<Language>("ja");
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [respondingKey, setRespondingKey] = useState<string | null>(null);
+  const [cardErrors, setCardErrors] = useState<Record<string, string>>({});
   const [newVisitIds, setNewVisitIds] = useState<Set<string>>(new Set());
   const initialLoadDone = useRef(false);
   const knownPendingRef = useRef<Set<string>>(new Set());
@@ -70,7 +61,7 @@ function StaffPageContent() {
 
   const fetchVisits = useCallback(async () => {
     try {
-      const res = await fetch("/api/visits");
+      const res = await fetch("/api/visits?summary=true");
       if (!res.ok) throw new Error("fetch failed");
       const data: Visit[] = await res.json();
       const recent = data.filter(
@@ -122,6 +113,11 @@ function StaffPageContent() {
   async function respond(visitId: string, status: string) {
     const key = `${visitId}:${status}`;
     setRespondingKey(key);
+    setCardErrors((prev) => {
+      const next = { ...prev };
+      delete next[visitId];
+      return next;
+    });
     try {
       const res = await fetch(`/api/visits/${visitId}`, {
         method: "PATCH",
@@ -131,7 +127,10 @@ function StaffPageContent() {
       if (!res.ok) throw new Error("respond failed");
       await fetchVisits();
     } catch {
-      setFetchError(true);
+      setCardErrors((prev) => ({
+        ...prev,
+        [visitId]: t(language, "staff_respondFailed"),
+      }));
     } finally {
       setRespondingKey(null);
     }
@@ -142,21 +141,24 @@ function StaffPageContent() {
   return (
     <div className="min-h-screen bg-yobell-bg">
       <header className="yobell-glass border-b border-yobell-border px-g3 py-g2 shadow-glass">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-yobell-navy">
-              YOBELL Entry — スタッフ通知
+        <div className="staff-page-header mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-g2">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-yobell-navy sm:text-2xl">
+              {t(language, "staff_title")}
             </h1>
-            <p className="text-sm text-yobell-muted">
-              来訪者の呼び出しをリアルタイムで確認・対応
-            </p>
+            <p className="text-sm text-yobell-muted">{t(language, "staff_subtitle")}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="staff-page-actions flex flex-wrap items-center gap-g2">
+            <LanguageToggle
+              language={language}
+              onChange={setLanguage}
+              variant="premium"
+            />
             <Link href="/" className="admin-btn-secondary">
-              キオスク
+              {t(language, "staff_linkKiosk")}
             </Link>
             <Link href="/admin" className="admin-btn-secondary">
-              管理画面
+              {t(language, "staff_linkAdmin")}
             </Link>
             <button
               type="button"
@@ -164,7 +166,7 @@ function StaffPageContent() {
               className="admin-btn-secondary flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
-              {t("ja", "auth_logout")}
+              {t(language, "auth_logout")}
             </button>
           </div>
         </div>
@@ -173,14 +175,14 @@ function StaffPageContent() {
       <main className="mx-auto max-w-6xl px-g3 py-g4">
         {loading ? (
           <div className="py-20">
-            <PremiumSpinner label="読み込み中..." size="lg" />
+            <PremiumSpinner label={t(language, "kiosk_loading")} size="lg" />
           </div>
         ) : fetchError ? (
           <div className="rounded-yobell border border-yobell-danger/30 bg-yobell-surface p-g4 text-center">
-            <p className="text-lg font-semibold text-yobell-navy">通信エラー</p>
-            <p className="mt-g1 text-yobell-muted">
-              しばらくしてからもう一度お試しください
+            <p className="text-lg font-semibold text-yobell-navy">
+              {t(language, "kiosk_errorTitle")}
             </p>
+            <p className="mt-g1 text-yobell-muted">{t(language, "kiosk_errorMessage")}</p>
             <button
               type="button"
               onClick={() => {
@@ -189,7 +191,7 @@ function StaffPageContent() {
               }}
               className="admin-btn-primary mt-g3"
             >
-              再試行
+              {t(language, "kiosk_retry")}
             </button>
           </div>
         ) : pendingVisits.length === 0 ? (
@@ -197,8 +199,8 @@ function StaffPageContent() {
             <div className="mx-auto mb-g2 flex h-16 w-16 items-center justify-center rounded-full bg-yobell-bg">
               <Bell className="h-8 w-8 text-yobell-muted" strokeWidth={1.5} />
             </div>
-            <p className="admin-empty-title text-lg">現在、待機中の来訪者はいません</p>
-            <p className="admin-empty-desc">3秒ごとに自動更新されます</p>
+            <p className="admin-empty-title text-lg">{t(language, "staff_emptyTitle")}</p>
+            <p className="admin-empty-desc">{t(language, "staff_emptyDesc")}</p>
           </div>
         ) : (
           <div className="space-y-g3">
@@ -206,15 +208,19 @@ function StaffPageContent() {
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-yobell-danger text-sm font-bold text-white health-status-pulse">
                 {pendingVisits.length}
               </span>
-              <h2 className="text-xl font-bold text-yobell-navy">新しい来訪者</h2>
+              <h2 className="text-xl font-bold text-yobell-navy">
+                {t(language, "staff_newVisitors")}
+              </h2>
             </div>
 
             {pendingVisits.map((visit) => (
               <VisitCard
                 key={visit.id}
                 visit={visit}
+                language={language}
                 isNew={newVisitIds.has(visit.id)}
                 respondingKey={respondingKey}
+                errorMessage={cardErrors[visit.id]}
                 onRespond={respond}
               />
             ))}
@@ -223,14 +229,16 @@ function StaffPageContent() {
 
         {visits.filter((v) => v.status !== "pending").length > 0 && (
           <div className="mt-g4">
-            <h2 className="mb-g2 text-lg font-bold text-yobell-muted">最近の対応</h2>
+            <h2 className="mb-g2 text-lg font-bold text-yobell-muted">
+              {t(language, "staff_recentHistory")}
+            </h2>
             <div className="space-y-g2">
               {visits
                 .filter((v) => v.status !== "pending")
                 .slice(0, 10)
                 .map((visit) => (
                   <div key={visit.id} className="staff-history-row">
-                    <div>
+                    <div className="min-w-0">
                       <span className="font-semibold text-yobell-navy">
                         {visit.visitorName}
                       </span>
@@ -238,11 +246,9 @@ function StaffPageContent() {
                       <span className="text-yobell-muted">{visit.hostStaff.name}</span>
                     </div>
                     <span
-                      className={`admin-badge ${
-                        STATUS_LABELS[visit.status]?.color ?? "admin-badge-gray"
-                      }`}
+                      className={`admin-badge shrink-0 ${visitStatusBadgeColor(visit.status)}`}
                     >
-                      {STATUS_LABELS[visit.status]?.label ?? visit.status}
+                      {visitStatusLabel(language, visit.status)}
                     </span>
                   </div>
                 ))}
@@ -256,47 +262,47 @@ function StaffPageContent() {
 
 function VisitCard({
   visit,
+  language,
   isNew,
   respondingKey,
+  errorMessage,
   onRespond,
 }: {
   visit: Visit;
+  language: Language;
   isNew: boolean;
   respondingKey: string | null;
+  errorMessage?: string;
   onRespond: (id: string, status: string) => void;
 }) {
-  const time = new Date(visit.createdAt).toLocaleTimeString("ja-JP", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const time = new Date(visit.createdAt).toLocaleTimeString(
+    language === "ko" ? "ko-KR" : language === "en" ? "en-US" : "ja-JP",
+    { hour: "2-digit", minute: "2-digit" },
+  );
 
   const actions = [
-    { status: "accepted", label: "今行きます", className: "text-yobell-success border-r border-yobell-border hover:bg-green-50" },
-    { status: "please_wait", label: "少々お待ちください", className: "text-yobell-gold border-r border-yobell-border hover:bg-amber-50" },
-    { status: "declined", label: "本日は対応できません", className: "text-yobell-danger hover:bg-red-50" },
-  ] as const;
+    { status: "accepted", labelKey: "staff_respondAccept" as const, className: "text-yobell-success hover:bg-green-50" },
+    { status: "please_wait", labelKey: "staff_respondWait" as const, className: "text-yobell-gold hover:bg-amber-50" },
+    { status: "declined", labelKey: "staff_respondDecline" as const, className: "text-yobell-danger hover:bg-red-50" },
+  ];
+
+  const visitResponding = respondingKey?.startsWith(`${visit.id}:`) ?? false;
 
   return (
     <div className={`staff-visit-card ${isNew ? "staff-visit-card-new" : ""}`}>
-      <div className="flex items-start gap-g3 p-g3">
-        {visit.photoData ? (
-          <img
-            src={visit.photoData}
-            alt={visit.visitorName}
-            className="h-24 w-24 shrink-0 rounded-yobell-sm object-cover"
-          />
-        ) : (
-          <div className="staff-card-avatar h-24 w-24 shrink-0 text-3xl">
-            <span>{visit.visitorName.charAt(0)}</span>
-          </div>
-        )}
+      <div className="flex flex-col gap-g3 p-g3 sm:flex-row sm:items-start">
+        <div className="staff-card-avatar mx-auto h-20 w-20 shrink-0 text-3xl sm:mx-0 sm:h-24 sm:w-24">
+          <span>{visit.visitorName.charAt(0)}</span>
+        </div>
 
-        <div className="flex-1">
-          <div className="flex items-start justify-between gap-g2">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-g2">
             <div>
-              <h3 className="text-2xl font-bold text-yobell-navy">{visit.visitorName}</h3>
+              <h3 className="text-xl font-bold text-yobell-navy sm:text-2xl">
+                {visit.visitorName}
+              </h3>
               {visit.visitorCompany && (
-                <p className="text-lg text-yobell-muted">{visit.visitorCompany}</p>
+                <p className="text-base text-yobell-muted sm:text-lg">{visit.visitorCompany}</p>
               )}
             </div>
             <span className="text-sm tabular-nums text-yobell-muted">{time}</span>
@@ -304,7 +310,7 @@ function VisitCard({
 
           <div className="mt-g2 flex flex-wrap gap-g1">
             <span className="admin-badge admin-badge-navy">
-              {VISITOR_TYPE_LABELS[visit.visitorType] ?? visit.visitorType}
+              {visitorTypeLabel(language, visit.visitorType as VisitorType)}
             </span>
             {visit.purpose && (
               <span className="admin-badge admin-badge-gray">{visit.purpose}</span>
@@ -314,39 +320,44 @@ function VisitCard({
             )}
           </div>
 
-          <p className="mt-g2 text-lg text-yobell-navy">
-            担当: <strong>{visit.hostStaff.name}</strong>
+          <p className="mt-g2 text-base text-yobell-navy sm:text-lg">
+            {t(language, "staff_hostLabel")}: <strong>{visit.hostStaff.name}</strong>
             <span className="text-yobell-muted">
               {" "}
               ({visit.hostStaff.company.name} / {visit.hostStaff.department})
             </span>
           </p>
+
+          {errorMessage && (
+            <p className="mt-g2 text-sm font-medium text-yobell-danger" role="alert">
+              {errorMessage}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-0 border-t border-yobell-border">
-        {actions.map(({ status, label, className }) => {
+      <div className="staff-response-grid grid grid-cols-1 border-t border-yobell-border sm:grid-cols-3">
+        {actions.map(({ status, labelKey, className }, index) => {
           const key = `${visit.id}:${status}`;
           const isLoading = respondingKey === key;
-          const isDisabled = respondingKey !== null;
 
           return (
             <button
               key={status}
               type="button"
-              disabled={isDisabled}
+              disabled={visitResponding}
               onClick={() => onRespond(visit.id, status)}
-              className={`staff-response-btn ${className} ${
-                isLoading ? "staff-response-btn-loading" : ""
-              }`}
+              className={`staff-response-btn border-yobell-border ${className} ${
+                index < 2 ? "sm:border-r" : ""
+              } ${isLoading ? "staff-response-btn-loading" : ""}`}
             >
               {isLoading ? (
                 <span className="inline-flex items-center justify-center gap-2">
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  送信中
+                  {t(language, "staff_respondSending")}
                 </span>
               ) : (
-                label
+                t(language, labelKey)
               )}
             </button>
           );

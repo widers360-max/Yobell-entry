@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { KioskLayout } from "@/components/KioskLayout";
 import { KioskHomeScreen } from "@/components/KioskHomeScreen";
 import { CallMethodScreen } from "@/components/CallMethodScreen";
@@ -34,13 +34,14 @@ import {
   type InputMethod,
 } from "@/lib/types";
 import { VISIT_PLACEHOLDER } from "@/lib/visit-constants";
-import {
-  KIOSK_SHOWROOM_DEFAULTS,
-  YOBELL_DEFAULT_ACCENT,
-  YOBELL_DEFAULT_PRIMARY,
-} from "@/lib/design-system";
+import { mergeKioskSettings } from "@/lib/kiosk-defaults";
 import { t, visitorTypeLabel } from "@/lib/i18n";
 import { useKioskIdleTimeout } from "@/lib/use-kiosk-idle-timeout";
+import {
+  completePendingVisit,
+  isTerminalVisitStatus,
+  patchVisitStatus,
+} from "@/lib/visit-client";
 
 type Step =
   | "idle"
@@ -52,27 +53,6 @@ type Step =
   | "waiting";
 
 type StaffMember = KioskStaffMember;
-
-const DEFAULT_SETTINGS: KioskSettings = {
-  brandName: KIOSK_SHOWROOM_DEFAULTS.brandName,
-  tagline: KIOSK_SHOWROOM_DEFAULTS.tagline,
-  logoUrl: null,
-  welcomeMessage: KIOSK_SHOWROOM_DEFAULTS.welcomeMessage,
-  languageDefault: "ja",
-  fallbackMessage:
-    "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
-  privacyNotice:
-    "入力された情報は受付対応および来訪記録のために利用されます。",
-  heroImageUrl: null,
-  heroVideoUrl: null,
-  companyDisplayName: KIOSK_SHOWROOM_DEFAULTS.companyDisplayName,
-  heroTitle: KIOSK_SHOWROOM_DEFAULTS.heroTitle,
-  heroSubtitle: KIOSK_SHOWROOM_DEFAULTS.heroSubtitle,
-  primaryColor: YOBELL_DEFAULT_PRIMARY,
-  accentColor: YOBELL_DEFAULT_ACCENT,
-  retentionDays: 30,
-  idleTimeoutSeconds: KIOSK_SHOWROOM_DEFAULTS.idleTimeoutSeconds,
-};
 
 export default function KioskPage() {
   const [step, setStep] = useState<Step>("idle");
@@ -92,6 +72,17 @@ export default function KioskPage() {
   const [bootstrapError, setBootstrapError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [receptionError, setReceptionError] = useState("");
+  const visitIdRef = useRef<string | null>(null);
+  const visitStatusRef = useRef("pending");
+
+  useEffect(() => {
+    visitIdRef.current = state.visitId;
+  }, [state.visitId]);
+
+  useEffect(() => {
+    visitStatusRef.current = visitStatus;
+  }, [visitStatus]);
 
   useEffect(() => {
     Promise.all([
@@ -99,7 +90,7 @@ export default function KioskPage() {
       fetch("/api/visitor-cards").then((r) => r.json()),
     ])
       .then(([settingsData, cardsData]: [KioskSettings, VisitorCardRecord[]]) => {
-        setSettings({ ...DEFAULT_SETTINGS, ...settingsData });
+        setSettings(mergeKioskSettings(settingsData));
         setVisitorCards(cardsData);
         setState((s) => ({
           ...s,
@@ -127,6 +118,7 @@ export default function KioskPage() {
 
   useEffect(() => {
     if (step !== "waiting" || !state.visitId) return;
+    if (isTerminalVisitStatus(visitStatus)) return;
 
     const poll = setInterval(async () => {
       const res = await fetch(`/api/visits/${state.visitId}`);
@@ -137,7 +129,7 @@ export default function KioskPage() {
     }, 2000);
 
     return () => clearInterval(poll);
-  }, [step, state.visitId]);
+  }, [step, state.visitId, visitStatus]);
 
   useEffect(() => {
     if (step !== "waiting") return;
@@ -150,23 +142,29 @@ export default function KioskPage() {
   }, [step]);
 
   useEffect(() => {
-    if (
-      step === "waiting" &&
-      waitSeconds >= 60 &&
-      visitStatus === "pending"
-    ) {
-      if (state.visitId) {
-        fetch(`/api/visits/${state.visitId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "no_response" }),
-        });
-      }
-      setVisitStatus("no_response");
+    if (step !== "waiting" || waitSeconds < 60 || visitStatus !== "pending" || !state.visitId) {
+      return;
     }
+
+    let cancelled = false;
+
+    void (async () => {
+      const ok = await patchVisitStatus(state.visitId!, "no_response");
+      if (cancelled || !ok) return;
+      const res = await fetch(`/api/visits/${state.visitId}`);
+      if (cancelled || !res.ok) return;
+      const visit = await res.json();
+      setVisitStatus(visit.status);
+      setWaitingVisit(parseVisitSnapshot(visit));
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [step, waitSeconds, visitStatus, state.visitId]);
 
   const resetKiosk = useCallback(() => {
+    void completePendingVisit(visitIdRef.current, visitStatusRef.current);
     setHomeActive(false);
     setStep("idle");
     setState((s) => ({
@@ -178,6 +176,7 @@ export default function KioskPage() {
     setWaitSeconds(0);
     setWaitingVisit(null);
     setFormError("");
+    setReceptionError("");
   }, []);
 
   function setLanguage(lang: Language) {
@@ -192,6 +191,12 @@ export default function KioskPage() {
     photoData?: string | null;
     inputMethod?: InputMethod;
   }) {
+    const method = overrides?.inputMethod ?? state.inputMethod ?? "manual";
+    if (method === "manual" && !state.privacyConsent) {
+      setSubmitError(t(state.language, "privacyConsentRequired"));
+      return false;
+    }
+
     setIsSubmitting(true);
     setSubmitError("");
     try {
@@ -276,6 +281,10 @@ export default function KioskPage() {
   }
 
   function submitManualWithoutInput() {
+    if (!state.privacyConsent) {
+      setFormError(t(state.language, "privacyConsentRequired"));
+      return;
+    }
     void submitVisit({
       visitorName: VISIT_PLACEHOLDER.NOT_ENTERED,
       visitorCompany: VISIT_PLACEHOLDER.NOT_ENTERED,
@@ -300,6 +309,7 @@ export default function KioskPage() {
   }
 
   function handleSelectOtherHost() {
+    void completePendingVisit(state.visitId, visitStatus);
     setStep("host");
     setVisitStatus("pending");
     setWaitSeconds(0);
@@ -339,6 +349,7 @@ export default function KioskPage() {
 
   const handleContactReception = useCallback(async () => {
     setIsContactingReception(true);
+    setReceptionError("");
     try {
       const params = new URLSearchParams({ active: "true" });
       const res = await fetch(`/api/staff?${params}`);
@@ -346,11 +357,13 @@ export default function KioskPage() {
       const reception = findReceptionStaff(allStaff);
       if (reception) {
         selectHost(reception);
+      } else {
+        setReceptionError(t(state.language, "noResults"));
       }
     } finally {
       setIsContactingReception(false);
     }
-  }, []);
+  }, [state.language]);
 
   function handleSelectPurpose(type: VisitorType) {
     setState((s) => ({ ...s, visitorType: type }));
@@ -374,7 +387,7 @@ export default function KioskPage() {
   }, [step, visitStatus, resetKiosk]);
 
   const lang = state.language;
-  const kioskSettings = settings ?? DEFAULT_SETTINGS;
+  const kioskSettings = settings ?? mergeKioskSettings(null);
   const idleSeconds = kioskSettings.idleTimeoutSeconds ?? 60;
 
   useKioskIdleTimeout({
@@ -450,6 +463,7 @@ export default function KioskPage() {
             setHomeActive(true);
           }}
           isContactingReception={isContactingReception}
+          receptionError={receptionError}
         />
       )}
 
@@ -518,20 +532,25 @@ export default function KioskPage() {
                 className="kiosk-input"
               />
             </div>
-            <label className="premium-consent-row flex cursor-pointer items-start gap-g2 rounded-yobell-sm border-2 border-yobell-border p-g3 transition-colors duration-touch hover:border-yobell-gold">
+            <label
+              htmlFor="privacy-consent"
+              className="premium-consent-row flex cursor-pointer items-start gap-g2 rounded-yobell-sm border-2 border-yobell-border p-g3 transition-colors duration-touch hover:border-yobell-gold"
+            >
               <input
+                id="privacy-consent"
                 type="checkbox"
                 checked={state.privacyConsent}
                 onChange={(e) =>
                   setState((s) => ({ ...s, privacyConsent: e.target.checked }))
                 }
                 className="mt-1 h-6 w-6 shrink-0 accent-yobell-gold"
+                aria-describedby="privacy-notice-text"
               />
               <div>
                 <span className="text-lg font-semibold">
                   {t(lang, "privacyConsent")}
                 </span>
-                <p className="mt-1 text-base text-[var(--yobell-muted)]">
+                <p id="privacy-notice-text" className="mt-1 text-base text-[var(--yobell-muted)]">
                   {privacyNotice}
                 </p>
               </div>
@@ -545,6 +564,10 @@ export default function KioskPage() {
             onBack={() => setStep("callMethod")}
             primaryLabel={t(lang, "next")}
             onPrimary={() => {
+              if (!state.privacyConsent) {
+                setFormError(t(lang, "privacyConsentRequired"));
+                return;
+              }
               setFormError("");
               setStep("photo");
             }}
@@ -593,10 +616,12 @@ export default function KioskPage() {
             )}
             {state.photoData && (
               <div className="flex items-center gap-4 pt-4">
-                <span className="font-semibold text-[var(--yobell-muted)]">写真</span>
+                <span className="font-semibold text-[var(--yobell-muted)]">
+                  {t(lang, "confirmPhoto")}
+                </span>
                 <img
                   src={state.photoData}
-                  alt="Visitor"
+                  alt={t(lang, "photoAltVisitor")}
                   className="h-20 w-20 rounded-xl object-cover"
                 />
               </div>

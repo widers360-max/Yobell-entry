@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { PasswordPrompt } from "./PasswordPrompt";
 import { isUnlocked, type AuthRole } from "@/lib/auth-session";
+import { t } from "@/lib/i18n";
 import type { Language } from "@/lib/types";
 
 const ADMIN_LANG_KEY = "yobell-admin-lang";
@@ -41,7 +42,7 @@ export function PasswordGate({
     return (
       <div className="gate-loading">
         <Loader2 className="h-8 w-8 animate-spin text-yobell-gold" />
-        <p className="text-sm">読み込み中...</p>
+        <p className="text-sm">{t(lang, "kiosk_loading")}</p>
       </div>
     );
   }

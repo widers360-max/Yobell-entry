@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -13,6 +13,8 @@ import {
   Mail,
   ExternalLink,
   LogOut,
+  Menu,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -53,6 +55,7 @@ export function AdminShell({
 }) {
   const router = useRouter();
   const { lang, setLang, t } = useAdminI18n();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function handleLogout() {
     clearUnlock("admin");
@@ -61,7 +64,15 @@ export function AdminShell({
 
   return (
     <div className="admin-shell">
-      <aside className="admin-sidebar">
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="admin-sidebar-backdrop"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <aside className={`admin-sidebar ${sidebarOpen ? "admin-sidebar-open" : ""}`}>
         <div className="admin-sidebar-brand">
           <div className="admin-brand-mark">W</div>
           <div>
@@ -87,7 +98,10 @@ export function AdminShell({
               <button
                 key={key}
                 type="button"
-                onClick={() => onSectionChange(key)}
+                onClick={() => {
+                  onSectionChange(key);
+                  setSidebarOpen(false);
+                }}
                 className={`admin-nav-item ${active ? "admin-nav-item-active" : ""}`}
               >
                 <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
@@ -106,9 +120,19 @@ export function AdminShell({
 
       <div className="admin-main">
         <header className="admin-topbar">
-          <div>
-            <p className="admin-topbar-eyebrow">YOBELL Admin</p>
-            <h1 className="admin-topbar-title">{t(ADMIN_NAV_I18N[section])}</h1>
+          <div className="flex items-center gap-g2">
+            <button
+              type="button"
+              className="admin-mobile-menu lg:hidden"
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label="Menu"
+            >
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+            <div>
+              <p className="admin-topbar-eyebrow">YOBELL Admin</p>
+              <h1 className="admin-topbar-title">{t(ADMIN_NAV_I18N[section])}</h1>
+            </div>
           </div>
         </header>
         <main className="admin-content">

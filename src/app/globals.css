@@ -1233,10 +1233,24 @@ body {
 @media (max-width: 1024px) {
   .admin-sidebar {
     @apply w-60;
+    transform: translateX(-100%);
+    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .admin-sidebar-open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar-backdrop {
+    @apply fixed inset-0 z-20 bg-yobell-navy/40 backdrop-blur-sm;
   }
 
   .admin-main {
-    @apply ml-60;
+    @apply ml-0;
+  }
+
+  .admin-mobile-menu {
+    @apply flex h-10 w-10 items-center justify-center rounded-yobell-sm border border-yobell-border bg-yobell-surface text-yobell-navy;
   }
 }
 
@@ -1459,6 +1473,29 @@ body {
 
 .health-status-pulse {
   animation: healthPulse 2s ease-in-out infinite;
+}
+
+.staff-response-grid {
+  @apply grid gap-0;
+}
+
+@media (max-width: 640px) {
+  .staff-page-header {
+    @apply flex-col items-stretch;
+  }
+
+  .staff-page-actions {
+    @apply w-full justify-between;
+  }
+
+  .staff-response-btn {
+    min-height: 3.5rem;
+    @apply border-b border-yobell-border;
+  }
+
+  .staff-response-btn:last-child {
+    @apply border-b-0;
+  }
 }
 
 @keyframes healthPulse {
