@@ -28,6 +28,12 @@ export type TranslationKey =
   | "home_companySuffix"
   | "idle_welcomeTo"
   | "idle_smartReception"
+  | "kiosk_loading"
+  | "kiosk_errorTitle"
+  | "kiosk_errorMessage"
+  | "kiosk_retry"
+  | "kiosk_submitFailed"
+  | "kiosk_bootstrapFailed"
   | "nav_admin"
   | "nav_staff"
   | "auth_adminTitle"
@@ -143,6 +149,12 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     home_companySuffix: "へ",
     idle_welcomeTo: "Welcome to",
     idle_smartReception: "Smart Reception by YOBELL",
+    kiosk_loading: "読み込み中...",
+    kiosk_errorTitle: "通信エラー",
+    kiosk_errorMessage: "しばらくしてからもう一度お試しください",
+    kiosk_retry: "再試行",
+    kiosk_submitFailed: "呼び出しを送信できませんでした。もう一度お試しください。",
+    kiosk_bootstrapFailed: "設定を読み込めませんでした。ネットワークをご確認ください。",
     nav_admin: "管理",
     nav_staff: "スタッフ",
     auth_adminTitle: "管理者パスワード",
@@ -260,6 +272,12 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     home_companySuffix: "",
     idle_welcomeTo: "Welcome to",
     idle_smartReception: "Smart Reception by YOBELL",
+    kiosk_loading: "Loading...",
+    kiosk_errorTitle: "Connection error",
+    kiosk_errorMessage: "Please wait a moment and try again.",
+    kiosk_retry: "Retry",
+    kiosk_submitFailed: "Could not send the call request. Please try again.",
+    kiosk_bootstrapFailed: "Could not load settings. Please check your network.",
     nav_admin: "Admin",
     nav_staff: "Staff",
     auth_adminTitle: "Admin Password",
@@ -378,6 +396,12 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     home_companySuffix: "",
     idle_welcomeTo: "Welcome to",
     idle_smartReception: "Smart Reception by YOBELL",
+    kiosk_loading: "불러오는 중...",
+    kiosk_errorTitle: "통신 오류",
+    kiosk_errorMessage: "잠시 후 다시 시도해 주세요.",
+    kiosk_retry: "다시 시도",
+    kiosk_submitFailed: "호출을 전송하지 못했습니다. 다시 시도해 주세요.",
+    kiosk_bootstrapFailed: "설정을 불러오지 못했습니다. 네트워크를 확인해 주세요.",
     nav_admin: "관리",
     nav_staff: "스태프",
     auth_adminTitle: "관리자 비밀번호",

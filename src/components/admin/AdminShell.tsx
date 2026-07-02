@@ -111,7 +111,11 @@ export function AdminShell({
             <h1 className="admin-topbar-title">{t(ADMIN_NAV_I18N[section])}</h1>
           </div>
         </header>
-        <main className="admin-content">{children}</main>
+        <main className="admin-content">
+          <div key={section} className="admin-section-enter">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

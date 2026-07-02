@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { Bell, LogOut, Loader2 } from "lucide-react";
 import { PasswordGate } from "@/components/PasswordGate";
+import { PremiumSpinner } from "@/components/kiosk";
 import { clearUnlock } from "@/lib/auth-session";
 import { t } from "@/lib/i18n";
 
@@ -37,11 +38,11 @@ const VISITOR_TYPE_LABELS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: "未対応", color: "bg-amber-100 text-amber-800" },
-  accepted: { label: "対応中", color: "bg-green-100 text-green-800" },
-  please_wait: { label: "お待ちください", color: "bg-blue-100 text-blue-800" },
-  declined: { label: "対応不可", color: "bg-red-100 text-red-800" },
-  no_response: { label: "無応答", color: "bg-gray-100 text-gray-800" },
+  pending: { label: "未対応", color: "admin-badge-amber" },
+  accepted: { label: "対応中", color: "admin-badge-green" },
+  please_wait: { label: "お待ちください", color: "admin-badge-blue" },
+  declined: { label: "対応不可", color: "admin-badge-red" },
+  no_response: { label: "無応答", color: "admin-badge-gray" },
 };
 
 export default function StaffPage() {
@@ -56,6 +57,11 @@ function StaffPageContent() {
   const router = useRouter();
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+  const [respondingKey, setRespondingKey] = useState<string | null>(null);
+  const [newVisitIds, setNewVisitIds] = useState<Set<string>>(new Set());
+  const initialLoadDone = useRef(false);
+  const knownPendingRef = useRef<Set<string>>(new Set());
 
   function handleLogout() {
     clearUnlock("staff");
@@ -65,16 +71,43 @@ function StaffPageContent() {
   const fetchVisits = useCallback(async () => {
     try {
       const res = await fetch("/api/visits");
-      const data = await res.json();
+      if (!res.ok) throw new Error("fetch failed");
+      const data: Visit[] = await res.json();
       const recent = data.filter(
-        (v: Visit) =>
+        (v) =>
           v.status === "pending" ||
           (v.status !== "completed" &&
-            Date.now() - new Date(v.createdAt).getTime() < 30 * 60 * 1000)
+            Date.now() - new Date(v.createdAt).getTime() < 30 * 60 * 1000),
       );
+
+      const pending = recent.filter((v) => v.status === "pending");
+
+      if (!initialLoadDone.current) {
+        pending.forEach((v) => knownPendingRef.current.add(v.id));
+        initialLoadDone.current = true;
+      } else {
+        const fresh = pending.filter((v) => !knownPendingRef.current.has(v.id));
+        if (fresh.length > 0) {
+          setNewVisitIds((prev) => {
+            const next = new Set(prev);
+            fresh.forEach((v) => next.add(v.id));
+            return next;
+          });
+          fresh.forEach((v) => knownPendingRef.current.add(v.id));
+          window.setTimeout(() => {
+            setNewVisitIds((prev) => {
+              const next = new Set(prev);
+              fresh.forEach((v) => next.delete(v.id));
+              return next;
+            });
+          }, 3000);
+        }
+      }
+
       setVisits(recent);
+      setFetchError(false);
     } catch {
-      /* ignore */
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -87,12 +120,21 @@ function StaffPageContent() {
   }, [fetchVisits]);
 
   async function respond(visitId: string, status: string) {
-    await fetch(`/api/visits/${visitId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    fetchVisits();
+    const key = `${visitId}:${status}`;
+    setRespondingKey(key);
+    try {
+      const res = await fetch(`/api/visits/${visitId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error("respond failed");
+      await fetchVisits();
+    } catch {
+      setFetchError(true);
+    } finally {
+      setRespondingKey(null);
+    }
   }
 
   const pendingVisits = visits.filter((v) => v.status === "pending");
@@ -128,54 +170,76 @@ function StaffPageContent() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-g3 py-g4">
         {loading ? (
-          <p className="text-center text-gray-500">読み込み中...</p>
+          <div className="py-20">
+            <PremiumSpinner label="読み込み中..." size="lg" />
+          </div>
+        ) : fetchError ? (
+          <div className="rounded-yobell border border-yobell-danger/30 bg-yobell-surface p-g4 text-center">
+            <p className="text-lg font-semibold text-yobell-navy">通信エラー</p>
+            <p className="mt-g1 text-yobell-muted">
+              しばらくしてからもう一度お試しください
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoading(true);
+                void fetchVisits();
+              }}
+              className="admin-btn-primary mt-g3"
+            >
+              再試行
+            </button>
+          </div>
         ) : pendingVisits.length === 0 ? (
-          <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white py-20 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-              <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
+          <div className="admin-empty rounded-yobell border-2 border-dashed border-yobell-border bg-yobell-surface py-g6">
+            <div className="mx-auto mb-g2 flex h-16 w-16 items-center justify-center rounded-full bg-yobell-bg">
+              <Bell className="h-8 w-8 text-yobell-muted" strokeWidth={1.5} />
             </div>
-            <p className="text-xl text-gray-500">現在、待機中の来訪者はいません</p>
-            <p className="mt-2 text-sm text-gray-400">3秒ごとに自動更新されます</p>
+            <p className="admin-empty-title text-lg">現在、待機中の来訪者はいません</p>
+            <p className="admin-empty-desc">3秒ごとに自動更新されます</p>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-sm font-bold text-white animate-pulse">
+          <div className="space-y-g3">
+            <div className="flex items-center gap-g2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-yobell-danger text-sm font-bold text-white health-status-pulse">
                 {pendingVisits.length}
               </span>
-              <h2 className="text-xl font-bold">新しい来訪者</h2>
+              <h2 className="text-xl font-bold text-yobell-navy">新しい来訪者</h2>
             </div>
 
             {pendingVisits.map((visit) => (
-              <VisitCard key={visit.id} visit={visit} onRespond={respond} />
+              <VisitCard
+                key={visit.id}
+                visit={visit}
+                isNew={newVisitIds.has(visit.id)}
+                respondingKey={respondingKey}
+                onRespond={respond}
+              />
             ))}
           </div>
         )}
 
         {visits.filter((v) => v.status !== "pending").length > 0 && (
-          <div className="mt-12">
-            <h2 className="mb-4 text-lg font-bold text-gray-600">最近の対応</h2>
-            <div className="space-y-3">
+          <div className="mt-g4">
+            <h2 className="mb-g2 text-lg font-bold text-yobell-muted">最近の対応</h2>
+            <div className="space-y-g2">
               {visits
                 .filter((v) => v.status !== "pending")
                 .slice(0, 10)
                 .map((visit) => (
-                  <div
-                    key={visit.id}
-                    className="flex items-center justify-between rounded-xl border bg-white px-5 py-4"
-                  >
+                  <div key={visit.id} className="staff-history-row">
                     <div>
-                      <span className="font-semibold">{visit.visitorName}</span>
-                      <span className="mx-2 text-gray-400">→</span>
-                      <span className="text-gray-600">{visit.hostStaff.name}</span>
+                      <span className="font-semibold text-yobell-navy">
+                        {visit.visitorName}
+                      </span>
+                      <span className="mx-2 text-yobell-muted">→</span>
+                      <span className="text-yobell-muted">{visit.hostStaff.name}</span>
                     </div>
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        STATUS_LABELS[visit.status]?.color ?? "bg-gray-100"
+                      className={`admin-badge ${
+                        STATUS_LABELS[visit.status]?.color ?? "admin-badge-gray"
                       }`}
                     >
                       {STATUS_LABELS[visit.status]?.label ?? visit.status}
@@ -192,9 +256,13 @@ function StaffPageContent() {
 
 function VisitCard({
   visit,
+  isNew,
+  respondingKey,
   onRespond,
 }: {
   visit: Visit;
+  isNew: boolean;
+  respondingKey: string | null;
   onRespond: (id: string, status: string) => void;
 }) {
   const time = new Date(visit.createdAt).toLocaleTimeString("ja-JP", {
@@ -202,51 +270,53 @@ function VisitCard({
     minute: "2-digit",
   });
 
+  const actions = [
+    { status: "accepted", label: "今行きます", className: "text-yobell-success border-r border-yobell-border hover:bg-green-50" },
+    { status: "please_wait", label: "少々お待ちください", className: "text-yobell-gold border-r border-yobell-border hover:bg-amber-50" },
+    { status: "declined", label: "本日は対応できません", className: "text-yobell-danger hover:bg-red-50" },
+  ] as const;
+
   return (
-    <div className="overflow-hidden rounded-2xl border-2 border-amber-200 bg-white shadow-lg">
-      <div className="flex items-start gap-6 p-6">
+    <div className={`staff-visit-card ${isNew ? "staff-visit-card-new" : ""}`}>
+      <div className="flex items-start gap-g3 p-g3">
         {visit.photoData ? (
           <img
             src={visit.photoData}
             alt={visit.visitorName}
-            className="h-24 w-24 shrink-0 rounded-xl object-cover"
+            className="h-24 w-24 shrink-0 rounded-yobell-sm object-cover"
           />
         ) : (
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-3xl font-bold text-gray-400">
-            {visit.visitorName.charAt(0)}
+          <div className="staff-card-avatar h-24 w-24 shrink-0 text-3xl">
+            <span>{visit.visitorName.charAt(0)}</span>
           </div>
         )}
 
         <div className="flex-1">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-g2">
             <div>
-              <h3 className="text-2xl font-bold">{visit.visitorName}</h3>
+              <h3 className="text-2xl font-bold text-yobell-navy">{visit.visitorName}</h3>
               {visit.visitorCompany && (
-                <p className="text-lg text-gray-600">{visit.visitorCompany}</p>
+                <p className="text-lg text-yobell-muted">{visit.visitorCompany}</p>
               )}
             </div>
-            <span className="text-sm text-gray-400">{time}</span>
+            <span className="text-sm tabular-nums text-yobell-muted">{time}</span>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            <span className="rounded-lg bg-teal-50 px-3 py-1 text-sm font-medium text-teal-700">
+          <div className="mt-g2 flex flex-wrap gap-g1">
+            <span className="admin-badge admin-badge-navy">
               {VISITOR_TYPE_LABELS[visit.visitorType] ?? visit.visitorType}
             </span>
             {visit.purpose && (
-              <span className="rounded-lg bg-gray-100 px-3 py-1 text-sm text-gray-600">
-                {visit.purpose}
-              </span>
+              <span className="admin-badge admin-badge-gray">{visit.purpose}</span>
             )}
             {visit.visitorPhone && (
-              <span className="rounded-lg bg-gray-100 px-3 py-1 text-sm text-gray-600">
-                {visit.visitorPhone}
-              </span>
+              <span className="admin-badge admin-badge-gray">{visit.visitorPhone}</span>
             )}
           </div>
 
-          <p className="mt-3 text-lg">
+          <p className="mt-g2 text-lg text-yobell-navy">
             担当: <strong>{visit.hostStaff.name}</strong>
-            <span className="text-gray-500">
+            <span className="text-yobell-muted">
               {" "}
               ({visit.hostStaff.company.name} / {visit.hostStaff.department})
             </span>
@@ -254,28 +324,33 @@ function VisitCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-0 border-t">
-        <button
-          type="button"
-          onClick={() => onRespond(visit.id, "accepted")}
-          className="border-r py-5 text-lg font-bold text-green-700 transition-colors hover:bg-green-50 active:bg-green-100"
-        >
-          今行きます
-        </button>
-        <button
-          type="button"
-          onClick={() => onRespond(visit.id, "please_wait")}
-          className="border-r py-5 text-lg font-bold text-amber-700 transition-colors hover:bg-amber-50 active:bg-amber-100"
-        >
-          少々お待ちください
-        </button>
-        <button
-          type="button"
-          onClick={() => onRespond(visit.id, "declined")}
-          className="py-5 text-lg font-bold text-red-700 transition-colors hover:bg-red-50 active:bg-red-100"
-        >
-          本日は対応できません
-        </button>
+      <div className="grid grid-cols-3 gap-0 border-t border-yobell-border">
+        {actions.map(({ status, label, className }) => {
+          const key = `${visit.id}:${status}`;
+          const isLoading = respondingKey === key;
+          const isDisabled = respondingKey !== null;
+
+          return (
+            <button
+              key={status}
+              type="button"
+              disabled={isDisabled}
+              onClick={() => onRespond(visit.id, status)}
+              className={`staff-response-btn ${className} ${
+                isLoading ? "staff-response-btn-loading" : ""
+              }`}
+            >
+              {isLoading ? (
+                <span className="inline-flex items-center justify-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  送信中
+                </span>
+              ) : (
+                label
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

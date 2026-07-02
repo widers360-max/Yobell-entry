@@ -36,7 +36,15 @@ export function PremiumCard({
   minHeight,
 }: PremiumCardProps) {
   const [pressed, setPressed] = useState(false);
+  const [sweeping, setSweeping] = useState(false);
   const isInteractive = Boolean(onClick);
+
+  const handleClick = () => {
+    if (!onClick) return;
+    setSweeping(true);
+    window.setTimeout(() => setSweeping(false), 520);
+    onClick();
+  };
 
   const iconContent =
     iconNode ??
@@ -100,6 +108,7 @@ export function PremiumCard({
     isInteractive ? "premium-card-interactive" : "",
     selected || pressed ? "premium-card-selected" : "",
     pressed ? "premium-card-pressed" : "",
+    sweeping ? "premium-card-sweep" : "",
     className,
   ]
     .filter(Boolean)
@@ -117,7 +126,7 @@ export function PremiumCard({
     <TouchRipple className="block w-full">
       <button
         type="button"
-        onClick={onClick}
+        onClick={handleClick}
         onPointerDown={() => setPressed(true)}
         onPointerUp={() => setPressed(false)}
         onPointerLeave={() => setPressed(false)}

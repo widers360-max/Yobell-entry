@@ -10,6 +10,8 @@ import { WaitingScreen } from "@/components/WaitingScreen";
 import {
   KioskActionBar,
   KioskStepTransition,
+  KioskErrorState,
+  PremiumSpinner,
   StepHeader,
 } from "@/components/kiosk";
 import {
@@ -86,6 +88,10 @@ export default function KioskPage() {
   const [waitingVisit, setWaitingVisit] = useState<WaitingVisitSnapshot | null>(null);
   const [isCallingAgain, setIsCallingAgain] = useState(false);
   const [homeActive, setHomeActive] = useState(false);
+  const [bootstrapReady, setBootstrapReady] = useState(false);
+  const [bootstrapError, setBootstrapError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -100,7 +106,8 @@ export default function KioskPage() {
           language: (settingsData.languageDefault as Language) || "ja",
         }));
       })
-      .catch(() => {});
+      .catch(() => setBootstrapError(true))
+      .finally(() => setBootstrapReady(true));
   }, []);
 
   const fetchStaff = useCallback(async (q: string) => {
@@ -185,42 +192,56 @@ export default function KioskPage() {
     photoData?: string | null;
     inputMethod?: InputMethod;
   }) {
-    const res = await fetch("/api/visits", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        visitorName: overrides?.visitorName ?? state.visitorName,
-        visitorCompany:
-          overrides?.visitorCompany !== undefined
-            ? overrides.visitorCompany
-            : state.visitorCompany || null,
-        visitorPhone:
-          overrides?.visitorPhone !== undefined
-            ? overrides.visitorPhone
-            : state.visitorPhone || null,
-        purpose:
-          overrides?.purpose !== undefined
-            ? overrides.purpose
-            : state.purpose || null,
-        visitorType: state.visitorType,
-        hostStaffId: state.hostStaffId,
-        photoData:
-          overrides?.photoData !== undefined
-            ? overrides.photoData
-            : state.photoData,
-        inputMethod: overrides?.inputMethod ?? state.inputMethod ?? "manual",
-      }),
-    });
-    const visit = await res.json();
-    if (!res.ok) return;
-    setState((s) => ({ ...s, visitId: visit.id }));
-    setWaitingVisit(parseVisitSnapshot(visit));
-    setStep("waiting");
-    setWaitSeconds(0);
-    setVisitStatus("pending");
+    setIsSubmitting(true);
+    setSubmitError("");
+    try {
+      const res = await fetch("/api/visits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          visitorName: overrides?.visitorName ?? state.visitorName,
+          visitorCompany:
+            overrides?.visitorCompany !== undefined
+              ? overrides.visitorCompany
+              : state.visitorCompany || null,
+          visitorPhone:
+            overrides?.visitorPhone !== undefined
+              ? overrides.visitorPhone
+              : state.visitorPhone || null,
+          purpose:
+            overrides?.purpose !== undefined
+              ? overrides.purpose
+              : state.purpose || null,
+          visitorType: state.visitorType,
+          hostStaffId: state.hostStaffId,
+          photoData:
+            overrides?.photoData !== undefined
+              ? overrides.photoData
+              : state.photoData,
+          inputMethod: overrides?.inputMethod ?? state.inputMethod ?? "manual",
+        }),
+      });
+      const visit = await res.json();
+      if (!res.ok) {
+        setSubmitError(t(state.language, "kiosk_submitFailed"));
+        return false;
+      }
+      setState((s) => ({ ...s, visitId: visit.id }));
+      setWaitingVisit(parseVisitSnapshot(visit));
+      setStep("waiting");
+      setWaitSeconds(0);
+      setVisitStatus("pending");
+      return true;
+    } catch {
+      setSubmitError(t(state.language, "kiosk_submitFailed"));
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function handleSelectCallMethod(method: InputMethod) {
+    setSubmitError("");
     setState((s) => ({ ...s, inputMethod: method }));
 
     if (method === "quick") {
@@ -364,6 +385,33 @@ export default function KioskPage() {
   const privacyNotice = kioskSettings.privacyNotice ?? t(lang, "privacyNotice");
   const fallbackMsg = kioskSettings.fallbackMessage ?? t(lang, "waitingFallback");
 
+  const submitOverlay = isSubmitting ? (
+    <div className="kiosk-submit-overlay">
+      <PremiumSpinner label={t(lang, "kiosk_loading")} size="lg" />
+    </div>
+  ) : null;
+
+  if (!bootstrapReady) {
+    return (
+      <div className="kiosk-portrait flex min-h-screen items-center justify-center bg-yobell-bg">
+        <PremiumSpinner label={t(lang, "kiosk_loading")} size="lg" />
+      </div>
+    );
+  }
+
+  if (bootstrapError) {
+    return (
+      <div className="kiosk-portrait flex min-h-screen items-center justify-center bg-yobell-bg px-g4">
+        <KioskErrorState
+          title={t(lang, "kiosk_errorTitle")}
+          message={t(lang, "kiosk_bootstrapFailed")}
+          retryLabel={t(lang, "kiosk_retry")}
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
+
   if (step === "idle") {
     return (
       <KioskHomeScreen
@@ -410,6 +458,7 @@ export default function KioskPage() {
           language={lang}
           onSelect={handleSelectCallMethod}
           onBack={() => setStep("host")}
+          errorMessage={submitError}
         />
       )}
 
@@ -559,8 +608,12 @@ export default function KioskPage() {
               setStep(state.inputMethod === "business_card" ? "callMethod" : "visitorInfo")
             }
             primaryLabel={t(lang, "callHost")}
+            primaryLoading={isSubmitting}
             onPrimary={() => void submitVisit()}
           />
+          {submitError && step === "confirm" && (
+            <p className="text-center text-lg text-yobell-danger">{submitError}</p>
+          )}
         </div>
       )}
 
@@ -591,6 +644,7 @@ export default function KioskPage() {
         />
       )}
       </KioskStepTransition>
+      {submitOverlay}
     </KioskLayout>
   );
 }
