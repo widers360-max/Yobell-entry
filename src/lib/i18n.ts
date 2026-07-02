@@ -86,6 +86,20 @@ export type TranslationKey =
   | "confirmType"
   | "callHost"
   | "waitingTitle"
+  | "waitingSubtitle"
+  | "waitingCountdown"
+  | "waitingProgressTitle"
+  | "waitingStep_create"
+  | "waitingStep_notify"
+  | "waitingStep_await"
+  | "progress_pending"
+  | "progress_success"
+  | "progress_failed"
+  | "notifyEmailSent"
+  | "notifyEmailFailed"
+  | "waitingReturnReception"
+  | "waitingSelectOtherHost"
+  | "waitingCallAgain"
   | "waitingPending"
   | "waitingAccepted"
   | "waitingPleaseWait"
@@ -187,13 +201,25 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     confirmType: "来訪種別",
     callHost: "担当者を呼び出す",
     waitingTitle: "担当者を呼び出しています",
+    waitingSubtitle: "少々お待ちください",
+    waitingCountdown: "残り {seconds} 秒",
+    waitingProgressTitle: "通知の進行状況",
+    waitingStep_create: "来訪情報を作成",
+    waitingStep_notify: "担当者へ通知",
+    waitingStep_await: "応答待ち",
+    progress_pending: "処理中",
+    progress_success: "完了",
+    progress_failed: "失敗",
+    notifyEmailSent: "メール通知送信済み",
+    notifyEmailFailed: "通知を送信できませんでした",
+    waitingReturnReception: "受付に戻る",
+    waitingSelectOtherHost: "別の担当者を選ぶ",
+    waitingCallAgain: "もう一度呼び出す",
     waitingPending: "担当者を呼び出しています。少々お待ちください。",
-    waitingAccepted: "担当者がお迎えに向かっています。少々お待ちください。",
-    waitingPleaseWait: "担当者より「少々お待ちください」との返答がありました。",
-    waitingDeclined:
-      "本日は対応できないとのことです。お手数ですがお電話でご連絡ください。",
-    waitingNoResponse:
-      "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
+    waitingAccepted: "担当者が向かっています",
+    waitingPleaseWait: "担当者より、少々お待ちください",
+    waitingDeclined: "本日は対応できません",
+    waitingNoResponse: "担当者が応答できません",
     waitingFallback:
       "担当者が応答できません。お手数ですがお電話またはメールでご連絡ください。",
     returnHome: "トップに戻る",
@@ -289,12 +315,25 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     confirmPurpose: "Purpose",
     confirmType: "Visit Type",
     callHost: "Notify Host",
-    waitingTitle: "Notifying Host",
+    waitingTitle: "Calling your host",
+    waitingSubtitle: "Please wait a moment",
+    waitingCountdown: "{seconds}s remaining",
+    waitingProgressTitle: "Notification progress",
+    waitingStep_create: "Create visit record",
+    waitingStep_notify: "Notify host",
+    waitingStep_await: "Awaiting response",
+    progress_pending: "Pending",
+    progress_success: "Done",
+    progress_failed: "Failed",
+    notifyEmailSent: "Email notification sent",
+    notifyEmailFailed: "Could not send notification",
+    waitingReturnReception: "Return to reception",
+    waitingSelectOtherHost: "Choose another host",
+    waitingCallAgain: "Call again",
     waitingPending: "Notifying the host. Please wait a moment.",
-    waitingAccepted: "The host is on their way. Please wait.",
-    waitingPleaseWait: "The host asked you to please wait a moment.",
-    waitingDeclined:
-      "The host is unavailable today. Please contact by phone.",
+    waitingAccepted: "Your host is on the way",
+    waitingPleaseWait: "Please wait a moment — message from your host",
+    waitingDeclined: "Unavailable today",
     waitingNoResponse:
       "No response from the host. Please contact by phone or email.",
     waitingFallback:
@@ -392,12 +431,25 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     confirmPurpose: "용건",
     confirmType: "방문 유형",
     callHost: "담당자 호출",
-    waitingTitle: "담당자 호출 중",
+    waitingTitle: "담당자를 호출하고 있습니다",
+    waitingSubtitle: "잠시만 기다려 주세요",
+    waitingCountdown: "남은 시간 {seconds}초",
+    waitingProgressTitle: "알림 진행 상황",
+    waitingStep_create: "방문 정보 생성",
+    waitingStep_notify: "담당자에게 알림",
+    waitingStep_await: "응답 대기",
+    progress_pending: "진행 중",
+    progress_success: "완료",
+    progress_failed: "실패",
+    notifyEmailSent: "이메일 알림 전송 완료",
+    notifyEmailFailed: "알림을 보낼 수 없습니다",
+    waitingReturnReception: "접수대로 돌아가기",
+    waitingSelectOtherHost: "다른 담당자 선택",
+    waitingCallAgain: "다시 호출하기",
     waitingPending: "담당자를 호출하고 있습니다. 잠시만 기다려 주세요.",
-    waitingAccepted: "담당자가 맞이하러 오고 있습니다. 잠시만 기다려 주세요.",
-    waitingPleaseWait: "담당자가 잠시만 기다려 달라고 했습니다.",
-    waitingDeclined:
-      "오늘은 대응이 어렵다고 합니다. 전화로 연락해 주세요.",
+    waitingAccepted: "담당자가 오고 있습니다",
+    waitingPleaseWait: "담당자가 잠시만 기다려 달라고 했습니다",
+    waitingDeclined: "오늘은 대응이 어렵습니다",
     waitingNoResponse:
       "담당자가 응답하지 않습니다. 전화 또는 이메일로 연락해 주세요.",
     waitingFallback:
@@ -410,8 +462,18 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
   },
 };
 
-export function t(lang: Language, key: TranslationKey): string {
-  return translations[lang][key] ?? translations.ja[key];
+export function t(
+  lang: Language,
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+): string {
+  let text = translations[lang][key] ?? translations.ja[key];
+  if (params) {
+    for (const [name, value] of Object.entries(params)) {
+      text = text.replace(`{${name}}`, String(value));
+    }
+  }
+  return text;
 }
 
 export function visitorTypeLabel(lang: Language, type: VisitorType): string {

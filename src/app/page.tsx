@@ -6,12 +6,18 @@ import { KioskHomeScreen } from "@/components/KioskHomeScreen";
 import { CallMethodScreen } from "@/components/CallMethodScreen";
 import { CameraCapture } from "@/components/CameraCapture";
 import { HostSelectionScreen } from "@/components/HostSelectionScreen";
+import { WaitingScreen } from "@/components/WaitingScreen";
 import {
   KioskActionBar,
   KioskStepTransition,
-  PremiumButton,
   StepHeader,
 } from "@/components/kiosk";
+import {
+  buildNotificationProgress,
+  parseVisitSnapshot,
+  resolveWaitingHost,
+  type WaitingVisitSnapshot,
+} from "@/lib/waiting-utils";
 import {
   findReceptionStaff,
   type KioskStaffMember,
@@ -31,7 +37,7 @@ import {
   YOBELL_DEFAULT_ACCENT,
   YOBELL_DEFAULT_PRIMARY,
 } from "@/lib/design-system";
-import { t, visitorTypeLabel, waitingMessage } from "@/lib/i18n";
+import { t, visitorTypeLabel } from "@/lib/i18n";
 
 type Step =
   | "idle"
@@ -75,6 +81,8 @@ export default function KioskPage() {
   const [waitSeconds, setWaitSeconds] = useState(0);
   const [formError, setFormError] = useState("");
   const [isContactingReception, setIsContactingReception] = useState(false);
+  const [waitingVisit, setWaitingVisit] = useState<WaitingVisitSnapshot | null>(null);
+  const [isCallingAgain, setIsCallingAgain] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -115,6 +123,7 @@ export default function KioskPage() {
       if (!res.ok) return;
       const visit = await res.json();
       setVisitStatus(visit.status);
+      setWaitingVisit(parseVisitSnapshot(visit));
     }, 2000);
 
     return () => clearInterval(poll);
@@ -156,6 +165,7 @@ export default function KioskPage() {
     setSearchQuery("");
     setVisitStatus("pending");
     setWaitSeconds(0);
+    setWaitingVisit(null);
     setFormError("");
   }
 
@@ -200,6 +210,7 @@ export default function KioskPage() {
     const visit = await res.json();
     if (!res.ok) return;
     setState((s) => ({ ...s, visitId: visit.id }));
+    setWaitingVisit(parseVisitSnapshot(visit));
     setStep("waiting");
     setWaitSeconds(0);
     setVisitStatus("pending");
@@ -256,8 +267,49 @@ export default function KioskPage() {
       hostStaffId: member.id,
       hostStaffName: member.name,
       hostCompanyName: member.company.name,
+      hostDepartment: member.department,
+      hostRole: member.role,
+      hostStaffStatus: member.staffStatus ?? "available",
     }));
     setStep("callMethod");
+  }
+
+  function handleSelectOtherHost() {
+    setStep("host");
+    setVisitStatus("pending");
+    setWaitSeconds(0);
+    setWaitingVisit(null);
+    setState((s) => ({
+      ...s,
+      visitId: null,
+      hostStaffId: null,
+      hostStaffName: null,
+      hostCompanyName: null,
+      hostDepartment: null,
+      hostRole: null,
+      hostStaffStatus: null,
+    }));
+  }
+
+  async function handleCallAgain() {
+    if (!state.visitId) return;
+    setIsCallingAgain(true);
+    try {
+      await fetch(`/api/visits/${state.visitId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "pending", respondedAt: null }),
+      });
+      setVisitStatus("pending");
+      setWaitSeconds(0);
+      const res = await fetch(`/api/visits/${state.visitId}`);
+      if (res.ok) {
+        const visit = await res.json();
+        setWaitingVisit(parseVisitSnapshot(visit));
+      }
+    } finally {
+      setIsCallingAgain(false);
+    }
   }
 
   const handleContactReception = useCallback(async () => {
@@ -482,32 +534,30 @@ export default function KioskPage() {
       )}
 
       {step === "waiting" && (
-        <div className="flex flex-col items-center gap-g4 py-g3 text-center">
-          <StatusIcon status={visitStatus} />
-          <StepHeader
-            title={t(lang, "waitingTitle")}
-            subtitle={
-              visitStatus === "no_response"
-                ? fallbackMsg
-                : waitingMessage(lang, visitStatus)
-            }
-          />
-          {visitStatus === "pending" && (
-            <div className="text-lg tabular-nums text-yobell-muted">
-              {Math.max(0, 60 - waitSeconds)}s
-            </div>
+        <WaitingScreen
+          language={lang}
+          visitStatus={visitStatus}
+          waitSeconds={waitSeconds}
+          fallbackMessage={fallbackMsg}
+          host={resolveWaitingHost(waitingVisit, state.hostStaffName ? {
+            name: state.hostStaffName,
+            companyName: state.hostCompanyName ?? "",
+            department: state.hostDepartment ?? "",
+            role: state.hostRole ?? "",
+            staffStatus: state.hostStaffStatus ?? "available",
+          } : null)}
+          progressSteps={buildNotificationProgress(
+            waitingVisit,
+            visitStatus,
+            Boolean(state.visitId),
           )}
-          {(visitStatus !== "pending" || waitSeconds >= 60) && (
-            <PremiumButton
-              fullWidth
-              className="max-w-lg"
-              variant={visitStatus === "accepted" ? "success" : "primary"}
-              onClick={resetKiosk}
-            >
-              {t(lang, "returnHome")}
-            </PremiumButton>
-          )}
-        </div>
+          notificationSent={waitingVisit?.notificationSent ?? false}
+          notificationError={waitingVisit?.notificationError ?? null}
+          onReturnReception={resetKiosk}
+          onSelectOtherHost={handleSelectOtherHost}
+          onCallAgain={() => void handleCallAgain()}
+          isCallingAgain={isCallingAgain}
+        />
       )}
       </KioskStepTransition>
     </KioskLayout>
@@ -519,38 +569,6 @@ function ConfirmRow({ label, value }: { label: string; value: string }) {
     <div className="flex justify-between gap-4 py-4 first:pt-0 last:pb-0">
       <span className="font-semibold text-[var(--yobell-muted)]">{label}</span>
       <span className="text-right font-bold">{value}</span>
-    </div>
-  );
-}
-
-function StatusIcon({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    pending: "from-blue-400 to-blue-600",
-    accepted: "from-green-400 to-green-600",
-    please_wait: "from-amber-400 to-amber-600",
-    declined: "from-red-400 to-red-600",
-    no_response: "from-gray-400 to-gray-600",
-  };
-
-  return (
-    <div
-      className={`flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br shadow-2xl ${
-        colors[status] ?? colors.pending
-      } ${status === "pending" ? "animate-pulse-ring" : ""}`}
-    >
-      {status === "accepted" ? (
-        <svg className="h-14 w-14 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-      ) : status === "declined" || status === "no_response" ? (
-        <svg className="h-14 w-14 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      ) : (
-        <svg className="h-14 w-14 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )}
     </div>
   );
 }

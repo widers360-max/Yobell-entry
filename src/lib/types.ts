@@ -25,6 +25,9 @@ export interface KioskState {
   hostStaffId: string | null;
   hostStaffName: string | null;
   hostCompanyName: string | null;
+  hostDepartment: string | null;
+  hostRole: string | null;
+  hostStaffStatus: string | null;
   visitorCompany: string;
   visitorName: string;
   visitorPhone: string;
@@ -51,6 +54,9 @@ export const INITIAL_KIOSK_STATE: KioskState = {
   hostStaffId: null,
   hostStaffName: null,
   hostCompanyName: null,
+  hostDepartment: null,
+  hostRole: null,
+  hostStaffStatus: null,
   visitorCompany: "",
   visitorName: "",
   visitorPhone: "",
