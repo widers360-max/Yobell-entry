@@ -116,6 +116,7 @@ function AdminPageContent() {
       email: string | null;
       phone: string | null;
       notificationMethod: string;
+      staffStatus: string;
       active: boolean;
       companyId: string;
       company: { name: string };

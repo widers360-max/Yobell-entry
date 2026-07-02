@@ -48,8 +48,21 @@ export type TranslationKey =
   | "skipManualInput"
   | "cameraStarting"
   | "selectHost"
+  | "selectHostSub"
+  | "selectedPurpose"
+  | "contactReception"
   | "searchPlaceholder"
   | "noResults"
+  | "staffStatus_available"
+  | "staffStatus_meeting"
+  | "staffStatus_away"
+  | "staffStatus_unavailable"
+  | "notifyMethod_email"
+  | "notifyMethod_line_works"
+  | "notifyMethod_slack"
+  | "notifyMethod_teams"
+  | "notifyMethod_phone"
+  | "notifyMethod_dashboard"
   | "visitorInfo"
   | "companyName"
   | "yourName"
@@ -134,8 +147,21 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     skipManualInput: "入力せずに呼び出す",
     cameraStarting: "カメラを起動中...",
     selectHost: "担当者をお選びください",
+    selectHostSub: "ご訪問先の担当者を選択してください",
+    selectedPurpose: "ご用件",
+    contactReception: "受付に連絡する",
     searchPlaceholder: "名前・部署・会社名で検索",
     noResults: "該当する担当者が見つかりません",
+    staffStatus_available: "在席",
+    staffStatus_meeting: "会議中",
+    staffStatus_away: "外出",
+    staffStatus_unavailable: "不在",
+    notifyMethod_email: "メール",
+    notifyMethod_line_works: "LINE WORKS",
+    notifyMethod_slack: "Slack",
+    notifyMethod_teams: "Teams",
+    notifyMethod_phone: "電話",
+    notifyMethod_dashboard: "ダッシュボード",
     visitorInfo: "来訪者情報の入力",
     companyName: "会社名",
     yourName: "お名前",
@@ -224,8 +250,21 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     skipManualInput: "Call without entering details",
     cameraStarting: "Starting camera...",
     selectHost: "Please select your host",
-    searchPlaceholder: "Search by name, department, or company",
-    noResults: "No staff members found",
+    selectHostSub: "Choose the person you are visiting",
+    selectedPurpose: "Visit purpose",
+    contactReception: "Contact reception",
+    searchPlaceholder: "Search by name, department, role, or company",
+    noResults: "No matching staff found",
+    staffStatus_available: "Available",
+    staffStatus_meeting: "In meeting",
+    staffStatus_away: "Away",
+    staffStatus_unavailable: "Unavailable",
+    notifyMethod_email: "Email",
+    notifyMethod_line_works: "LINE WORKS",
+    notifyMethod_slack: "Slack",
+    notifyMethod_teams: "Teams",
+    notifyMethod_phone: "Phone",
+    notifyMethod_dashboard: "Dashboard",
     visitorInfo: "Visitor Information",
     companyName: "Company Name",
     yourName: "Your Name",
@@ -314,8 +353,21 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     skipManualInput: "입력 없이 호출",
     cameraStarting: "카메라 시작 중...",
     selectHost: "담당자를 선택해 주세요",
-    searchPlaceholder: "이름·부서·회사명으로 검색",
-    noResults: "해당 담당자를 찾을 수 없습니다",
+    selectHostSub: "방문하실 담당자를 선택해 주세요",
+    selectedPurpose: "방문 목적",
+    contactReception: "접수대에 연락하기",
+    searchPlaceholder: "이름·부서·직책·회사명으로 검색",
+    noResults: "해당하는 담당자를 찾을 수 없습니다",
+    staffStatus_available: "재실",
+    staffStatus_meeting: "회의 중",
+    staffStatus_away: "외출",
+    staffStatus_unavailable: "부재",
+    notifyMethod_email: "이메일",
+    notifyMethod_line_works: "LINE WORKS",
+    notifyMethod_slack: "Slack",
+    notifyMethod_teams: "Teams",
+    notifyMethod_phone: "전화",
+    notifyMethod_dashboard: "대시보드",
     visitorInfo: "방문자 정보 입력",
     companyName: "회사명",
     yourName: "성함",

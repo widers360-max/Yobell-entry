@@ -27,7 +27,8 @@ model Staff {
   role               String
   email              String?
   phone              String?
-  notificationMethod String  @default("dashboard")
+  notificationMethod String  @default("email")
+  staffStatus        String  @default("available")
   active             Boolean @default(true)
   visits             Visit[]
   createdAt          DateTime @default(now())

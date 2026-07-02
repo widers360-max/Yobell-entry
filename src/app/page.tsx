@@ -5,13 +5,17 @@ import { KioskLayout } from "@/components/KioskLayout";
 import { KioskHomeScreen } from "@/components/KioskHomeScreen";
 import { CallMethodScreen } from "@/components/CallMethodScreen";
 import { CameraCapture } from "@/components/CameraCapture";
+import { HostSelectionScreen } from "@/components/HostSelectionScreen";
 import {
   KioskActionBar,
   KioskStepTransition,
   PremiumButton,
-  PremiumCard,
   StepHeader,
 } from "@/components/kiosk";
+import {
+  findReceptionStaff,
+  type KioskStaffMember,
+} from "@/lib/staff-utils";
 import {
   INITIAL_KIOSK_STATE,
   type KioskState,
@@ -38,13 +42,7 @@ type Step =
   | "confirm"
   | "waiting";
 
-interface StaffMember {
-  id: string;
-  name: string;
-  department: string;
-  role: string;
-  company: { id: string; name: string };
-}
+type StaffMember = KioskStaffMember;
 
 const DEFAULT_SETTINGS: KioskSettings = {
   brandName: KIOSK_SHOWROOM_DEFAULTS.brandName,
@@ -76,6 +74,7 @@ export default function KioskPage() {
   const [visitStatus, setVisitStatus] = useState("pending");
   const [waitSeconds, setWaitSeconds] = useState(0);
   const [formError, setFormError] = useState("");
+  const [isContactingReception, setIsContactingReception] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -251,6 +250,31 @@ export default function KioskPage() {
     });
   }
 
+  function selectHost(member: StaffMember) {
+    setState((s) => ({
+      ...s,
+      hostStaffId: member.id,
+      hostStaffName: member.name,
+      hostCompanyName: member.company.name,
+    }));
+    setStep("callMethod");
+  }
+
+  const handleContactReception = useCallback(async () => {
+    setIsContactingReception(true);
+    try {
+      const params = new URLSearchParams({ active: "true" });
+      const res = await fetch(`/api/staff?${params}`);
+      const allStaff: StaffMember[] = await res.json();
+      const reception = findReceptionStaff(allStaff);
+      if (reception) {
+        selectHost(reception);
+      }
+    } finally {
+      setIsContactingReception(false);
+    }
+  }, []);
+
   function handleSelectPurpose(type: VisitorType) {
     setState((s) => ({ ...s, visitorType: type }));
     setStep("host");
@@ -285,44 +309,17 @@ export default function KioskPage() {
     >
       <KioskStepTransition stepKey={step}>
       {step === "host" && (
-        <div className="flex flex-col gap-g3">
-          <StepHeader title={t(lang, "selectHost")} />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t(lang, "searchPlaceholder")}
-            className="kiosk-input"
-          />
-          <div className="grid max-h-[50vh] grid-cols-1 gap-g2 overflow-y-auto pr-2 sm:grid-cols-2">
-            {staff.length === 0 ? (
-              <p className="col-span-full py-g6 text-center text-xl text-yobell-muted">
-                {t(lang, "noResults")}
-              </p>
-            ) : (
-              staff.map((member) => (
-                <PremiumCard
-                  key={member.id}
-                  layout="horizontal"
-                  title={member.name}
-                  subtitle={member.company.name}
-                  meta={`${member.department} · ${member.role}`}
-                  onClick={() => {
-                    setState((s) => ({
-                      ...s,
-                      hostStaffId: member.id,
-                      hostStaffName: member.name,
-                      hostCompanyName: member.company.name,
-                    }));
-                    setStep("callMethod");
-                  }}
-                  minHeight="7.5rem"
-                />
-              ))
-            )}
-          </div>
-          <KioskActionBar backLabel={t(lang, "back")} onBack={() => setStep("idle")} />
-        </div>
+        <HostSelectionScreen
+          language={lang}
+          visitorType={state.visitorType}
+          staff={staff}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSelectHost={selectHost}
+          onContactReception={() => void handleContactReception()}
+          onBack={() => setStep("idle")}
+          isContactingReception={isContactingReception}
+        />
       )}
 
       {step === "callMethod" && (

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pencil, Trash2, Plus, UserX } from "lucide-react";
 import { AdminCard, AdminInput, AdminSelect, Btn, Badge } from "./ui";
 import { useAdminI18n } from "./AdminI18nProvider";
+import { normalizeStaffStatus } from "@/lib/staff-utils";
 
 interface Company {
   id: string;
@@ -18,6 +19,7 @@ interface StaffMember {
   email: string | null;
   phone: string | null;
   notificationMethod: string;
+  staffStatus: string;
   active: boolean;
   companyId: string;
   company: { name: string };
@@ -30,7 +32,8 @@ const EMPTY = {
   role: "",
   email: "",
   phone: "",
-  notificationMethod: "dashboard",
+  notificationMethod: "email",
+  staffStatus: "available",
   active: true,
 };
 
@@ -110,6 +113,7 @@ export function StaffSection({
       email: s.email ?? "",
       phone: s.phone ?? "",
       notificationMethod: s.notificationMethod,
+      staffStatus: s.staffStatus ?? "available",
       active: s.active,
     });
   }
@@ -162,8 +166,22 @@ export function StaffSection({
               value={form.notificationMethod}
               onChange={(e) => setForm({ ...form, notificationMethod: e.target.value })}
             >
-              <option value="dashboard">{t("notify_dashboard")}</option>
               <option value="email">{t("notify_email")}</option>
+              <option value="line_works">{t("notify_line_works")}</option>
+              <option value="slack">{t("notify_slack")}</option>
+              <option value="teams">{t("notify_teams")}</option>
+              <option value="phone">{t("notify_phone")}</option>
+              <option value="dashboard">{t("notify_dashboard")}</option>
+            </AdminSelect>
+            <AdminSelect
+              label={t("field_staffStatus")}
+              value={form.staffStatus}
+              onChange={(e) => setForm({ ...form, staffStatus: e.target.value })}
+            >
+              <option value="available">{t("staffStatus_available")}</option>
+              <option value="meeting">{t("staffStatus_meeting")}</option>
+              <option value="away">{t("staffStatus_away")}</option>
+              <option value="unavailable">{t("staffStatus_unavailable")}</option>
             </AdminSelect>
             <label className="flex items-center gap-2 self-end pb-2 text-sm">
               <input
@@ -209,6 +227,7 @@ export function StaffSection({
                 <th className="pb-3 pr-4 font-medium">{t("col_company")}</th>
                 <th className="pb-3 pr-4 font-medium">{t("col_department")}</th>
                 <th className="pb-3 pr-4 font-medium">{t("col_contact")}</th>
+                <th className="pb-3 pr-4 font-medium">{t("field_staffStatus")}</th>
                 <th className="pb-3 pr-4 font-medium">{t("col_status")}</th>
                 <th className="pb-3 font-medium">{t("col_actions")}</th>
               </tr>
@@ -222,6 +241,13 @@ export function StaffSection({
                     {s.department} / {s.role}
                   </td>
                   <td className="py-3 pr-4 text-slate-500">{s.email ?? s.phone ?? "—"}</td>
+                  <td className="py-3 pr-4">
+                    <Badge color="amber">
+                      {t(
+                        `staffStatus_${normalizeStaffStatus(s.staffStatus)}` as "staffStatus_available",
+                      )}
+                    </Badge>
+                  </td>
                   <td className="py-3 pr-4">
                     <Badge color={s.active ? "green" : "gray"}>
                       {s.active ? t("active") : t("inactive")}
