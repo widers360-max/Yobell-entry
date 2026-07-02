@@ -1,11 +1,17 @@
 "use client";
 
-import { Phone, QrCode } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { QrCode } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
 import { KioskTopBar } from "./KioskTopBar";
 import { getIcon } from "@/lib/icon-utils";
 import { t } from "@/lib/i18n";
-import { YOBELL_DEFAULT_ACCENT, YOBELL_DEFAULT_PRIMARY } from "@/lib/design-system";
+import {
+  KIOSK_SHOWROOM_DEFAULTS,
+  YOBELL_DEFAULT_ACCENT,
+  YOBELL_DEFAULT_PRIMARY,
+  poweredByLabel,
+} from "@/lib/design-system";
 import type { KioskSettings, Language, VisitorCardRecord, VisitorType } from "@/lib/types";
 
 interface KioskHomeScreenProps {
@@ -16,6 +22,19 @@ interface KioskHomeScreenProps {
   onSelectPurpose: (type: VisitorType) => void;
 }
 
+function resolveShowroomCopy(settings: KioskSettings) {
+  const company =
+    settings.companyDisplayName?.trim() || KIOSK_SHOWROOM_DEFAULTS.companyDisplayName;
+  const welcomeLine =
+    settings.heroTitle?.trim() || KIOSK_SHOWROOM_DEFAULTS.heroTitle;
+  const heroSubtitle =
+    settings.heroSubtitle?.trim() || KIOSK_SHOWROOM_DEFAULTS.heroSubtitle;
+  const tagline = settings.tagline?.trim() || KIOSK_SHOWROOM_DEFAULTS.tagline;
+  const brandName = settings.brandName?.trim() || KIOSK_SHOWROOM_DEFAULTS.brandName;
+
+  return { company, welcomeLine, heroSubtitle, tagline, brandName };
+}
+
 export function KioskHomeScreen({
   language,
   onLanguageChange,
@@ -23,8 +42,13 @@ export function KioskHomeScreen({
   visitorCards,
   onSelectPurpose,
 }: KioskHomeScreenProps) {
+  const [isActive, setIsActive] = useState(false);
+  const [pressedCard, setPressedCard] = useState<string | null>(null);
+  const [now, setNow] = useState(() => new Date());
+
   const primary = settings.primaryColor ?? YOBELL_DEFAULT_PRIMARY;
   const accent = settings.accentColor ?? YOBELL_DEFAULT_ACCENT;
+  const copy = resolveShowroomCopy(settings);
 
   const activeCards = visitorCards
     .filter((c) => c.active)
@@ -39,206 +63,251 @@ export function KioskHomeScreen({
     "--yobell-accent": accent,
   } as React.CSSProperties;
 
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const activate = useCallback(() => {
+    setIsActive(true);
+  }, []);
+
+  const dateLabel = now.toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  });
+  const timeLabel = now.toLocaleTimeString("ja-JP", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <div
-      className="kiosk-portrait flex min-h-screen flex-col bg-white"
+      className="kiosk-portrait relative flex min-h-screen flex-col overflow-hidden bg-yobell-bg"
       style={cssVars}
     >
       <KioskTopBar language={language} />
-      <header className="flex shrink-0 items-center justify-between px-8 pb-4 pt-6">
-        <div className="flex items-center gap-4">
+
+      {/* Header */}
+      <header className="flex shrink-0 items-center justify-between px-g3 pb-g1 pt-g2">
+        <div className="flex min-w-0 items-center gap-g2">
           {settings.logoUrl ? (
             <img
               src={settings.logoUrl}
-              alt={settings.brandName}
-              className="h-16 w-auto object-contain"
+              alt={copy.brandName}
+              className="h-12 w-auto max-w-[200px] object-contain"
             />
           ) : (
-            <div className="flex items-center gap-3">
-              <div
-                className="flex h-14 w-14 items-center justify-center rounded-xl shadow-md"
-                style={{ background: primary }}
-              >
-                <span className="text-2xl font-black" style={{ color: accent }}>
-                  Y
-                </span>
+            <div className="flex items-center gap-g2">
+              <div className="flex h-11 w-11 items-center justify-center rounded-yobell-sm bg-yobell-navy shadow-glass">
+                <span className="text-xl font-black text-yobell-gold">Y</span>
               </div>
-              <div>
-                <p
-                  className="text-3xl font-black tracking-tight"
-                  style={{ color: primary }}
-                >
-                  {settings.brandName}
+              <div className="min-w-0">
+                <p className="truncate text-xl font-black tracking-tight text-yobell-navy">
+                  {copy.brandName}
                 </p>
-                <p className="text-xs font-semibold tracking-[0.2em] text-[var(--yobell-muted)]">
+                <p className="text-[10px] font-semibold tracking-[0.18em] text-yobell-muted">
                   {t(language, "smartReception")}
                 </p>
               </div>
             </div>
           )}
         </div>
-        <LanguageToggle
-          language={language}
-          onChange={onLanguageChange}
-          variant="premium"
-        />
+
+        <div className="flex items-center gap-g2">
+          {isActive && (
+            <div className="hidden text-right sm:block">
+              <p className="text-sm font-semibold tabular-nums text-yobell-navy">{timeLabel}</p>
+              <p className="text-[11px] text-yobell-muted">{dateLabel}</p>
+            </div>
+          )}
+          <LanguageToggle
+            language={language}
+            onChange={onLanguageChange}
+            variant="premium"
+          />
+        </div>
       </header>
 
-      <section className="shrink-0 px-8">
-        <HeroMedia
-          videoUrl={settings.heroVideoUrl}
-          imageUrl={settings.heroImageUrl}
-          title={settings.heroTitle}
-          subtitle={settings.heroSubtitle}
-          primary={primary}
-          accent={accent}
-        />
+      {/* Hero / Welcome */}
+      <section
+        className={`relative shrink-0 px-g3 transition-all duration-slow ease-yobell ${
+          isActive ? "pb-g1" : "flex-1 pb-0"
+        }`}
+      >
+        <div
+          role={isActive ? undefined : "button"}
+          tabIndex={isActive ? undefined : 0}
+          onClick={!isActive ? activate : undefined}
+          onKeyDown={
+            !isActive
+              ? (e) => {
+                  if (e.key === "Enter" || e.key === " ") activate();
+                }
+              : undefined
+          }
+          className={`relative w-full overflow-hidden rounded-yobell shadow-glass-lg transition-all duration-slow ease-yobell ${
+            isActive ? "h-[200px]" : "h-full min-h-[420px] cursor-pointer"
+          }`}
+        >
+          <HeroBackdrop
+            videoUrl={settings.heroVideoUrl}
+            imageUrl={settings.heroImageUrl}
+            primary={primary}
+            accent={accent}
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-yobell-navy/85 via-yobell-navy/35 to-transparent" />
+
+          <div
+            className={`absolute inset-0 flex flex-col items-center justify-center px-g4 text-center text-white ${
+              !isActive ? "kiosk-idle-welcome" : ""
+            }`}
+          >
+            <p className="text-sm font-medium tracking-[0.35em] text-white/75 uppercase">
+              {copy.welcomeLine}
+            </p>
+            <h1 className="mt-g2 text-4xl font-black leading-tight tracking-tight drop-shadow-lg md:text-5xl">
+              {copy.company}
+              {language === "ja" ? t(language, "home_companySuffix") : ""}
+            </h1>
+            <p className="mt-g2 text-lg font-medium tracking-wide text-yobell-gold-light drop-shadow">
+              {copy.heroSubtitle}
+            </p>
+
+            {!isActive && (
+              <p className="mt-g4 rounded-full border border-white/25 bg-white/10 px-g3 py-g1 text-sm font-medium text-white/90 backdrop-blur-sm">
+                {t(language, "home_touchHint")}
+              </p>
+            )}
+          </div>
+        </div>
       </section>
 
-      <section className="flex flex-1 flex-col px-8 pb-4 pt-6">
-        <h2
-          className="mb-5 text-center text-2xl font-bold"
-          style={{ color: primary }}
-        >
-          {t(language, "selectVisitorType")}
-        </h2>
+      {/* Purpose selection — revealed in active mode */}
+      {isActive && (
+        <section className="kiosk-reveal-panel flex min-h-0 flex-1 flex-col px-g3 pb-g1 pt-g2">
+          <div className="mb-g2 flex items-end justify-between gap-g2">
+            <h2 className="text-xl font-bold text-yobell-navy">
+              {t(language, "selectVisitorType")}
+            </h2>
+            <div className="text-right sm:hidden">
+              <p className="text-sm font-semibold tabular-nums text-yobell-navy">{timeLabel}</p>
+              <p className="text-[10px] text-yobell-muted">{dateLabel}</p>
+            </div>
+          </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          {mainCards.map((card) => (
-            <PurposeCard
-              key={card.id}
-              card={card}
-              primary={primary}
-              accent={accent}
-              onSelect={onSelectPurpose}
-            />
-          ))}
-        </div>
-
-        {otherCard && (
-          <div className="mt-4 flex justify-center">
-            <div className="w-1/3 min-w-[200px]">
+          <div className="grid flex-1 grid-cols-3 gap-g2 content-start">
+            {mainCards.map((card) => (
               <PurposeCard
-                card={otherCard}
+                key={card.id}
+                card={card}
                 primary={primary}
-                accent={accent}
+                pressed={pressedCard === card.id}
+                onPressStart={() => setPressedCard(card.id)}
+                onPressEnd={() => setPressedCard(null)}
                 onSelect={onSelectPurpose}
               />
-            </div>
-          </div>
-        )}
-      </section>
-
-      <footer className="shrink-0">
-        <div className="flex items-center gap-6 bg-[var(--yobell-cream)] px-8 py-5">
-          <div className="flex flex-1 items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-[var(--yobell-border)] bg-white">
-              <QrCode className="h-8 w-8" style={{ color: primary }} strokeWidth={1.5} />
-            </div>
-            <div>
-              <p className="text-lg font-bold" style={{ color: primary }}>
-                {t(language, "footerPreregister")}
-              </p>
-              <p className="text-sm text-[var(--yobell-muted)]">
-                {t(language, "footerPreregisterSub")}
-              </p>
-            </div>
+            ))}
           </div>
 
-          <div className="h-14 w-px bg-[var(--yobell-border)]" />
+          {otherCard && (
+            <div className="mt-g2 flex justify-center">
+              <div className="w-1/3 min-w-[180px]">
+                <PurposeCard
+                  card={otherCard}
+                  primary={primary}
+                  pressed={pressedCard === otherCard.id}
+                  onPressStart={() => setPressedCard(otherCard.id)}
+                  onPressEnd={() => setPressedCard(null)}
+                  onSelect={onSelectPurpose}
+                />
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
-          <div className="flex flex-1 items-center gap-4">
-            <div
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full"
-              style={{ background: primary }}
-            >
-              <Phone className="h-6 w-6 text-white" strokeWidth={1.75} />
-            </div>
-            <div>
-              <p className="text-lg font-bold" style={{ color: primary }}>
-                {t(language, "footerHelp")}
-              </p>
-              <p className="text-sm text-[var(--yobell-muted)]">
-                {t(language, "footerHelpSub")}
-              </p>
-            </div>
+      {/* Footer utility */}
+      <footer
+        className={`shrink-0 transition-all duration-slow ease-yobell ${
+          isActive ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        <div className="yobell-glass mx-g3 mb-g1 flex items-center gap-g2 rounded-yobell-sm border border-yobell-border px-g2 py-g2">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-yobell-sm border-2 border-dashed border-yobell-border bg-yobell-surface">
+            <QrCode className="h-7 w-7 text-yobell-navy" strokeWidth={1.5} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-yobell-navy">
+              {t(language, "footerPreregister")}
+            </p>
+            <p className="text-xs text-yobell-muted">{t(language, "footerPreregisterSub")}</p>
           </div>
         </div>
 
-        <div
-          className="py-3 text-center text-sm text-white/80"
-          style={{ background: primary }}
-        >
-          © {settings.companyDisplayName}
+        <div className="bg-yobell-navy px-g3 py-g2 text-center">
+          <p className="text-sm font-medium text-white/90">{copy.tagline}</p>
+          <p className="mt-0.5 text-xs tracking-wide text-yobell-gold/90">
+            {poweredByLabel(copy.company)}
+          </p>
         </div>
       </footer>
     </div>
   );
 }
 
-function HeroMedia({
+function HeroBackdrop({
   videoUrl,
   imageUrl,
-  title,
-  subtitle,
   primary,
   accent,
 }: {
   videoUrl: string | null;
   imageUrl: string | null;
-  title: string;
-  subtitle: string;
   primary: string;
   accent: string;
 }) {
+  if (videoUrl) {
+    return (
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover"
+      >
+        <source src={videoUrl} />
+      </video>
+    );
+  }
+
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+    );
+  }
+
   return (
-    <div className="relative h-[280px] overflow-hidden rounded-2xl shadow-[0_8px_32px_rgba(26,43,75,0.18)]">
-      {videoUrl ? (
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover"
-        >
-          <source src={videoUrl} />
-        </video>
-      ) : imageUrl ? (
-        <img
-          src={imageUrl}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg, ${primary}, #2a4570)`,
-          }}
-        >
-          <div
-            className="absolute inset-0 opacity-30"
-            style={{
-              background: `radial-gradient(ellipse at 30% 20%, ${accent}66, transparent 60%)`,
-            }}
-          />
-        </div>
-      )}
-
-      <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
-
-      <div className="absolute bottom-0 left-0 right-0 p-8">
-        <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-md">
-          {title}
-        </h1>
-        <p className="mt-2 text-lg text-white/90 drop-shadow">{subtitle}</p>
-      </div>
-
-      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
-        <span className="h-2 w-2 rounded-full bg-white" />
-        <span className="h-2 w-2 rounded-full bg-white/40" />
-        <span className="h-2 w-2 rounded-full bg-white/40" />
-      </div>
+    <div className="kiosk-showroom-gradient absolute inset-0">
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          background: `radial-gradient(ellipse at 70% 20%, ${accent}55, transparent 55%)`,
+        }}
+      />
+      <div
+        className="absolute inset-0 opacity-30"
+        style={{
+          background: `radial-gradient(ellipse at 20% 80%, ${primary}, transparent 50%)`,
+        }}
+      />
     </div>
   );
 }
@@ -246,12 +315,16 @@ function HeroMedia({
 function PurposeCard({
   card,
   primary,
-  accent,
+  pressed,
+  onPressStart,
+  onPressEnd,
   onSelect,
 }: {
   card: VisitorCardRecord;
   primary: string;
-  accent: string;
+  pressed: boolean;
+  onPressStart: () => void;
+  onPressEnd: () => void;
   onSelect: (type: VisitorType) => void;
 }) {
   const Icon = getIcon(card.iconKey);
@@ -260,28 +333,19 @@ function PurposeCard({
     <button
       type="button"
       onClick={() => onSelect(card.typeKey as VisitorType)}
-      className="group flex min-h-[130px] flex-col items-center justify-center gap-2 rounded-2xl border border-[var(--yobell-border)] bg-white p-4 shadow-[0_4px_16px_rgba(26,43,75,0.08)] transition-all duration-200 active:scale-[0.97] hover:shadow-[0_8px_24px_rgba(26,43,75,0.14)]"
-      style={{ ["--hover-border" as string]: accent }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = accent;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "";
-      }}
+      onPointerDown={onPressStart}
+      onPointerUp={onPressEnd}
+      onPointerLeave={onPressEnd}
+      className={`kiosk-purpose-card ${pressed ? "yobell-card-selected scale-[0.96]" : ""}`}
     >
       <div
-        className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors"
-        style={{ background: `${primary}0d` }}
+        className="flex h-11 w-11 items-center justify-center rounded-yobell-sm transition-colors duration-fast"
+        style={{ background: `${primary}12` }}
       >
-        <Icon className="h-7 w-7" style={{ color: primary }} strokeWidth={1.75} />
+        <Icon className="h-6 w-6" style={{ color: primary }} strokeWidth={1.75} />
       </div>
-      <span
-        className="text-center text-lg font-bold leading-tight"
-        style={{ color: primary }}
-      >
-        {card.title}
-      </span>
-      <span className="text-center text-xs leading-snug text-[var(--yobell-muted)]">
+      <span className="text-base font-bold leading-tight text-yobell-navy">{card.title}</span>
+      <span className="line-clamp-2 text-[11px] leading-snug text-yobell-muted">
         {card.subtitle}
       </span>
     </button>
