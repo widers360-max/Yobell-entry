@@ -5,6 +5,7 @@ import { LanguageToggle } from "./LanguageToggle";
 import { KioskTopBar } from "./KioskTopBar";
 import { getIcon } from "@/lib/icon-utils";
 import { t } from "@/lib/i18n";
+import { YOBELL_DEFAULT_ACCENT, YOBELL_DEFAULT_PRIMARY } from "@/lib/design-system";
 import type { KioskSettings, Language, VisitorCardRecord, VisitorType } from "@/lib/types";
 
 interface KioskHomeScreenProps {
@@ -22,8 +23,8 @@ export function KioskHomeScreen({
   visitorCards,
   onSelectPurpose,
 }: KioskHomeScreenProps) {
-  const primary = settings.primaryColor ?? "#1a2b4b";
-  const accent = settings.accentColor ?? "#c9a227";
+  const primary = settings.primaryColor ?? YOBELL_DEFAULT_PRIMARY;
+  const accent = settings.accentColor ?? YOBELL_DEFAULT_ACCENT;
 
   const activeCards = visitorCards
     .filter((c) => c.active)

@@ -56,14 +56,14 @@ export function CallMethodScreen({
             onClick={() => onSelect(method)}
             className="kiosk-card-interactive flex min-h-[140px] items-center gap-6 p-8 text-left"
           >
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[var(--yobell-navy)] text-white shadow-lg">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-yobell-sm bg-yobell-navy text-white shadow-glass">
               <Icon className="h-10 w-10" strokeWidth={1.75} />
             </div>
             <div className="flex-1">
-              <p className="text-3xl font-bold text-[var(--yobell-navy)]">
+              <p className="text-3xl font-bold text-yobell-navy">
                 {t(language, titleKey)}
               </p>
-              <p className="mt-2 text-xl leading-relaxed text-[var(--yobell-muted)]">
+              <p className="mt-g1 text-xl leading-relaxed text-yobell-muted">
                 {t(language, subtitleKey)}
               </p>
             </div>

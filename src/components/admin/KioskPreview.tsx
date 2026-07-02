@@ -2,6 +2,7 @@
 
 import { getIcon } from "@/lib/icon-utils";
 import { getLangDisplay } from "@/lib/admin-i18n";
+import { YOBELL_DEFAULT_ACCENT, YOBELL_DEFAULT_PRIMARY } from "@/lib/design-system";
 import { useAdminI18n } from "./AdminI18nProvider";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
 
@@ -13,8 +14,8 @@ export function KioskPreview({
   cards: VisitorCardRecord[];
 }) {
   const { lang, t } = useAdminI18n();
-  const primary = settings.primaryColor ?? "#1a2b4b";
-  const accent = settings.accentColor ?? "#c9a227";
+  const primary = settings.primaryColor ?? YOBELL_DEFAULT_PRIMARY;
+  const accent = settings.accentColor ?? YOBELL_DEFAULT_ACCENT;
   const activeCards = cards.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
   const mainCards = activeCards.filter((c) => c.typeKey !== "other").slice(0, 6);
   const otherCard = activeCards.find((c) => c.typeKey === "other");

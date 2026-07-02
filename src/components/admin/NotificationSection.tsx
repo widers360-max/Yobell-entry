@@ -115,7 +115,7 @@ export function NotificationSection({
 
       <AdminCard title={t("notify_aboutTitle")} className="lg:col-span-2">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#1a2b4b]/10 text-[#1a2b4b]">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-yobell-sm bg-yobell-navy/10 text-yobell-navy">
             <Mail className="h-6 w-6" strokeWidth={1.75} />
           </div>
           <p className="text-sm leading-relaxed text-slate-600">{t("notify_aboutDesc")}</p>

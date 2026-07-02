@@ -98,14 +98,14 @@ function StaffPageContent() {
   const pendingVisits = visits.filter((v) => v.status === "pending");
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="border-b bg-white px-6 py-4 shadow-sm">
+    <div className="min-h-screen bg-yobell-bg">
+      <header className="yobell-glass border-b border-yobell-border px-g3 py-g2 shadow-glass">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--yobell-primary)]">
+            <h1 className="text-2xl font-bold text-yobell-navy">
               YOBELL Entry — スタッフ通知
             </h1>
-            <p className="text-sm text-[var(--yobell-muted)]">
+            <p className="text-sm text-yobell-muted">
               来訪者の呼び出しをリアルタイムで確認・対応
             </p>
           </div>

@@ -68,8 +68,8 @@ model KioskSetting {
   companyDisplayName String  @default("株式会社YOBELL")
   heroTitle          String  @default("ようこそ、株式会社YOBELLへ")
   heroSubtitle       String  @default("快適なオフィス環境を、すべての人に。")
-  primaryColor       String  @default("#1a2b4b")
-  accentColor        String  @default("#c9a227")
+  primaryColor       String  @default("#11284A")
+  accentColor        String  @default("#C8A246")
 }
 
 model VisitorCard {
