@@ -748,3 +748,420 @@ body {
     opacity: 0.35;
   }
 }
+
+/* ─── Admin SaaS console (Stage 6) ─── */
+.admin-shell {
+  @apply flex min-h-screen bg-yobell-bg;
+}
+
+.admin-sidebar {
+  @apply fixed inset-y-0 left-0 z-30 flex w-[17.5rem] flex-col border-r border-yobell-navy-dark bg-yobell-navy text-white shadow-glass-lg;
+}
+
+.admin-sidebar-brand {
+  @apply flex items-center gap-g2 border-b px-g3 py-g3;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-brand-mark {
+  @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-yobell-sm bg-yobell-gold text-lg font-black text-yobell-navy shadow-glass;
+}
+
+.admin-brand-title {
+  @apply text-lg font-black tracking-tight;
+}
+
+.admin-brand-subtitle {
+  @apply text-[11px] font-medium text-yobell-gold-light;
+}
+
+.admin-brand-console {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.admin-sidebar-logout {
+  @apply flex w-full items-center gap-g1 rounded-yobell-sm px-g2 py-2 text-sm font-medium transition-colors;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.admin-sidebar-logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.admin-nav-item {
+  @apply flex w-full items-center gap-g2 rounded-yobell-sm px-g2 py-2.5 text-left text-sm font-medium transition-all duration-fast;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.admin-nav-item-active {
+  @apply border-l-[3px] border-yobell-gold pl-[calc(0.5rem-3px)] text-white shadow-glass;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.admin-quick-link {
+  @apply flex items-center gap-g1 rounded-yobell-sm px-g2 py-2 text-xs transition-colors;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.admin-quick-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.admin-sidebar-tools {
+  @apply space-y-g2 border-b px-g3 py-g2;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-nav {
+  @apply flex-1 space-y-1 overflow-y-auto px-g2 py-g3;
+}
+
+.admin-sidebar-footer {
+  @apply space-y-1 border-t p-g2;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-main {
+  @apply ml-[17.5rem] flex min-h-screen flex-1 flex-col;
+}
+
+.admin-topbar {
+  @apply sticky top-0 z-20 border-b border-yobell-border px-g4 py-g3 backdrop-blur-md;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.admin-topbar-eyebrow {
+  @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-yobell-muted;
+}
+
+.admin-topbar-title {
+  @apply text-2xl font-bold text-yobell-navy;
+}
+
+.admin-content {
+  @apply flex-1 p-g4 lg:p-g5;
+}
+
+.admin-page-stack {
+  @apply space-y-g4;
+}
+
+.admin-card {
+  @apply overflow-hidden rounded-yobell border border-yobell-border bg-yobell-surface shadow-glass;
+}
+
+.admin-card-header {
+  @apply flex items-start justify-between gap-g2 border-b border-yobell-border px-g3 py-g3;
+}
+
+.admin-card-title {
+  @apply text-base font-bold text-yobell-navy;
+}
+
+.admin-card-description {
+  @apply mt-1 text-sm text-yobell-muted;
+}
+
+.admin-card-body {
+  @apply p-g3;
+}
+
+.admin-stat-grid {
+  @apply grid grid-cols-2 gap-g2 xl:grid-cols-3 2xl:grid-cols-6;
+}
+
+.admin-stat-card {
+  @apply rounded-yobell border border-yobell-border bg-yobell-surface p-g3 shadow-glass transition-shadow duration-fast hover:shadow-glass-lg;
+}
+
+.admin-stat-navy {
+  border-top: 3px solid var(--yobell-navy);
+}
+
+.admin-stat-amber {
+  border-top: 3px solid var(--yobell-gold);
+}
+
+.admin-stat-green {
+  border-top: 3px solid var(--yobell-success);
+}
+
+.admin-stat-blue {
+  border-top: 3px solid var(--yobell-navy-light);
+}
+
+.admin-stat-gold {
+  border-top: 3px solid var(--yobell-gold-light);
+}
+
+.admin-stat-label {
+  @apply text-sm font-medium text-yobell-muted;
+}
+
+.admin-stat-value {
+  @apply mt-g1 text-3xl font-black tracking-tight text-yobell-navy;
+}
+
+.admin-stat-hint {
+  @apply mt-1 text-xs text-yobell-muted;
+}
+
+.admin-dashboard-grid {
+  @apply grid gap-g3 lg:grid-cols-3;
+}
+
+.admin-status-list {
+  @apply space-y-g2 text-sm;
+}
+
+.admin-status-row {
+  @apply flex items-center justify-between gap-g2;
+}
+
+.admin-status-row dt {
+  @apply text-yobell-muted;
+}
+
+.admin-status-row dd {
+  @apply flex items-center gap-2 font-semibold text-yobell-navy;
+}
+
+.admin-status-dot {
+  @apply h-2 w-2 rounded-full;
+}
+
+.admin-status-dot.ok {
+  background: var(--yobell-success);
+}
+
+.admin-status-dot.bad {
+  background: var(--yobell-danger);
+}
+
+.admin-field {
+  @apply space-y-1;
+}
+
+.admin-label {
+  @apply block text-sm font-semibold text-yobell-navy;
+}
+
+.admin-hint {
+  @apply text-xs leading-relaxed text-yobell-muted;
+}
+
+.admin-input {
+  @apply w-full rounded-yobell-sm border border-yobell-border bg-yobell-surface px-g2 py-2 text-sm text-yobell-text outline-none transition-colors duration-fast focus:border-yobell-gold focus:ring-2 focus:ring-yobell-gold/15;
+}
+
+.admin-btn {
+  @apply inline-flex items-center justify-center gap-g1 rounded-yobell-sm font-semibold transition-all duration-fast disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.admin-btn-sm {
+  @apply px-g2 py-1 text-sm;
+}
+
+.admin-btn-md {
+  @apply px-g3 py-2 text-sm;
+}
+
+.admin-btn-lg {
+  @apply px-g4 py-3 text-base;
+}
+
+.admin-btn-primary {
+  @apply bg-yobell-navy text-white shadow-glass hover:opacity-95 active:scale-[0.98];
+}
+
+.admin-btn-secondary {
+  @apply border border-yobell-border bg-yobell-surface text-yobell-navy hover:border-yobell-gold;
+}
+
+.admin-btn-danger {
+  @apply bg-yobell-danger text-white hover:opacity-95;
+}
+
+.admin-btn-ghost {
+  @apply text-yobell-muted hover:bg-yobell-bg;
+}
+
+.admin-badge {
+  @apply inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}
+
+.admin-badge-gray {
+  background: rgba(92, 107, 122, 0.12);
+  color: var(--yobell-muted);
+}
+
+.admin-badge-green {
+  background: rgba(31, 138, 76, 0.12);
+  color: var(--yobell-success);
+}
+
+.admin-badge-amber {
+  background: rgba(200, 162, 70, 0.15);
+  color: var(--yobell-navy);
+}
+
+.admin-badge-red {
+  background: rgba(214, 69, 69, 0.12);
+  color: var(--yobell-danger);
+}
+
+.admin-badge-blue,
+.admin-badge-navy {
+  background: rgba(17, 40, 74, 0.1);
+  color: var(--yobell-navy);
+}
+
+.admin-toast {
+  @apply fixed right-g3 top-g3 z-[100] rounded-yobell-sm px-g3 py-g2 text-sm font-semibold text-white shadow-glass-lg;
+}
+
+.admin-toast-success {
+  background: var(--yobell-success);
+}
+
+.admin-toast-error {
+  background: var(--yobell-danger);
+}
+
+.admin-loading,
+.admin-empty {
+  @apply flex flex-col items-center justify-center px-g3 py-g6 text-center;
+}
+
+.admin-loading p,
+.admin-empty-title {
+  @apply mt-g2 text-sm font-semibold text-yobell-muted;
+}
+
+.admin-empty-desc {
+  @apply mt-1 text-xs text-yobell-muted;
+}
+
+.admin-table-wrap {
+  @apply max-h-[62vh] overflow-auto rounded-yobell-sm border border-yobell-border;
+}
+
+.admin-table {
+  @apply w-full min-w-[720px] text-sm;
+}
+
+.admin-table thead {
+  @apply sticky top-0 z-10 bg-yobell-surface;
+}
+
+.admin-table th {
+  @apply border-b border-yobell-border px-g2 py-3 text-left text-xs font-bold uppercase tracking-wide text-yobell-muted;
+}
+
+.admin-table td {
+  @apply border-b border-yobell-border/70 px-g2 py-3 align-middle text-yobell-text;
+}
+
+.admin-table tbody tr:hover {
+  @apply bg-yobell-bg/70;
+}
+
+.admin-filter-bar {
+  @apply grid gap-g2 sm:grid-cols-2 xl:grid-cols-3;
+}
+
+.admin-filter-actions {
+  @apply mt-g3 flex flex-wrap gap-g2;
+}
+
+.admin-form-actions {
+  @apply sticky bottom-0 z-10 -mx-g3 -mb-g3 mt-g3 flex flex-wrap gap-g2 border-t border-yobell-border bg-yobell-surface/95 px-g3 py-g3 backdrop-blur-sm;
+}
+
+.admin-card-row {
+  @apply flex flex-wrap items-start gap-g3 rounded-yobell-sm border border-yobell-border bg-yobell-bg/60 p-g3;
+}
+
+.admin-trend-chart {
+  @apply rounded-yobell-sm border border-yobell-border bg-gradient-to-b from-yobell-bg to-yobell-surface p-g3;
+}
+
+.admin-trend-bars {
+  @apply grid grid-cols-7 items-end gap-g1;
+  min-height: 12rem;
+}
+
+.admin-trend-bar-col {
+  @apply flex h-full flex-col items-center justify-end gap-1;
+}
+
+.admin-trend-value {
+  @apply text-xs font-bold tabular-nums text-yobell-navy;
+}
+
+.admin-trend-bar-track {
+  @apply flex h-28 w-full items-end justify-center rounded-t-md bg-yobell-navy/5 px-1;
+}
+
+.admin-trend-bar-fill {
+  @apply w-full rounded-t-md;
+  background: linear-gradient(180deg, var(--yobell-gold-light), var(--yobell-gold));
+  min-height: 8px;
+  transition: height 300ms ease;
+}
+
+.admin-trend-label {
+  @apply text-[10px] font-medium text-yobell-muted;
+}
+
+.admin-trend-empty {
+  @apply flex min-h-[12rem] items-center justify-center rounded-yobell-sm border border-dashed border-yobell-border bg-yobell-bg text-sm text-yobell-muted;
+}
+
+.admin-preview-colors {
+  @apply mt-g2 flex flex-wrap gap-g1;
+}
+
+.admin-color-swatch {
+  @apply flex items-center gap-1 rounded-full border border-yobell-border bg-yobell-surface px-2 py-1 text-[10px] font-semibold text-yobell-muted;
+}
+
+.admin-color-dot {
+  @apply h-3 w-3 rounded-full border border-black/10;
+}
+
+.admin-smtp-banner {
+  @apply rounded-yobell-sm border px-g3 py-g2 text-sm;
+}
+
+.admin-smtp-ready {
+  border-color: rgba(31, 138, 76, 0.35);
+  background: rgba(31, 138, 76, 0.08);
+  color: var(--yobell-success);
+}
+
+.admin-smtp-missing {
+  border-color: rgba(200, 162, 70, 0.4);
+  background: rgba(200, 162, 70, 0.1);
+  color: var(--yobell-navy);
+}
+
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    @apply w-60;
+  }
+
+  .admin-main {
+    @apply ml-60;
+  }
+}

@@ -19,6 +19,7 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { useAdminI18n } from "./AdminI18nProvider";
 import { ADMIN_NAV_I18N, ADMIN_NAV_KEYS } from "@/lib/admin-i18n";
 import { clearUnlock } from "@/lib/auth-session";
+import { KIOSK_SHOWROOM_DEFAULTS } from "@/lib/design-system";
 
 export type AdminSection =
   | "dashboard"
@@ -59,63 +60,58 @@ export function AdminShell({
   }
 
   return (
-    <div className="flex min-h-screen bg-yobell-bg">
-      <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-yobell-border bg-yobell-navy text-white">
-        <div className="border-b border-white/10 px-6 py-5">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="text-xl font-black tracking-tight">YOBELL</p>
-              <p className="text-xs font-medium text-white/50">{t("adminConsole")}</p>
-            </div>
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-brand">
+          <div className="admin-brand-mark">W</div>
+          <div>
+            <p className="admin-brand-title">YOBELL</p>
+            <p className="admin-brand-subtitle">{KIOSK_SHOWROOM_DEFAULTS.companyDisplayName}</p>
+            <p className="admin-brand-console">{t("adminConsole")}</p>
           </div>
-          <div className="mt-3 scale-90 origin-left">
-            <LanguageToggle language={lang} onChange={setLang} variant="premium" />
-          </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="mt-3 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <LogOut className="h-3.5 w-3.5" />
+        </div>
+
+        <div className="admin-sidebar-tools">
+          <LanguageToggle language={lang} onChange={setLang} variant="premium" />
+          <button type="button" onClick={handleLogout} className="admin-sidebar-logout">
+            <LogOut className="h-4 w-4" strokeWidth={1.75} />
             {t("auth_logout")}
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <nav className="admin-sidebar-nav">
           {ADMIN_NAV_KEYS.map((key) => {
             const Icon = NAV_ICONS[key];
+            const active = section === key;
             return (
               <button
                 key={key}
                 type="button"
                 onClick={() => onSectionChange(key)}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-                  section === key
-                    ? "bg-white/15 text-white"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                }`}
+                className={`admin-nav-item ${active ? "admin-nav-item-active" : ""}`}
               >
                 <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                {t(ADMIN_NAV_I18N[key])}
+                <span>{t(ADMIN_NAV_I18N[key])}</span>
               </button>
             );
           })}
         </nav>
 
-        <div className="border-t border-white/10 p-4 space-y-2">
+        <div className="admin-sidebar-footer">
           <QuickLink href="/" label={t("link_kiosk")} />
           <QuickLink href="/staff" label={t("link_staffNotify")} />
           <QuickLink href="/health" label={t("link_health")} />
         </div>
       </aside>
 
-      <div className="ml-64 flex flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-yobell-border bg-yobell-surface/90 px-g4 py-g2 backdrop-blur">
-          <h1 className="text-lg font-bold text-yobell-text">
-            {t(ADMIN_NAV_I18N[section])}
-          </h1>
+      <div className="admin-main">
+        <header className="admin-topbar">
+          <div>
+            <p className="admin-topbar-eyebrow">YOBELL Admin</p>
+            <h1 className="admin-topbar-title">{t(ADMIN_NAV_I18N[section])}</h1>
+          </div>
         </header>
-        <main className="flex-1 bg-yobell-bg p-g4">{children}</main>
+        <main className="admin-content">{children}</main>
       </div>
     </div>
   );
@@ -123,11 +119,7 @@ export function AdminShell({
 
 function QuickLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link
-      href={href}
-      target="_blank"
-      className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-    >
+    <Link href={href} target="_blank" className="admin-quick-link">
       <ExternalLink className="h-3.5 w-3.5" />
       {label}
     </Link>

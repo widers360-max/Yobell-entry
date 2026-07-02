@@ -45,7 +45,10 @@ const DEFAULT_DASHBOARD = {
     responded: 0,
     staffCount: 0,
     companyCount: 0,
+    monthVisits: 0,
+    avgResponseSeconds: null as number | null,
   },
+  visitTrend: [] as Array<{ date: string; count: number }>,
   latestVisits: [] as Array<{
     id: string;
     visitorName: string;

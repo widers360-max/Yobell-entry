@@ -57,6 +57,13 @@ export type AdminTranslationKey =
   | "dash_pending"
   | "dash_responded"
   | "dash_staffCount"
+  | "dash_monthVisits"
+  | "dash_avgResponse"
+  | "dash_avgResponseHint"
+  | "dash_preparing"
+  | "dash_visitTrend"
+  | "dash_trendEmpty"
+  | "dash_latestVisitsDesc"
   | "dash_kioskStatus"
   | "dash_latestVisits"
   | "dash_noVisits"
@@ -115,12 +122,15 @@ export type AdminTranslationKey =
   | "companies_list"
   | "companies_add"
   | "companies_edit"
+  | "companies_empty"
   | "staff_list"
   | "staff_add"
   | "staff_edit"
+  | "staff_empty"
   | "staff_deactivate"
   | "staff_activate"
   | "visits_filter"
+  | "visits_filterDesc"
   | "visits_list"
   | "visits_exportCsv"
   | "visits_purgeOld"
@@ -160,6 +170,8 @@ export type AdminTranslationKey =
   | "type_other"
   | "preview_selectPurpose"
   | "preview_preregister"
+  | "preview_colors"
+  | "branding_saveHint"
   | "preview_video"
   | "visits_statusFilter"
   | "visits_typeFilter"
@@ -247,6 +259,13 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     dash_pending: "未対応",
     dash_responded: "対応済み",
     dash_staffCount: "登録スタッフ数",
+    dash_monthVisits: "今月の来訪数",
+    dash_avgResponse: "平均応答時間",
+    dash_avgResponseHint: "応答データが蓄積されると表示されます",
+    dash_preparing: "準備中",
+    dash_visitTrend: "来訪トレンド（7日間）",
+    dash_trendEmpty: "直近7日間の来訪データはまだありません",
+    dash_latestVisitsDesc: "直近10件の来訪記録",
     dash_kioskStatus: "キオスクステータス",
     dash_latestVisits: "最新の来訪（10件）",
     dash_noVisits: "来訪記録はまだありません",
@@ -305,12 +324,15 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     companies_list: "会社一覧",
     companies_add: "会社を追加",
     companies_edit: "会社を編集",
+    companies_empty: "会社が登録されていません",
     staff_list: "スタッフ一覧",
     staff_add: "スタッフを追加",
     staff_edit: "スタッフを編集",
+    staff_empty: "スタッフが登録されていません",
     staff_deactivate: "無効化",
     staff_activate: "有効化",
     visits_filter: "検索・フィルター",
+    visits_filterDesc: "条件を指定して来訪ログを絞り込みます",
     visits_list: "来訪ログ",
     visits_exportCsv: "CSVエクスポート",
     visits_purgeOld: "保持期間外ログを削除",
@@ -350,6 +372,8 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     type_other: "その他",
     preview_selectPurpose: "ご用件をお選びください",
     preview_preregister: "事前登録はこちら",
+    preview_colors: "ブランドカラー",
+    branding_saveHint: "変更後は必ず保存してください。右のプレビューで確認できます。",
     preview_video: "▶ 動画",
     visits_statusFilter: "ステータス",
     visits_typeFilter: "来訪種別",
@@ -437,6 +461,13 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     dash_pending: "Pending",
     dash_responded: "Responded",
     dash_staffCount: "Registered Staff",
+    dash_monthVisits: "Visits This Month",
+    dash_avgResponse: "Avg. Response Time",
+    dash_avgResponseHint: "Shown once response data is available",
+    dash_preparing: "Preparing",
+    dash_visitTrend: "Visitor Trend (7 days)",
+    dash_trendEmpty: "No visits in the last 7 days",
+    dash_latestVisitsDesc: "Latest 10 visit records",
     dash_kioskStatus: "Kiosk Status",
     dash_latestVisits: "Latest Visits (10)",
     dash_noVisits: "No visit records yet",
@@ -495,12 +526,15 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     companies_list: "Companies",
     companies_add: "Add Company",
     companies_edit: "Edit Company",
+    companies_empty: "No companies registered yet",
     staff_list: "Staff",
     staff_add: "Add Staff",
     staff_edit: "Edit Staff",
+    staff_empty: "No staff registered yet",
     staff_deactivate: "Deactivate",
     staff_activate: "Activate",
     visits_filter: "Search & Filter",
+    visits_filterDesc: "Narrow visit logs by criteria",
     visits_list: "Visit Logs",
     visits_exportCsv: "Export CSV",
     visits_purgeOld: "Delete Old Logs",
@@ -540,6 +574,8 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     type_other: "Other",
     preview_selectPurpose: "Please select your visit purpose",
     preview_preregister: "Pre-register here",
+    preview_colors: "Brand colors",
+    branding_saveHint: "Save changes to apply them. Preview updates on the right.",
     preview_video: "▶ Video",
     visits_statusFilter: "Status",
     visits_typeFilter: "Visit Type",
@@ -627,6 +663,13 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     dash_pending: "미대응",
     dash_responded: "대응 완료",
     dash_staffCount: "등록 스태프",
+    dash_monthVisits: "이번 달 방문",
+    dash_avgResponse: "평균 응답 시간",
+    dash_avgResponseHint: "응답 데이터가 쌓이면 표시됩니다",
+    dash_preparing: "준비 중",
+    dash_visitTrend: "방문 추이 (7일)",
+    dash_trendEmpty: "최근 7일간 방문 데이터가 없습니다",
+    dash_latestVisitsDesc: "최근 방문 10건",
     dash_kioskStatus: "키오스크 상태",
     dash_latestVisits: "최근 방문 (10건)",
     dash_noVisits: "방문 기록이 없습니다",
@@ -685,12 +728,15 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     companies_list: "회사 목록",
     companies_add: "회사 추가",
     companies_edit: "회사 편집",
+    companies_empty: "등록된 회사가 없습니다",
     staff_list: "스태프 목록",
     staff_add: "스태프 추가",
     staff_edit: "스태프 편집",
+    staff_empty: "등록된 스태프가 없습니다",
     staff_deactivate: "비활성화",
     staff_activate: "활성화",
     visits_filter: "검색 · 필터",
+    visits_filterDesc: "조건으로 방문 로그를 필터링합니다",
     visits_list: "방문 로그",
     visits_exportCsv: "CSV보내기",
     visits_purgeOld: "보관 기간 외 로그 삭제",
@@ -730,6 +776,8 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     type_other: "기타",
     preview_selectPurpose: "방문 목적을 선택해 주세요",
     preview_preregister: "사전 등록",
+    preview_colors: "브랜드 컬러",
+    branding_saveHint: "변경 후 저장하세요. 오른쪽 미리보기에서 확인할 수 있습니다.",
     preview_video: "▶ 영상",
     visits_statusFilter: "상태",
     visits_typeFilter: "방문 유형",

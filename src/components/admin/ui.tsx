@@ -2,29 +2,33 @@
 
 import type { ReactNode } from "react";
 import type { Language } from "@/lib/types";
+import { Loader2 } from "lucide-react";
 
 export function AdminCard({
   children,
   className = "",
   title,
+  description,
   action,
 }: {
   children: ReactNode;
   className?: string;
   title?: string;
+  description?: string;
   action?: ReactNode;
 }) {
   return (
-    <div className={`yobell-card overflow-hidden ${className}`}>
+    <div className={`admin-card ${className}`}>
       {(title || action) && (
-        <div className="flex items-center justify-between border-b border-yobell-border px-g3 py-g2">
-          {title && (
-            <h3 className="text-base font-bold text-yobell-text">{title}</h3>
-          )}
+        <div className="admin-card-header">
+          <div>
+            {title && <h3 className="admin-card-title">{title}</h3>}
+            {description && <p className="admin-card-description">{description}</p>}
+          </div>
           {action}
         </div>
       )}
-      <div className="p-g3">{children}</div>
+      <div className="admin-card-body">{children}</div>
     </div>
   );
 }
@@ -33,77 +37,75 @@ export function StatCard({
   label,
   value,
   accent = "navy",
+  hint,
 }: {
   label: string;
   value: number | string;
-  accent?: "navy" | "amber" | "green" | "blue";
+  accent?: "navy" | "amber" | "green" | "blue" | "gold";
+  hint?: string;
 }) {
-  const colors = {
-    navy: "border-l-yobell-navy text-yobell-navy",
-    amber: "border-l-yobell-gold text-yobell-gold",
-    green: "border-l-yobell-success text-yobell-success",
-    blue: "border-l-yobell-navy-light text-yobell-navy-light",
-  };
   return (
-    <div
-      className={`yobell-card border-l-4 p-g3 ${colors[accent]}`}
-    >
-      <p className="text-sm font-medium text-yobell-muted">{label}</p>
-      <p className="mt-g1 text-3xl font-bold">{value}</p>
+    <div className={`admin-stat-card admin-stat-${accent}`}>
+      <p className="admin-stat-label">{label}</p>
+      <p className="admin-stat-value">{value}</p>
+      {hint && <p className="admin-stat-hint">{hint}</p>}
     </div>
   );
 }
 
 export function AdminInput({
   label,
+  hint,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & { label?: string }) {
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  label?: string;
+  hint?: string;
+}) {
   return (
-    <div>
-      {label && (
-        <label className="mb-g1 block text-sm font-medium text-yobell-muted">
-          {label}
-        </label>
-      )}
+    <div className="admin-field">
+      {label && <label className="admin-label">{label}</label>}
       <input {...props} className={`admin-input ${props.className ?? ""}`} />
+      {hint && <p className="admin-hint">{hint}</p>}
     </div>
   );
 }
 
 export function AdminTextarea({
   label,
+  hint,
   ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label?: string }) {
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  label?: string;
+  hint?: string;
+}) {
   return (
-    <div>
-      {label && (
-        <label className="mb-g1 block text-sm font-medium text-yobell-muted">
-          {label}
-        </label>
-      )}
+    <div className="admin-field">
+      {label && <label className="admin-label">{label}</label>}
       <textarea
         {...props}
-        className={`admin-input min-h-[80px] resize-y ${props.className ?? ""}`}
+        className={`admin-input min-h-[88px] resize-y ${props.className ?? ""}`}
       />
+      {hint && <p className="admin-hint">{hint}</p>}
     </div>
   );
 }
 
 export function AdminSelect({
   label,
+  hint,
   children,
   ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement> & { label?: string }) {
+}: React.SelectHTMLAttributes<HTMLSelectElement> & {
+  label?: string;
+  hint?: string;
+}) {
   return (
-    <div>
-      {label && (
-        <label className="mb-g1 block text-sm font-medium text-yobell-muted">
-          {label}
-        </label>
-      )}
+    <div className="admin-field">
+      {label && <label className="admin-label">{label}</label>}
       <select {...props} className={`admin-input ${props.className ?? ""}`}>
         {children}
       </select>
+      {hint && <p className="admin-hint">{hint}</p>}
     </div>
   );
 }
@@ -117,21 +119,10 @@ export function Btn({
   variant?: "primary" | "secondary" | "danger" | "ghost";
   size?: "sm" | "md" | "lg";
 }) {
-  const variants = {
-    primary: "yobell-btn-primary shadow-glass",
-    secondary: "yobell-btn-secondary",
-    danger: "yobell-btn-danger",
-    ghost: "text-yobell-muted hover:bg-yobell-bg",
-  };
-  const sizes = {
-    sm: "yobell-btn-sm px-g2",
-    md: "yobell-btn-md px-g3",
-    lg: "yobell-btn-lg px-g4",
-  };
   return (
     <button
       {...props}
-      className={`yobell-btn inline-flex items-center justify-center gap-g1 rounded-yobell-sm font-semibold transition-all duration-fast disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${props.className ?? ""}`}
+      className={`admin-btn admin-btn-${variant} admin-btn-${size} ${props.className ?? ""}`}
     >
       {children}
     </button>
@@ -143,22 +134,9 @@ export function Badge({
   color = "gray",
 }: {
   children: ReactNode;
-  color?: "gray" | "green" | "amber" | "red" | "blue";
+  color?: "gray" | "green" | "amber" | "red" | "blue" | "navy";
 }) {
-  const colors = {
-    gray: "bg-yobell-bg text-yobell-muted",
-    green: "bg-yobell-success/10 text-yobell-success",
-    amber: "bg-yobell-gold/15 text-yobell-gold-hover",
-    red: "bg-yobell-danger/10 text-yobell-danger",
-    blue: "bg-yobell-navy/10 text-yobell-navy",
-  };
-  return (
-    <span
-      className={`inline-flex rounded-full px-g2 py-0.5 text-xs font-semibold ${colors[color]}`}
-    >
-      {children}
-    </span>
-  );
+  return <span className={`admin-badge admin-badge-${color}`}>{children}</span>;
 }
 
 export function Toast({
@@ -170,14 +148,52 @@ export function Toast({
 }) {
   if (!message) return null;
   return (
-    <div
-      className={`fixed right-g3 top-g3 z-50 rounded-yobell-sm px-g3 py-g2 text-sm font-semibold text-white shadow-glass-lg ${
-        type === "success" ? "bg-yobell-success" : "bg-yobell-danger"
-      }`}
-    >
+    <div className={`admin-toast admin-toast-${type}`} role="status">
       {message}
     </div>
   );
+}
+
+export function AdminLoading({ label }: { label: string }) {
+  return (
+    <div className="admin-loading">
+      <Loader2 className="h-6 w-6 animate-spin text-yobell-gold" />
+      <p>{label}</p>
+    </div>
+  );
+}
+
+export function AdminEmptyState({
+  title,
+  description,
+}: {
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div className="admin-empty">
+      <p className="admin-empty-title">{title}</p>
+      {description && <p className="admin-empty-desc">{description}</p>}
+    </div>
+  );
+}
+
+export function AdminTable({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`admin-table-wrap ${className}`}>
+      <table className="admin-table">{children}</table>
+    </div>
+  );
+}
+
+export function AdminFormActions({ children }: { children: ReactNode }) {
+  return <div className="admin-form-actions">{children}</div>;
 }
 
 export function formatDate(iso: string, lang: Language = "ja") {
@@ -189,4 +205,12 @@ export function formatDate(iso: string, lang: Language = "ja") {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+export function formatDuration(seconds: number | null, preparingLabel: string): string {
+  if (seconds === null || seconds <= 0) return preparingLabel;
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return rest > 0 ? `${minutes}m ${rest}s` : `${minutes}m`;
 }
