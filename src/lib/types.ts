@@ -83,6 +83,7 @@ export interface KioskSettings {
   primaryColor: string;
   accentColor: string;
   retentionDays: number;
+  idleTimeoutSeconds: number;
 }
 
 export interface VisitorCardRecord {

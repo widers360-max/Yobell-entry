@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { QrCode } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
 import { KioskTopBar } from "./KioskTopBar";
@@ -21,6 +21,12 @@ interface KioskHomeScreenProps {
   settings: KioskSettings;
   visitorCards: VisitorCardRecord[];
   onSelectPurpose: (type: VisitorType) => void;
+  isActive: boolean;
+  onActivate: () => void;
+}
+
+function companyShortName(name: string) {
+  return name.replace(/^株式会社\s*/, "").trim() || name;
 }
 
 function resolveShowroomCopy(settings: KioskSettings) {
@@ -32,9 +38,20 @@ function resolveShowroomCopy(settings: KioskSettings) {
     settings.heroSubtitle?.trim() || KIOSK_SHOWROOM_DEFAULTS.heroSubtitle;
   const tagline = settings.tagline?.trim() || KIOSK_SHOWROOM_DEFAULTS.tagline;
   const brandName = settings.brandName?.trim() || KIOSK_SHOWROOM_DEFAULTS.brandName;
+  const welcomeMessage =
+    settings.welcomeMessage?.trim() || KIOSK_SHOWROOM_DEFAULTS.welcomeMessage;
 
-  return { company, welcomeLine, heroSubtitle, tagline, brandName };
+  return { company, welcomeLine, heroSubtitle, tagline, brandName, welcomeMessage };
 }
+
+type IdleSlide = {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  line?: string;
+};
+
+const SLIDE_INTERVAL_MS = 8_000;
 
 export function KioskHomeScreen({
   language,
@@ -42,19 +59,46 @@ export function KioskHomeScreen({
   settings,
   visitorCards,
   onSelectPurpose,
+  isActive,
+  onActivate,
 }: KioskHomeScreenProps) {
-  const [isActive, setIsActive] = useState(false);
   const [now, setNow] = useState(() => new Date());
+  const [slideIndex, setSlideIndex] = useState(0);
 
   const primary = settings.primaryColor ?? YOBELL_DEFAULT_PRIMARY;
   const accent = settings.accentColor ?? YOBELL_DEFAULT_ACCENT;
   const copy = resolveShowroomCopy(settings);
+  const shortCompany = companyShortName(copy.company);
 
   const activeCards = visitorCards
     .filter((c) => c.active)
     .sort((a, b) => a.sortOrder - b.sortOrder);
   const mainCards = activeCards.filter((c) => c.typeKey !== "other").slice(0, 6);
   const otherCard = activeCards.find((c) => c.typeKey === "other");
+
+  const idleSlides = useMemo<IdleSlide[]>(
+    () => [
+      {
+        eyebrow: t(language, "idle_welcomeTo"),
+        title: shortCompany,
+        subtitle: t(language, "idle_smartReception"),
+        line: copy.welcomeMessage,
+      },
+      {
+        eyebrow: copy.welcomeLine,
+        title: copy.company,
+        subtitle: copy.heroSubtitle,
+        line: copy.welcomeMessage,
+      },
+      {
+        eyebrow: copy.brandName,
+        title: t(language, "idle_smartReception"),
+        subtitle: copy.tagline,
+        line: copy.welcomeMessage,
+      },
+    ],
+    [language, shortCompany, copy],
+  );
 
   const cssVars = {
     "--yobell-navy": primary,
@@ -64,33 +108,149 @@ export function KioskHomeScreen({
   } as React.CSSProperties;
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 30_000);
+    const interval = isActive ? 30_000 : 1_000;
+    const timer = setInterval(() => setNow(new Date()), interval);
     return () => clearInterval(timer);
-  }, []);
+  }, [isActive]);
+
+  useEffect(() => {
+    if (isActive) return;
+    const timer = setInterval(() => {
+      setSlideIndex((i) => (i + 1) % idleSlides.length);
+    }, SLIDE_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [isActive, idleSlides.length]);
 
   const activate = useCallback(() => {
-    setIsActive(true);
-  }, []);
+    onActivate();
+  }, [onActivate]);
 
-  const dateLabel = now.toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-  });
-  const timeLabel = now.toLocaleTimeString("ja-JP", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const dateLabel = now.toLocaleDateString(
+    language === "ko" ? "ko-KR" : language === "en" ? "en-US" : "ja-JP",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "short",
+    },
+  );
+  const timeLabel = now.toLocaleTimeString(
+    language === "ko" ? "ko-KR" : language === "en" ? "en-US" : "ja-JP",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
+
+  if (!isActive) {
+    const slide = idleSlides[slideIndex] ?? idleSlides[0];
+
+    return (
+      <div
+        className="kiosk-idle-showroom kiosk-portrait relative flex min-h-screen flex-col overflow-hidden"
+        style={cssVars}
+        role="button"
+        tabIndex={0}
+        onPointerDown={activate}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") activate();
+        }}
+      >
+        <KioskTopBar language={language} />
+
+        <HeroBackdrop
+          videoUrl={settings.heroVideoUrl}
+          imageUrl={settings.heroImageUrl}
+          primary={primary}
+          accent={accent}
+        />
+
+        <div className="kiosk-idle-showroom-overlay absolute inset-0 bg-gradient-to-t from-yobell-navy/90 via-yobell-navy/45 to-yobell-navy/25" />
+
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+          <header className="flex shrink-0 items-start justify-between px-g4 pt-g3">
+            <div className="flex min-w-0 items-center gap-g2">
+              {settings.logoUrl ? (
+                <img
+                  src={settings.logoUrl}
+                  alt={copy.brandName}
+                  className="h-14 w-auto max-w-[220px] object-contain drop-shadow-lg"
+                />
+              ) : (
+                <div className="flex items-center gap-g2">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-yobell-sm bg-white/10 shadow-glass backdrop-blur-sm">
+                    <span className="text-2xl font-black text-yobell-gold">Y</span>
+                  </div>
+                  <div className="min-w-0 text-white">
+                    <p className="truncate text-lg font-black tracking-tight">{copy.brandName}</p>
+                    <p className="text-[10px] font-semibold tracking-[0.2em] text-white/70">
+                      {t(language, "smartReception")}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="text-right">
+              <p className="text-3xl font-black tabular-nums tracking-tight text-white drop-shadow-lg">
+                {timeLabel}
+              </p>
+              <p className="mt-1 text-sm font-medium text-white/80">{dateLabel}</p>
+            </div>
+          </header>
+
+          <div className="flex flex-1 flex-col items-center justify-center px-g4 text-center text-white">
+            <div key={slideIndex} className="kiosk-idle-slide kiosk-idle-welcome max-w-2xl">
+              {slide.eyebrow && (
+                <p className="text-sm font-semibold tracking-[0.35em] text-white/75 uppercase">
+                  {slide.eyebrow}
+                </p>
+              )}
+              <h1 className="mt-g2 text-5xl font-black leading-tight tracking-tight drop-shadow-xl md:text-6xl">
+                {slide.title}
+              </h1>
+              {slide.subtitle && (
+                <p className="mt-g3 text-xl font-medium tracking-wide text-yobell-gold-light drop-shadow md:text-2xl">
+                  {slide.subtitle}
+                </p>
+              )}
+              {slide.line && (
+                <p className="mt-g4 text-lg font-medium text-white/90 md:text-xl">{slide.line}</p>
+              )}
+            </div>
+
+            <div className="mt-g4 flex gap-2">
+              {idleSlides.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all duration-slow ${
+                    i === slideIndex ? "w-8 bg-yobell-gold" : "w-1.5 bg-white/35"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <footer className="shrink-0 px-g4 pb-g4 pt-g2 text-center">
+            <p className="kiosk-idle-touch-hint inline-block rounded-full border border-white/25 bg-white/10 px-g4 py-g2 text-base font-medium text-white/95 backdrop-blur-sm">
+              {t(language, "home_touchHint")}
+            </p>
+            <p className="mt-g2 text-xs tracking-wide text-white/50">
+              {poweredByLabel(copy.company)}
+            </p>
+          </footer>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
-      className="kiosk-portrait relative flex min-h-screen flex-col overflow-hidden bg-yobell-bg"
+      className="kiosk-portrait kiosk-active-enter relative flex min-h-screen flex-col overflow-hidden bg-yobell-bg"
       style={cssVars}
     >
       <KioskTopBar language={language} />
 
-      {/* Header */}
       <header className="flex shrink-0 items-center justify-between px-g3 pb-g1 pt-g2">
         <div className="flex min-w-0 items-center gap-g2">
           {settings.logoUrl ? (
@@ -117,12 +277,10 @@ export function KioskHomeScreen({
         </div>
 
         <div className="flex items-center gap-g2">
-          {isActive && (
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold tabular-nums text-yobell-navy">{timeLabel}</p>
-              <p className="text-[11px] text-yobell-muted">{dateLabel}</p>
-            </div>
-          )}
+          <div className="hidden text-right sm:block">
+            <p className="text-sm font-semibold tabular-nums text-yobell-navy">{timeLabel}</p>
+            <p className="text-[11px] text-yobell-muted">{dateLabel}</p>
+          </div>
           <LanguageToggle
             language={language}
             onChange={onLanguageChange}
@@ -131,114 +289,75 @@ export function KioskHomeScreen({
         </div>
       </header>
 
-      {/* Hero / Welcome */}
-      <section
-        className={`relative shrink-0 px-g3 transition-all duration-slow ease-yobell ${
-          isActive ? "pb-g1" : "flex-1 pb-0"
-        }`}
-      >
-        <div
-          role={isActive ? undefined : "button"}
-          tabIndex={isActive ? undefined : 0}
-          onClick={!isActive ? activate : undefined}
-          onKeyDown={
-            !isActive
-              ? (e) => {
-                  if (e.key === "Enter" || e.key === " ") activate();
-                }
-              : undefined
-          }
-          className={`relative w-full overflow-hidden rounded-yobell shadow-glass-lg transition-all duration-slow ease-yobell ${
-            isActive ? "h-[200px]" : "h-full min-h-[420px] cursor-pointer"
-          }`}
-        >
+      <section className="relative shrink-0 px-g3 pb-g1 transition-all duration-slow ease-yobell">
+        <div className="relative h-[200px] w-full overflow-hidden rounded-yobell shadow-glass-lg">
           <HeroBackdrop
             videoUrl={settings.heroVideoUrl}
             imageUrl={settings.heroImageUrl}
             primary={primary}
             accent={accent}
           />
-
           <div className="absolute inset-0 bg-gradient-to-t from-yobell-navy/85 via-yobell-navy/35 to-transparent" />
-
-          <div
-            className={`absolute inset-0 flex flex-col items-center justify-center px-g4 text-center text-white ${
-              !isActive ? "kiosk-idle-welcome" : ""
-            }`}
-          >
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-g4 text-center text-white">
             <p className="text-sm font-medium tracking-[0.35em] text-white/75 uppercase">
               {copy.welcomeLine}
             </p>
-            <h1 className="mt-g2 text-4xl font-black leading-tight tracking-tight drop-shadow-lg md:text-5xl">
+            <h1 className="mt-g2 text-3xl font-black leading-tight tracking-tight drop-shadow-lg">
               {copy.company}
               {language === "ja" ? t(language, "home_companySuffix") : ""}
             </h1>
-            <p className="mt-g2 text-lg font-medium tracking-wide text-yobell-gold-light drop-shadow">
+            <p className="mt-g2 text-base font-medium tracking-wide text-yobell-gold-light drop-shadow">
               {copy.heroSubtitle}
             </p>
-
-            {!isActive && (
-              <p className="mt-g4 rounded-full border border-white/25 bg-white/10 px-g3 py-g1 text-sm font-medium text-white/90 backdrop-blur-sm">
-                {t(language, "home_touchHint")}
-              </p>
-            )}
           </div>
         </div>
       </section>
 
-      {/* Purpose selection — revealed in active mode */}
-      {isActive && (
-        <section className="kiosk-reveal-panel flex min-h-0 flex-1 flex-col px-g3 pb-g1 pt-g2">
-          <div className="mb-g2 flex items-end justify-between gap-g2">
-            <h2 className="text-xl font-bold text-yobell-navy">
-              {t(language, "selectVisitorType")}
-            </h2>
-            <div className="text-right sm:hidden">
-              <p className="text-sm font-semibold tabular-nums text-yobell-navy">{timeLabel}</p>
-              <p className="text-[10px] text-yobell-muted">{dateLabel}</p>
+      <section className="kiosk-reveal-panel flex min-h-0 flex-1 flex-col px-g3 pb-g1 pt-g2">
+        <div className="mb-g2 flex items-end justify-between gap-g2">
+          <h2 className="text-xl font-bold text-yobell-navy">
+            {t(language, "selectVisitorType")}
+          </h2>
+          <div className="text-right sm:hidden">
+            <p className="text-sm font-semibold tabular-nums text-yobell-navy">{timeLabel}</p>
+            <p className="text-[10px] text-yobell-muted">{dateLabel}</p>
+          </div>
+        </div>
+
+        <div className="grid flex-1 grid-cols-3 gap-g2 content-start">
+          {mainCards.map((card) => {
+            const Icon = getIcon(card.iconKey);
+            return (
+              <PremiumCard
+                key={card.id}
+                layout="vertical"
+                title={card.title}
+                subtitle={card.subtitle}
+                icon={Icon}
+                primaryColor={primary}
+                onClick={() => onSelectPurpose(card.typeKey as VisitorType)}
+              />
+            );
+          })}
+        </div>
+
+        {otherCard && (
+          <div className="mt-g2 flex justify-center">
+            <div className="w-1/3 min-w-[180px]">
+              <PremiumCard
+                layout="vertical"
+                title={otherCard.title}
+                subtitle={otherCard.subtitle}
+                icon={getIcon(otherCard.iconKey)}
+                primaryColor={primary}
+                onClick={() => onSelectPurpose(otherCard.typeKey as VisitorType)}
+              />
             </div>
           </div>
+        )}
+      </section>
 
-          <div className="grid flex-1 grid-cols-3 gap-g2 content-start">
-            {mainCards.map((card) => {
-              const Icon = getIcon(card.iconKey);
-              return (
-                <PremiumCard
-                  key={card.id}
-                  layout="vertical"
-                  title={card.title}
-                  subtitle={card.subtitle}
-                  icon={Icon}
-                  primaryColor={primary}
-                  onClick={() => onSelectPurpose(card.typeKey as VisitorType)}
-                />
-              );
-            })}
-          </div>
-
-          {otherCard && (
-            <div className="mt-g2 flex justify-center">
-              <div className="w-1/3 min-w-[180px]">
-                <PremiumCard
-                  layout="vertical"
-                  title={otherCard.title}
-                  subtitle={otherCard.subtitle}
-                  icon={getIcon(otherCard.iconKey)}
-                  primaryColor={primary}
-                  onClick={() => onSelectPurpose(otherCard.typeKey as VisitorType)}
-                />
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* Footer utility */}
-      <footer
-        className={`shrink-0 transition-all duration-slow ease-yobell ${
-          isActive ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-      >
+      <footer className="shrink-0">
         <div className="yobell-glass mx-g3 mb-g1 flex items-center gap-g2 rounded-yobell-sm border border-yobell-border px-g2 py-g2">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-yobell-sm border-2 border-dashed border-yobell-border bg-yobell-surface">
             <QrCode className="h-7 w-7 text-yobell-navy" strokeWidth={1.5} />

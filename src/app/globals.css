@@ -296,6 +296,53 @@ body {
     forwards;
 }
 
+@keyframes kioskIdleSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kioskActiveEnter {
+  from {
+    opacity: 0.92;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.kiosk-idle-showroom {
+  @apply relative min-h-screen w-full;
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.kiosk-idle-showroom-overlay {
+  pointer-events: none;
+}
+
+.kiosk-idle-slide {
+  animation: kioskIdleSlideIn 0.8s ease-out;
+}
+
+.kiosk-idle-touch-hint {
+  animation: kioskIdleGlow 4s ease-in-out infinite;
+}
+
+.kiosk-active-enter {
+  animation: kioskActiveEnter var(--yobell-duration-slow) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .kiosk-purpose-card {
   @apply yobell-card-premium flex flex-col items-center justify-center gap-g1 border-yobell-border p-g2 text-center transition-all duration-fast ease-yobell;
   min-height: 7.5rem;

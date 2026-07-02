@@ -36,6 +36,7 @@ const DEFAULT_SETTINGS: KioskSettings = {
   primaryColor: YOBELL_DEFAULT_PRIMARY,
   accentColor: YOBELL_DEFAULT_ACCENT,
   retentionDays: 30,
+  idleTimeoutSeconds: KIOSK_SHOWROOM_DEFAULTS.idleTimeoutSeconds,
 };
 
 const DEFAULT_DASHBOARD = {

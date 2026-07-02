@@ -97,6 +97,7 @@ export type AdminTranslationKey =
   | "field_fallbackMessage"
   | "field_privacyNotice"
   | "field_retentionDays"
+  | "field_idleTimeoutSeconds"
   | "field_companyName"
   | "field_welcomeMessage"
   | "field_name"
@@ -299,6 +300,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     field_fallbackMessage: "フォールバックメッセージ",
     field_privacyNotice: "プライバシー通知文",
     field_retentionDays: "ログ保持日数",
+    field_idleTimeoutSeconds: "アイドル復帰までの秒数",
     field_companyName: "会社名",
     field_welcomeMessage: "ウェルカムメッセージ",
     field_name: "名前",
@@ -501,6 +503,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     field_fallbackMessage: "Fallback Message",
     field_privacyNotice: "Privacy Notice",
     field_retentionDays: "Log Retention (days)",
+    field_idleTimeoutSeconds: "Idle timeout (seconds)",
     field_companyName: "Company Name",
     field_welcomeMessage: "Welcome Message",
     field_name: "Name",
@@ -703,6 +706,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     field_fallbackMessage: "폴백 메시지",
     field_privacyNotice: "개인정보 안내",
     field_retentionDays: "로그 보관 일수",
+    field_idleTimeoutSeconds: "유휴 복귀 시간(초)",
     field_companyName: "회사명",
     field_welcomeMessage: "환영 메시지",
     field_name: "이름",

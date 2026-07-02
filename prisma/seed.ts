@@ -126,6 +126,7 @@ async function main() {
       heroVideoUrl: null,
       primaryColor: "#11284A",
       accentColor: "#C8A246",
+      idleTimeoutSeconds: 60,
     },
   });
 
