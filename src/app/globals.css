@@ -614,7 +614,137 @@ body {
   background: rgba(92, 107, 122, 0.1);
 }
 
-.staff-status-danger {
-  color: var(--yobell-danger);
+/* ─── Waiting screen (Stage 5) ─── */
+.waiting-screen {
+  animation: kioskStepEnter 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.waiting-status-copy {
+  animation: waitingFadeIn 400ms ease-out forwards;
+}
+
+.waiting-pulse {
+  @apply relative flex h-36 w-36 items-center justify-center;
+}
+
+.waiting-pulse-ring {
+  @apply absolute inset-0 rounded-full;
+  border: 2px solid rgba(200, 162, 70, 0.35);
+}
+
+.waiting-pulse-ring-1 {
+  animation: waitingWave 2.8s ease-out infinite;
+}
+
+.waiting-pulse-ring-2 {
+  animation: waitingWave 2.8s ease-out 0.9s infinite;
+}
+
+.waiting-pulse-ring-3 {
+  animation: waitingWave 2.8s ease-out 1.8s infinite;
+}
+
+.waiting-pulse-core {
+  @apply relative z-10 flex h-24 w-24 items-center justify-center rounded-full shadow-glass-lg;
+  background: linear-gradient(135deg, var(--yobell-navy), var(--yobell-navy-light));
+}
+
+.waiting-pulse-success .waiting-pulse-core {
+  background: linear-gradient(135deg, var(--yobell-success), #2aa564);
+}
+
+.waiting-pulse-warning .waiting-pulse-core {
+  background: linear-gradient(135deg, var(--yobell-gold), var(--yobell-gold-hover));
+}
+
+.waiting-pulse-muted .waiting-pulse-core {
+  background: linear-gradient(135deg, #6b7c8f, var(--yobell-muted));
+}
+
+.waiting-pulse-success .waiting-pulse-ring {
+  border-color: rgba(31, 138, 76, 0.35);
+  animation: waitingSuccessPop 600ms ease-out forwards;
+}
+
+.waiting-host-card {
+  @apply flex items-center gap-g3 rounded-yobell border bg-yobell-surface p-g3 shadow-glass-premium;
+  border-color: var(--yobell-border);
+  animation: waitingFadeIn 500ms ease-out forwards;
+}
+
+.waiting-host-avatar {
+  @apply h-16 w-16 shrink-0;
+}
+
+.waiting-progress-row {
+  @apply flex items-center gap-g2 rounded-yobell-sm border px-g3 py-g2 transition-all duration-touch;
+  border-color: var(--yobell-border);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.waiting-progress-success {
+  border-color: rgba(31, 138, 76, 0.35);
+  background: rgba(31, 138, 76, 0.06);
+}
+
+.waiting-progress-failed {
+  border-color: rgba(214, 69, 69, 0.35);
+  background: rgba(214, 69, 69, 0.05);
+}
+
+.waiting-progress-pending {
+  border-color: rgba(200, 162, 70, 0.3);
+}
+
+.waiting-progress-icon {
+  @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full;
+  background: rgba(17, 40, 74, 0.08);
+  color: var(--yobell-navy);
+}
+
+.waiting-progress-success .waiting-progress-icon {
+  background: rgba(31, 138, 76, 0.15);
+  color: var(--yobell-success);
+}
+
+.waiting-progress-failed .waiting-progress-icon {
   background: rgba(214, 69, 69, 0.12);
+  color: var(--yobell-danger);
+}
+
+@keyframes waitingWave {
+  0% {
+    transform: scale(0.72);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes waitingFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes waitingSuccessPop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.5;
+  }
+  60% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
 }
