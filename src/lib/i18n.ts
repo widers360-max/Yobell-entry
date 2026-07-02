@@ -77,6 +77,7 @@ export type TranslationKey =
   | "phoneOptional"
   | "purposeOptional"
   | "privacyConsent"
+  | "privacyConsentRequired"
   | "privacyNotice"
   | "next"
   | "back"
@@ -86,6 +87,9 @@ export type TranslationKey =
   | "skipPhoto"
   | "retakePhoto"
   | "confirmTitle"
+  | "confirmPhoto"
+  | "photoAltVisitor"
+  | "photoAltCaptured"
   | "confirmHost"
   | "confirmVisitor"
   | "confirmCompany"
@@ -198,6 +202,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     phoneOptional: "電話番号（任意）",
     purposeOptional: "用件（任意）",
     privacyConsent: "個人情報の取り扱いに同意する",
+    privacyConsentRequired: "個人情報の取り扱いへの同意が必要です",
     privacyNotice:
       "入力された情報は受付対応および来訪記録のために利用されます。",
     next: "次へ",
@@ -209,6 +214,9 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     skipPhoto: "写真なしで進む",
     retakePhoto: "撮り直す",
     confirmTitle: "内容の確認",
+    confirmPhoto: "写真",
+    photoAltVisitor: "来訪者写真",
+    photoAltCaptured: "撮影した写真",
     confirmHost: "担当者",
     confirmVisitor: "お名前",
     confirmCompany: "会社名",
@@ -321,6 +329,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     phoneOptional: "Phone Number (optional)",
     purposeOptional: "Purpose (optional)",
     privacyConsent: "I agree to the privacy policy",
+    privacyConsentRequired: "Please agree to the privacy policy to continue",
     privacyNotice:
       "The information entered will be used for reception and visit records.",
     next: "Next",
@@ -332,6 +341,9 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     skipPhoto: "Continue without photo",
     retakePhoto: "Retake",
     confirmTitle: "Confirm Details",
+    confirmPhoto: "Photo",
+    photoAltVisitor: "Visitor photo",
+    photoAltCaptured: "Captured photo",
     confirmHost: "Host",
     confirmVisitor: "Name",
     confirmCompany: "Company",
@@ -445,6 +457,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     phoneOptional: "전화번호 (선택)",
     purposeOptional: "용건 (선택)",
     privacyConsent: "개인정보 처리에 동의합니다",
+    privacyConsentRequired: "개인정보 처리에 동의해 주세요",
     privacyNotice:
       "입력된 정보는 접수 대응 및 방문 기록을 위해 이용됩니다.",
     next: "다음",
@@ -456,6 +469,9 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     skipPhoto: "사진 없이 진행",
     retakePhoto: "다시 촬영",
     confirmTitle: "내용 확인",
+    confirmPhoto: "사진",
+    photoAltVisitor: "방문자 사진",
+    photoAltCaptured: "촬영한 사진",
     confirmHost: "담당자",
     confirmVisitor: "성함",
     confirmCompany: "회사명",

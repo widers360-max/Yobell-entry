@@ -17,6 +17,7 @@ interface HostSelectionScreenProps {
   onContactReception: () => void;
   onBack: () => void;
   isContactingReception?: boolean;
+  receptionError?: string;
 }
 
 export function HostSelectionScreen({
@@ -29,6 +30,7 @@ export function HostSelectionScreen({
   onContactReception,
   onBack,
   isContactingReception = false,
+  receptionError,
 }: HostSelectionScreenProps) {
   const groupedStaff = groupStaffByCompany(staff);
   const hasResults = staff.length > 0;
@@ -59,8 +61,15 @@ export function HostSelectionScreen({
           className="host-search-input"
           autoComplete="off"
           enterKeyHint="search"
+          aria-label={t(language, "searchPlaceholder")}
         />
       </div>
+
+      {receptionError && (
+        <p className="rounded-yobell-sm border border-yobell-danger/30 bg-yobell-danger/5 px-g3 py-g2 text-center text-base text-yobell-danger" role="alert">
+          {receptionError}
+        </p>
+      )}
 
       <div className="host-staff-list flex-1 overflow-y-auto pr-1">
         {!hasResults ? (
