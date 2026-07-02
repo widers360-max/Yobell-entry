@@ -26,6 +26,8 @@ export type TranslationKey =
   | "smartReception"
   | "home_touchHint"
   | "home_companySuffix"
+  | "idle_welcomeTo"
+  | "idle_smartReception"
   | "nav_admin"
   | "nav_staff"
   | "auth_adminTitle"
@@ -137,8 +139,10 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "お困りの方はスタッフまで",
     footerHelpSub: "内線 100 または受付までお声がけください",
     smartReception: "SMART RECEPTION",
-    home_touchHint: "画面をタップして受付を開始",
+    home_touchHint: "画面に触れて受付を開始",
     home_companySuffix: "へ",
+    idle_welcomeTo: "Welcome to",
+    idle_smartReception: "Smart Reception by YOBELL",
     nav_admin: "管理",
     nav_staff: "スタッフ",
     auth_adminTitle: "管理者パスワード",
@@ -252,8 +256,10 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     footerHelp: "Need assistance?",
     footerHelpSub: "Extension 100 or speak to reception",
     smartReception: "SMART RECEPTION",
-    home_touchHint: "Tap the screen to begin reception",
+    home_touchHint: "Touch the screen to begin reception",
     home_companySuffix: "",
+    idle_welcomeTo: "Welcome to",
+    idle_smartReception: "Smart Reception by YOBELL",
     nav_admin: "Admin",
     nav_staff: "Staff",
     auth_adminTitle: "Admin Password",
@@ -370,6 +376,8 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     smartReception: "SMART RECEPTION",
     home_touchHint: "화면을 터치하여 접수를 시작하세요",
     home_companySuffix: "",
+    idle_welcomeTo: "Welcome to",
+    idle_smartReception: "Smart Reception by YOBELL",
     nav_admin: "관리",
     nav_staff: "스태프",
     auth_adminTitle: "관리자 비밀번호",

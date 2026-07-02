@@ -38,6 +38,7 @@ import {
   YOBELL_DEFAULT_PRIMARY,
 } from "@/lib/design-system";
 import { t, visitorTypeLabel } from "@/lib/i18n";
+import { useKioskIdleTimeout } from "@/lib/use-kiosk-idle-timeout";
 
 type Step =
   | "idle"
@@ -68,6 +69,7 @@ const DEFAULT_SETTINGS: KioskSettings = {
   primaryColor: YOBELL_DEFAULT_PRIMARY,
   accentColor: YOBELL_DEFAULT_ACCENT,
   retentionDays: 30,
+  idleTimeoutSeconds: KIOSK_SHOWROOM_DEFAULTS.idleTimeoutSeconds,
 };
 
 export default function KioskPage() {
@@ -83,6 +85,7 @@ export default function KioskPage() {
   const [isContactingReception, setIsContactingReception] = useState(false);
   const [waitingVisit, setWaitingVisit] = useState<WaitingVisitSnapshot | null>(null);
   const [isCallingAgain, setIsCallingAgain] = useState(false);
+  const [homeActive, setHomeActive] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -156,18 +159,19 @@ export default function KioskPage() {
     }
   }, [step, waitSeconds, visitStatus, state.visitId]);
 
-  function resetKiosk() {
+  const resetKiosk = useCallback(() => {
+    setHomeActive(false);
     setStep("idle");
-    setState({
+    setState((s) => ({
       ...INITIAL_KIOSK_STATE,
-      language: state.language,
-    });
+      language: s.language,
+    }));
     setSearchQuery("");
     setVisitStatus("pending");
     setWaitSeconds(0);
     setWaitingVisit(null);
     setFormError("");
-  }
+  }, []);
 
   function setLanguage(lang: Language) {
     setState((s) => ({ ...s, language: lang }));
@@ -332,8 +336,30 @@ export default function KioskPage() {
     setStep("host");
   }
 
+  const handleIdleTimeout = useCallback(() => {
+    if (
+      step === "waiting" &&
+      (visitStatus === "pending" ||
+        visitStatus === "please_wait" ||
+        visitStatus === "accepted")
+    ) {
+      return;
+    }
+    if (step === "idle") {
+      setHomeActive(false);
+      return;
+    }
+    resetKiosk();
+  }, [step, visitStatus, resetKiosk]);
+
   const lang = state.language;
   const kioskSettings = settings ?? DEFAULT_SETTINGS;
+  const idleSeconds = kioskSettings.idleTimeoutSeconds ?? 60;
+
+  useKioskIdleTimeout({
+    idleSeconds,
+    onTimeout: handleIdleTimeout,
+  });
   const tagline = kioskSettings.tagline ?? t(lang, "tagline");
   const privacyNotice = kioskSettings.privacyNotice ?? t(lang, "privacyNotice");
   const fallbackMsg = kioskSettings.fallbackMessage ?? t(lang, "waitingFallback");
@@ -346,6 +372,8 @@ export default function KioskPage() {
         settings={kioskSettings}
         visitorCards={visitorCards}
         onSelectPurpose={handleSelectPurpose}
+        isActive={homeActive}
+        onActivate={() => setHomeActive(true)}
       />
     );
   }
@@ -369,7 +397,10 @@ export default function KioskPage() {
           onSearchChange={setSearchQuery}
           onSelectHost={selectHost}
           onContactReception={() => void handleContactReception()}
-          onBack={() => setStep("idle")}
+          onBack={() => {
+            setStep("idle");
+            setHomeActive(true);
+          }}
           isContactingReception={isContactingReception}
         />
       )}

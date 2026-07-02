@@ -25,6 +25,7 @@ const FIELD_KEYS: {
   { key: "fallbackMessage", labelKey: "field_fallbackMessage" },
   { key: "privacyNotice", labelKey: "field_privacyNotice" },
   { key: "retentionDays", labelKey: "field_retentionDays", type: "number" },
+  { key: "idleTimeoutSeconds", labelKey: "field_idleTimeoutSeconds", type: "number" },
 ];
 
 export function BrandingSection({

@@ -44,6 +44,7 @@ export const KIOSK_SHOWROOM_DEFAULTS = {
   heroSubtitle: "Smart Reception by YOBELL",
   tagline: "内線電話のないオフィス受付",
   welcomeMessage: "ご来社ありがとうございます",
+  idleTimeoutSeconds: 60,
 } as const;
 
 export function poweredByLabel(companyDisplayName: string): string {
