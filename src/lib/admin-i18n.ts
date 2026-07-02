@@ -122,6 +122,7 @@ export type AdminTranslationKey =
   | "companies_list"
   | "companies_add"
   | "companies_edit"
+  | "companies_empty"
   | "staff_list"
   | "staff_add"
   | "staff_edit"
@@ -323,6 +324,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     companies_list: "会社一覧",
     companies_add: "会社を追加",
     companies_edit: "会社を編集",
+    companies_empty: "会社が登録されていません",
     staff_list: "スタッフ一覧",
     staff_add: "スタッフを追加",
     staff_edit: "スタッフを編集",
@@ -524,6 +526,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     companies_list: "Companies",
     companies_add: "Add Company",
     companies_edit: "Edit Company",
+    companies_empty: "No companies registered yet",
     staff_list: "Staff",
     staff_add: "Add Staff",
     staff_edit: "Edit Staff",
@@ -725,6 +728,7 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     companies_list: "회사 목록",
     companies_add: "회사 추가",
     companies_edit: "회사 편집",
+    companies_empty: "등록된 회사가 없습니다",
     staff_list: "스태프 목록",
     staff_add: "스태프 추가",
     staff_edit: "스태프 편집",

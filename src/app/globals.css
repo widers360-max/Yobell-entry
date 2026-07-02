@@ -1088,6 +1088,10 @@ body {
   @apply sticky bottom-0 z-10 -mx-g3 -mb-g3 mt-g3 flex flex-wrap gap-g2 border-t border-yobell-border bg-yobell-surface/95 px-g3 py-g3 backdrop-blur-sm;
 }
 
+.admin-card-row {
+  @apply flex flex-wrap items-start gap-g3 rounded-yobell-sm border border-yobell-border bg-yobell-bg/60 p-g3;
+}
+
 .admin-trend-chart {
   @apply rounded-yobell-sm border border-yobell-border bg-gradient-to-b from-yobell-bg to-yobell-surface p-g3;
 }

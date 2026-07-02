@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Save, ChevronUp, ChevronDown } from "lucide-react";
 import { ICON_OPTIONS, getIcon } from "@/lib/icon-utils";
-import { AdminCard, AdminInput, AdminSelect, Btn, Badge } from "./ui";
+import { AdminCard, AdminInput, AdminSelect, AdminFormActions, Btn, Badge } from "./ui";
 import { useAdminI18n } from "./AdminI18nProvider";
 import type { VisitorCardRecord } from "@/lib/types";
 
@@ -51,24 +51,12 @@ export function VisitorCardsSection({
   const sorted = [...form].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
-    <AdminCard
-      title={t("cards_title")}
-      action={
-        <Btn onClick={handleSave} disabled={saving} size="sm">
-          <Save className="h-4 w-4" />
-          {saving ? t("saving") : t("saveAll")}
-        </Btn>
-      }
-    >
-      <p className="mb-6 text-sm text-slate-500">{t("cards_desc")}</p>
+    <AdminCard title={t("cards_title")} description={t("cards_desc")}>
       <div className="space-y-4">
         {sorted.map((card, index) => {
           const Icon = getIcon(card.iconKey);
           return (
-            <div
-              key={card.id}
-              className="flex flex-wrap items-start gap-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4"
-            >
+            <div key={card.id} className="admin-card-row">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
                 <Icon className="h-6 w-6 text-yobell-navy" strokeWidth={1.75} />
               </div>
@@ -131,6 +119,12 @@ export function VisitorCardsSection({
           );
         })}
       </div>
+      <AdminFormActions>
+        <Btn onClick={handleSave} disabled={saving}>
+          <Save className="h-4 w-4" />
+          {saving ? t("saving") : t("saveAll")}
+        </Btn>
+      </AdminFormActions>
     </AdminCard>
   );
 }

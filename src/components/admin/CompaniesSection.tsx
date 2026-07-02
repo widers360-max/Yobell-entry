@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
-import { AdminCard, AdminInput, AdminTextarea, Btn, Badge } from "./ui";
+import {
+  AdminCard,
+  AdminInput,
+  AdminTextarea,
+  AdminTable,
+  AdminEmptyState,
+  AdminFormActions,
+  Btn,
+  Badge,
+} from "./ui";
 import { useAdminI18n } from "./AdminI18nProvider";
 
 interface Company {
@@ -122,12 +131,12 @@ export function CompaniesSection({
               {t("active")}
             </label>
           </div>
-          <div className="mt-4 flex gap-2">
+          <AdminFormActions>
             <Btn onClick={save}>{t("save")}</Btn>
             <Btn variant="secondary" onClick={resetForm}>
               {t("cancel")}
             </Btn>
-          </div>
+          </AdminFormActions>
         </AdminCard>
       )}
 
@@ -148,28 +157,30 @@ export function CompaniesSection({
           ) : null
         }
       >
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        {companies.length === 0 ? (
+          <AdminEmptyState title={t("companies_empty")} />
+        ) : (
+          <AdminTable>
             <thead>
-              <tr className="border-b border-slate-100 text-left text-slate-500">
-                <th className="pb-3 pr-4 font-medium">{t("col_company")}</th>
-                <th className="pb-3 pr-4 font-medium">{t("col_staffCount")}</th>
-                <th className="pb-3 pr-4 font-medium">{t("col_status")}</th>
-                <th className="pb-3 font-medium">{t("col_actions")}</th>
+              <tr>
+                <th>{t("col_company")}</th>
+                <th>{t("col_staffCount")}</th>
+                <th>{t("col_status")}</th>
+                <th>{t("col_actions")}</th>
               </tr>
             </thead>
             <tbody>
               {companies.map((c) => (
-                <tr key={c.id} className="border-b border-slate-50">
-                  <td className="py-3 pr-4 font-medium">{c.name}</td>
-                  <td className="py-3 pr-4">{c._count.staff}</td>
-                  <td className="py-3 pr-4">
+                <tr key={c.id}>
+                  <td className="font-semibold text-yobell-navy">{c.name}</td>
+                  <td>{c._count.staff}</td>
+                  <td>
                     <Badge color={c.active ? "green" : "gray"}>
                       {c.active ? t("active") : t("inactive")}
                     </Badge>
                   </td>
-                  <td className="py-3">
-                    <div className="flex gap-2">
+                  <td>
+                    <div className="flex gap-1">
                       <Btn variant="ghost" size="sm" onClick={() => startEdit(c)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Btn>
@@ -179,15 +190,15 @@ export function CompaniesSection({
                         onClick={() => remove(c.id)}
                         disabled={c._count.staff > 0}
                       >
-                        <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                        <Trash2 className="h-3.5 w-3.5 text-yobell-danger" />
                       </Btn>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+          </AdminTable>
+        )}
       </AdminCard>
     </div>
   );
