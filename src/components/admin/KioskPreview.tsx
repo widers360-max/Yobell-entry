@@ -44,8 +44,14 @@ export function KioskPreview({
         } as React.CSSProperties
       }
     >
-      <div className="bg-yobell-surface px-3 py-2 text-center text-xs font-medium text-yobell-muted">
-        {t("branding_preview")}
+      <div className="bg-yobell-surface px-g2 py-2 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-yobell-muted">
+          {t("branding_preview")}
+        </p>
+        <div className="admin-preview-colors mt-2 justify-center">
+          <ColorSwatch label={t("preview_colors")} color={primary} />
+          <ColorSwatch label="Gold" color={accent} />
+        </div>
       </div>
       <div className="flex flex-col bg-yobell-bg" style={{ minHeight: 520 }}>
         <div className="flex items-center justify-between px-4 py-3">
@@ -66,7 +72,7 @@ export function KioskPreview({
           </div>
         </div>
 
-        <div className="relative mx-4 h-24 overflow-hidden rounded-yobell-sm shadow-glass">
+        <div className="relative mx-4 h-28 overflow-hidden rounded-yobell-sm shadow-glass-lg border border-yobell-border">
           {settings.heroVideoUrl ? (
             <div className="absolute inset-0 flex items-center justify-center bg-yobell-navy text-xs text-white/60">
               {t("preview_video")}
@@ -134,5 +140,14 @@ export function KioskPreview({
         </div>
       </div>
     </div>
+  );
+}
+
+function ColorSwatch({ label, color }: { label: string; color: string }) {
+  return (
+    <span className="admin-color-swatch">
+      <span className="admin-color-dot" style={{ background: color }} />
+      {label}
+    </span>
   );
 }

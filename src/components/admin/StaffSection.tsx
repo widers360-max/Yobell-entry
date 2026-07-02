@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, Trash2, Plus, UserX } from "lucide-react";
-import { AdminCard, AdminInput, AdminSelect, Btn, Badge } from "./ui";
+import { AdminCard, AdminInput, AdminSelect, Btn, Badge, AdminTable, AdminEmptyState } from "./ui";
 import { useAdminI18n } from "./AdminI18nProvider";
 import { normalizeStaffStatus } from "@/lib/staff-utils";
 
@@ -219,41 +219,43 @@ export function StaffSection({
           ) : null
         }
       >
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        {staff.length === 0 ? (
+          <AdminEmptyState title={t("staff_empty")} />
+        ) : (
+          <AdminTable>
             <thead>
-              <tr className="border-b border-slate-100 text-left text-slate-500">
-                <th className="pb-3 pr-4 font-medium">{t("field_name")}</th>
-                <th className="pb-3 pr-4 font-medium">{t("col_company")}</th>
-                <th className="pb-3 pr-4 font-medium">{t("col_department")}</th>
-                <th className="pb-3 pr-4 font-medium">{t("col_contact")}</th>
-                <th className="pb-3 pr-4 font-medium">{t("field_staffStatus")}</th>
-                <th className="pb-3 pr-4 font-medium">{t("col_status")}</th>
-                <th className="pb-3 font-medium">{t("col_actions")}</th>
+              <tr>
+                <th>{t("field_name")}</th>
+                <th>{t("col_company")}</th>
+                <th>{t("col_department")}</th>
+                <th>{t("col_contact")}</th>
+                <th>{t("field_staffStatus")}</th>
+                <th>{t("col_status")}</th>
+                <th>{t("col_actions")}</th>
               </tr>
             </thead>
             <tbody>
               {staff.map((s) => (
-                <tr key={s.id} className="border-b border-slate-50">
-                  <td className="py-3 pr-4 font-medium">{s.name}</td>
-                  <td className="py-3 pr-4">{s.company.name}</td>
-                  <td className="py-3 pr-4">
+                <tr key={s.id}>
+                  <td className="font-semibold text-yobell-navy">{s.name}</td>
+                  <td>{s.company.name}</td>
+                  <td>
                     {s.department} / {s.role}
                   </td>
-                  <td className="py-3 pr-4 text-slate-500">{s.email ?? s.phone ?? "—"}</td>
-                  <td className="py-3 pr-4">
+                  <td className="text-yobell-muted">{s.email ?? s.phone ?? "—"}</td>
+                  <td>
                     <Badge color="amber">
                       {t(
                         `staffStatus_${normalizeStaffStatus(s.staffStatus)}` as "staffStatus_available",
                       )}
                     </Badge>
                   </td>
-                  <td className="py-3 pr-4">
+                  <td>
                     <Badge color={s.active ? "green" : "gray"}>
                       {s.active ? t("active") : t("inactive")}
                     </Badge>
                   </td>
-                  <td className="py-3">
+                  <td>
                     <div className="flex gap-1">
                       <Btn variant="ghost" size="sm" onClick={() => startEdit(s)}>
                         <Pencil className="h-3.5 w-3.5" />
@@ -262,15 +264,15 @@ export function StaffSection({
                         <UserX className="h-3.5 w-3.5" />
                       </Btn>
                       <Btn variant="ghost" size="sm" onClick={() => remove(s.id)}>
-                        <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                        <Trash2 className="h-3.5 w-3.5 text-yobell-danger" />
                       </Btn>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+          </AdminTable>
+        )}
       </AdminCard>
     </div>
   );

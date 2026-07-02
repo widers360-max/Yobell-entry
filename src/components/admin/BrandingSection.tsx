@@ -2,13 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { Save } from "lucide-react";
-import { AdminCard, AdminInput, AdminTextarea, Btn } from "./ui";
+import { AdminCard, AdminInput, AdminTextarea, AdminFormActions, Btn } from "./ui";
 import { KioskPreview } from "./KioskPreview";
 import { useAdminI18n } from "./AdminI18nProvider";
 import type { AdminTranslationKey } from "@/lib/admin-i18n";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
 
-const FIELD_KEYS: { key: keyof KioskSettings; labelKey: AdminTranslationKey; type?: string }[] = [
+const FIELD_KEYS: {
+  key: keyof KioskSettings;
+  labelKey: AdminTranslationKey;
+  type?: string;
+}[] = [
   { key: "companyDisplayName", labelKey: "field_companyDisplayName" },
   { key: "brandName", labelKey: "field_brandName" },
   { key: "logoUrl", labelKey: "field_logoUrl" },
@@ -47,17 +51,9 @@ export function BrandingSection({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-2">
-      <AdminCard
-        title={t("branding_title")}
-        action={
-          <Btn onClick={handleSave} disabled={saving} size="sm">
-            <Save className="h-4 w-4" />
-            {saving ? t("saving") : t("save")}
-          </Btn>
-        }
-      >
-        <div className="space-y-4">
+    <div className="grid gap-g4 xl:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[minmax(0,1fr)_24rem]">
+      <AdminCard title={t("branding_title")} description={t("branding_saveHint")}>
+        <div className="space-y-g3">
           {FIELD_KEYS.map((f) =>
             f.key === "fallbackMessage" || f.key === "privacyNotice" || f.key === "heroSubtitle" ? (
               <AdminTextarea
@@ -81,12 +77,18 @@ export function BrandingSection({
                   })
                 }
               />
-            )
+            ),
           )}
         </div>
+        <AdminFormActions>
+          <Btn onClick={handleSave} disabled={saving}>
+            <Save className="h-4 w-4" />
+            {saving ? t("saving") : t("save")}
+          </Btn>
+        </AdminFormActions>
       </AdminCard>
 
-      <div className="xl:sticky xl:top-24 xl:self-start">
+      <div className="xl:sticky xl:top-28 xl:self-start">
         <KioskPreview settings={form} cards={cards} />
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { Search, Download, Trash2 } from "lucide-react";
-import { AdminCard, AdminInput, AdminSelect, Btn, Badge, formatDate } from "./ui";
+import { AdminCard, AdminInput, AdminSelect, Btn, Badge, formatDate, AdminTable, AdminLoading, AdminEmptyState } from "./ui";
 import { useAdminI18n } from "./AdminI18nProvider";
 import {
   getStatusLabel,
@@ -111,9 +111,9 @@ export function VisitsSection({
   }
 
   return (
-    <div className="space-y-6">
-      <AdminCard title={t("visits_filter")}>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="admin-page-stack">
+      <AdminCard title={t("visits_filter")} description={t("visits_filterDesc")}>
+        <div className="admin-filter-bar">
           <AdminInput
             label={t("visits_searchVisitor")}
             value={filters.q}
@@ -166,7 +166,7 @@ export function VisitsSection({
             onChange={(e) => setFilters({ ...filters, to: e.target.value })}
           />
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="admin-filter-actions">
           <Btn onClick={loadVisits} disabled={loading}>
             <Search className="h-4 w-4" />
             {loading ? t("searching") : t("search")}
@@ -185,19 +185,23 @@ export function VisitsSection({
       </AdminCard>
 
       <AdminCard title={`${t("visits_list")} (${visits.length})`}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        {loading ? (
+          <AdminLoading label={t("searching")} />
+        ) : visits.length === 0 ? (
+          <AdminEmptyState title={t("visits_noResults")} />
+        ) : (
+          <AdminTable>
             <thead>
-              <tr className="border-b border-slate-100 text-left text-slate-500">
-                <th className="pb-3 pr-3 font-medium">{t("col_datetime")}</th>
-                <th className="pb-3 pr-3 font-medium">{t("col_photo")}</th>
-                <th className="pb-3 pr-3 font-medium">{t("col_visitor")}</th>
-                <th className="pb-3 pr-3 font-medium">{t("col_company")}</th>
-                <th className="pb-3 pr-3 font-medium">{t("col_type")}</th>
-                <th className="pb-3 pr-3 font-medium">{t("col_inputMethod")}</th>
-                <th className="pb-3 pr-3 font-medium">{t("col_host")}</th>
-                <th className="pb-3 pr-3 font-medium">{t("col_notification")}</th>
-                <th className="pb-3 font-medium">{t("col_status")}</th>
+              <tr>
+                <th>{t("col_datetime")}</th>
+                <th>{t("col_photo")}</th>
+                <th>{t("col_visitor")}</th>
+                <th>{t("col_company")}</th>
+                <th>{t("col_type")}</th>
+                <th>{t("col_inputMethod")}</th>
+                <th>{t("col_host")}</th>
+                <th>{t("col_notification")}</th>
+                <th>{t("col_status")}</th>
               </tr>
             </thead>
             <tbody>
@@ -205,11 +209,11 @@ export function VisitsSection({
                 const st = getStatusLabel(lang, v.status);
                 const notify = notificationLabel(t, v);
                 return (
-                  <tr key={v.id} className="border-b border-slate-50">
-                    <td className="py-3 pr-3 whitespace-nowrap text-slate-500">
+                  <tr key={v.id}>
+                    <td className="whitespace-nowrap text-yobell-muted">
                       {formatDate(v.createdAt, lang)}
                     </td>
-                    <td className="py-3 pr-3">
+                    <td>
                       {v.photoData ? (
                         <img
                           src={v.photoData}
@@ -217,44 +221,36 @@ export function VisitsSection({
                           className="h-10 w-10 rounded-lg object-cover"
                         />
                       ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yobell-bg text-xs text-yobell-muted">
                           —
                         </div>
                       )}
                     </td>
-                    <td className="py-3 pr-3 font-medium">{v.visitorName}</td>
-                    <td className="py-3 pr-3">{v.visitorCompany ?? "—"}</td>
-                    <td className="py-3 pr-3">{getVisitorTypeLabel(lang, v.visitorType)}</td>
-                    <td className="py-3 pr-3">
-                      <span className="font-medium text-slate-700">
-                        {getInputMethodLabel(lang, v.inputMethod ?? "manual")}
-                      </span>
-                    </td>
-                    <td className="py-3 pr-3">{v.hostStaff.name}</td>
-                    <td className="py-3 pr-3">
+                    <td className="font-semibold text-yobell-navy">{v.visitorName}</td>
+                    <td>{v.visitorCompany ?? "—"}</td>
+                    <td>{getVisitorTypeLabel(lang, v.visitorType)}</td>
+                    <td>{getInputMethodLabel(lang, v.inputMethod ?? "manual")}</td>
+                    <td>{v.hostStaff.name}</td>
+                    <td>
                       <Badge color={notify.color}>{notify.label}</Badge>
                       {v.notificationError && !v.notificationSent && (
-                        <p className="mt-1 max-w-[140px] truncate text-xs text-slate-400" title={v.notificationError}>
+                        <p
+                          className="mt-1 max-w-[140px] truncate text-xs text-yobell-muted"
+                          title={v.notificationError}
+                        >
                           {v.notificationError}
                         </p>
                       )}
                     </td>
-                    <td className="py-3">
+                    <td>
                       <Badge color={st.color}>{st.label}</Badge>
                     </td>
                   </tr>
                 );
               })}
-              {visits.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
-                    {t("visits_noResults")}
-                  </td>
-                </tr>
-              )}
             </tbody>
-          </table>
-        </div>
+          </AdminTable>
+        )}
       </AdminCard>
     </div>
   );
