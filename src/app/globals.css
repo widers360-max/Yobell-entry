@@ -516,3 +516,105 @@ body {
     transform: translateY(0);
   }
 }
+
+/* ─── Host selection (Stage 4) ─── */
+.host-purpose-chip {
+  @apply inline-flex items-center gap-g2 self-center rounded-full border border-yobell-gold/35 bg-yobell-surface px-g3 py-g1 shadow-glass;
+}
+
+.host-purpose-chip-label {
+  @apply text-xs font-semibold uppercase tracking-[0.16em] text-yobell-muted;
+}
+
+.host-purpose-chip-value {
+  @apply text-sm font-bold text-yobell-navy md:text-base;
+}
+
+.host-search-wrap {
+  @apply relative;
+}
+
+.host-search-icon {
+  @apply pointer-events-none absolute left-g3 top-1/2 h-6 w-6 -translate-y-1/2 text-yobell-muted;
+}
+
+.host-search-input {
+  @apply w-full rounded-yobell border-2 bg-yobell-surface pl-g6 pr-g3 text-xl text-yobell-navy outline-none transition-all duration-touch;
+  border-color: var(--yobell-border);
+  min-height: 4.75rem;
+  box-shadow: var(--yobell-shadow-glass);
+}
+
+.host-search-input:focus {
+  border-color: var(--yobell-gold);
+  box-shadow:
+    0 0 0 3px rgba(200, 162, 70, 0.18),
+    var(--yobell-shadow-glass-lg);
+}
+
+.host-staff-list {
+  max-height: min(52vh, 720px);
+}
+
+.host-company-group {
+  @apply space-y-g2;
+}
+
+.host-company-heading {
+  @apply sticky top-0 z-10 border-b border-yobell-border bg-yobell-bg/95 py-g1 text-lg font-bold text-yobell-navy backdrop-blur-sm md:text-xl;
+}
+
+.host-empty-state {
+  @apply flex flex-col items-center px-g3 py-g6 text-center;
+}
+
+.staff-card {
+  @apply relative flex w-full items-center gap-g3 rounded-yobell border bg-yobell-surface p-g3 text-left shadow-glass-premium transition-all duration-touch;
+  border-color: var(--yobell-border);
+  min-height: 6.75rem;
+}
+
+.staff-card:hover {
+  border-color: var(--yobell-gold);
+  box-shadow: var(--yobell-shadow-glass-lg);
+}
+
+.staff-card:active {
+  transform: scale(0.985);
+}
+
+.staff-card-avatar {
+  @apply flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-yobell-navy text-xl font-bold text-yobell-gold shadow-glass;
+}
+
+.staff-card-body {
+  @apply min-w-0 flex-1 pr-10;
+}
+
+.staff-card-notify {
+  @apply absolute right-g3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-yobell-sm border border-yobell-border bg-yobell-bg text-yobell-navy;
+}
+
+.staff-status-badge {
+  @apply inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide;
+}
+
+.staff-status-success {
+  color: var(--yobell-success);
+  background: rgba(31, 138, 76, 0.12);
+}
+
+.staff-status-warning {
+  color: var(--yobell-navy);
+  background: rgba(200, 162, 70, 0.15);
+}
+
+.staff-status-muted {
+  color: var(--yobell-muted);
+  background: rgba(92, 107, 122, 0.1);
+}
+
+.staff-status-danger {
+  color: var(--yobell-danger);
+  background: rgba(214, 69, 69, 0.12);
+}

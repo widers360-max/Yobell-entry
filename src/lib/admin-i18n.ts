@@ -98,11 +98,20 @@ export type AdminTranslationKey =
   | "field_email"
   | "field_phone"
   | "field_notificationMethod"
+  | "field_staffStatus"
   | "field_title"
   | "field_subtitle"
   | "field_icon"
   | "notify_dashboard"
   | "notify_email"
+  | "notify_line_works"
+  | "notify_slack"
+  | "notify_teams"
+  | "notify_phone"
+  | "staffStatus_available"
+  | "staffStatus_meeting"
+  | "staffStatus_away"
+  | "staffStatus_unavailable"
   | "companies_list"
   | "companies_add"
   | "companies_edit"
@@ -279,11 +288,20 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     field_email: "メール",
     field_phone: "電話番号",
     field_notificationMethod: "通知方法",
+    field_staffStatus: "在席ステータス",
     field_title: "タイトル",
     field_subtitle: "サブタイトル",
     field_icon: "アイコン",
     notify_dashboard: "ダッシュボード",
-    notify_email: "メール（将来）",
+    notify_email: "メール",
+    notify_line_works: "LINE WORKS",
+    notify_slack: "Slack",
+    notify_teams: "Teams",
+    notify_phone: "電話",
+    staffStatus_available: "在席",
+    staffStatus_meeting: "会議中",
+    staffStatus_away: "外出",
+    staffStatus_unavailable: "不在",
     companies_list: "会社一覧",
     companies_add: "会社を追加",
     companies_edit: "会社を編集",
@@ -460,11 +478,20 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     field_email: "Email",
     field_phone: "Phone",
     field_notificationMethod: "Notification Method",
+    field_staffStatus: "Availability Status",
     field_title: "Title",
     field_subtitle: "Subtitle",
     field_icon: "Icon",
     notify_dashboard: "Dashboard",
-    notify_email: "Email (future)",
+    notify_email: "Email",
+    notify_line_works: "LINE WORKS",
+    notify_slack: "Slack",
+    notify_teams: "Teams",
+    notify_phone: "Phone",
+    staffStatus_available: "Available",
+    staffStatus_meeting: "In meeting",
+    staffStatus_away: "Away",
+    staffStatus_unavailable: "Unavailable",
     companies_list: "Companies",
     companies_add: "Add Company",
     companies_edit: "Edit Company",
@@ -641,11 +668,20 @@ const translations: Record<Language, Record<AdminTranslationKey, string>> = {
     field_email: "이메일",
     field_phone: "전화번호",
     field_notificationMethod: "알림 방법",
+    field_staffStatus: "재실 상태",
     field_title: "제목",
     field_subtitle: "부제목",
     field_icon: "아이콘",
     notify_dashboard: "대시보드",
-    notify_email: "이메일 (예정)",
+    notify_email: "이메일",
+    notify_line_works: "LINE WORKS",
+    notify_slack: "Slack",
+    notify_teams: "Teams",
+    notify_phone: "전화",
+    staffStatus_available: "재실",
+    staffStatus_meeting: "회의 중",
+    staffStatus_away: "외출",
+    staffStatus_unavailable: "부재",
     companies_list: "회사 목록",
     companies_add: "회사 추가",
     companies_edit: "회사 편집",
