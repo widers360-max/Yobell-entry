@@ -59,6 +59,7 @@ const STATUS_OPTIONS = [
   "please_wait",
   "declined",
   "no_response",
+  "completed",
 ] as const;
 
 export function VisitsSection({
@@ -89,10 +90,30 @@ export function VisitsSection({
     if (filters.visitorType) params.set("visitorType", filters.visitorType);
     if (filters.from) params.set("from", filters.from);
     if (filters.to) params.set("to", filters.to);
-    const res = await fetch(`/api/visits?${params}`);
-    setVisits(await res.json());
-    setLoading(false);
-  }, [filters]);
+    try {
+      const res = await fetch(`/api/visits?${params}`);
+      if (!res.ok) throw new Error("load failed");
+      const data = await res.json();
+      setVisits(Array.isArray(data) ? data : []);
+    } catch {
+      onMessage(t("msg_loadFailed"), "error");
+      setVisits([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, onMessage, t]);
+
+  const exportUrl = (() => {
+    const params = new URLSearchParams();
+    if (filters.q) params.set("q", filters.q);
+    if (filters.host) params.set("host", filters.host);
+    if (filters.status) params.set("status", filters.status);
+    if (filters.visitorType) params.set("visitorType", filters.visitorType);
+    if (filters.from) params.set("from", filters.from);
+    if (filters.to) params.set("to", filters.to);
+    const qs = params.toString();
+    return qs ? `/api/visits/export?${qs}` : "/api/visits/export";
+  })();
 
   useEffect(() => {
     loadVisits();
@@ -171,7 +192,7 @@ export function VisitsSection({
             <Search className="h-4 w-4" />
             {loading ? t("searching") : t("search")}
           </Btn>
-          <a href="/api/visits/export" className="inline-flex">
+          <a href={exportUrl} className="inline-flex">
             <Btn variant="secondary">
               <Download className="h-4 w-4" />
               {t("visits_exportCsv")}

@@ -127,7 +127,7 @@ export function CameraCapture({
           {preview ? (
             <img
               src={preview}
-              alt="Captured"
+              alt={t(language, "photoAltCaptured")}
               className="h-[400px] w-[600px] max-w-full object-cover"
             />
           ) : (

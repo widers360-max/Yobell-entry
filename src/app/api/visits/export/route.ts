@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { buildVisitWhereClause, getVisitSearchParams } from "@/lib/visit-query";
 
 function escapeCsv(value: string | null | undefined): string {
   if (value == null) return "";
@@ -10,7 +11,8 @@ function escapeCsv(value: string | null | undefined): string {
   return str;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const searchParams = getVisitSearchParams(request);
   const settings = await prisma.kioskSetting.findUnique({
     where: { id: "default" },
   });
@@ -18,12 +20,24 @@ export async function GET() {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - retentionDays);
 
+  const filterWhere = buildVisitWhereClause(searchParams);
+  const filterDate = (filterWhere as { createdAt?: { gte?: Date; lte?: Date } }).createdAt;
+
   const visits = await prisma.visit.findMany({
-    where: { createdAt: { gte: cutoff } },
+    where: {
+      ...filterWhere,
+      createdAt: {
+        gte: filterDate?.gte
+          ? new Date(Math.max(filterDate.gte.getTime(), cutoff.getTime()))
+          : cutoff,
+        ...(filterDate?.lte ? { lte: filterDate.lte } : {}),
+      },
+    },
     include: {
       hostStaff: { include: { company: true } },
     },
     orderBy: { createdAt: "desc" },
+    take: 5000,
   });
 
   const headers = [
@@ -61,7 +75,7 @@ export async function GET() {
       v.respondedAt?.toISOString() ?? "",
     ]
       .map(escapeCsv)
-      .join(",")
+      .join(","),
   );
 
   const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
