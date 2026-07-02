@@ -179,11 +179,12 @@ export function buildRespondSuccessHtml(): string {
   <title>対応を送信しました</title>
   <style>
     body { font-family: 'Noto Sans JP', sans-serif; background: ${YOBELL_COLORS.background}; color: ${YOBELL_COLORS.navy}; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
-    .card { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(17, 40, 74, 0.1); padding: 40px 32px; max-width: 420px; text-align: center; }
+    .card { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(17, 40, 74, 0.1); padding: 40px 32px; max-width: 420px; text-align: center; animation: fadeUp 320ms ease-out; }
     h1 { font-size: 24px; margin: 0 0 12px; }
     p { color: ${YOBELL_COLORS.textMuted}; margin: 0 0 28px; line-height: 1.6; }
     button { background: ${YOBELL_COLORS.navy}; color: #fff; border: none; border-radius: 24px; padding: 14px 32px; font-size: 16px; font-weight: bold; cursor: pointer; }
     button:hover { background: ${YOBELL_COLORS.navyDark}; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -197,13 +198,33 @@ export function buildRespondSuccessHtml(): string {
 }
 
 export function buildRespondErrorHtml(message: string): string {
+  const safeMessage =
+    message.includes("Invalid") || message.includes("not found")
+      ? "リクエストを処理できませんでした。リンクの有効期限が切れている可能性があります。"
+      : "しばらくしてからもう一度お試しください。";
+
   return `<!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="utf-8"><title>エラー</title></head>
-<body style="font-family: sans-serif; padding: 40px; text-align: center;">
-  <h1>エラー</h1>
-  <p>${message}</p>
-  <button type="button" onclick="window.close()">閉じる</button>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>エラー</title>
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; background: ${YOBELL_COLORS.background}; color: ${YOBELL_COLORS.navy}; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
+    .card { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(17, 40, 74, 0.1); padding: 40px 32px; max-width: 420px; text-align: center; animation: fadeUp 320ms ease-out; }
+    h1 { font-size: 24px; margin: 0 0 12px; color: ${YOBELL_COLORS.danger}; }
+    p { color: ${YOBELL_COLORS.textMuted}; margin: 0 0 28px; line-height: 1.6; }
+    button { background: ${YOBELL_COLORS.navy}; color: #fff; border: none; border-radius: 24px; padding: 14px 32px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:hover { background: ${YOBELL_COLORS.navyDark}; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>エラー</h1>
+    <p>${safeMessage}</p>
+    <button type="button" onclick="window.close()">閉じる</button>
+  </div>
 </body>
 </html>`;
 }

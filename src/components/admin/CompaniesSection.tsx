@@ -35,6 +35,7 @@ export function CompaniesSection({
   const { t } = useAdminI18n();
   const [editing, setEditing] = useState<Company | null>(null);
   const [creating, setCreating] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", logoUrl: "", welcomeMessage: "", active: true });
 
   function resetForm() {
@@ -48,31 +49,36 @@ export function CompaniesSection({
       onMessage(t("msg_companyRequired"), "error");
       return;
     }
-    const payload = {
-      name: form.name.trim(),
-      logoUrl: form.logoUrl || null,
-      welcomeMessage: form.welcomeMessage || null,
-      active: form.active,
-    };
-    const res = editing
-      ? await fetch(`/api/companies/${editing.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        })
-      : await fetch("/api/companies", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-    if (!res.ok) {
-      const err = await res.json();
-      onMessage(err.error ?? t("msg_saveFailed"), "error");
-      return;
+    setSaving(true);
+    try {
+      const payload = {
+        name: form.name.trim(),
+        logoUrl: form.logoUrl || null,
+        welcomeMessage: form.welcomeMessage || null,
+        active: form.active,
+      };
+      const res = editing
+        ? await fetch(`/api/companies/${editing.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+        : await fetch("/api/companies", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+      if (!res.ok) {
+        const err = await res.json();
+        onMessage(err.error ?? t("msg_saveFailed"), "error");
+        return;
+      }
+      onMessage(editing ? t("msg_companyUpdated") : t("msg_companyAdded"));
+      resetForm();
+      onRefresh();
+    } finally {
+      setSaving(false);
     }
-    onMessage(editing ? t("msg_companyUpdated") : t("msg_companyAdded"));
-    resetForm();
-    onRefresh();
   }
 
   async function remove(id: string) {
@@ -132,7 +138,9 @@ export function CompaniesSection({
             </label>
           </div>
           <AdminFormActions>
-            <Btn onClick={save}>{t("save")}</Btn>
+            <Btn onClick={save} loading={saving}>
+              {saving ? t("saving") : t("save")}
+            </Btn>
             <Btn variant="secondary" onClick={resetForm}>
               {t("cancel")}
             </Btn>

@@ -10,6 +10,7 @@ interface CallMethodScreenProps {
   language: Language;
   onSelect: (method: InputMethod) => void;
   onBack: () => void;
+  errorMessage?: string;
 }
 
 const OPTIONS: {
@@ -42,10 +43,17 @@ export function CallMethodScreen({
   language,
   onSelect,
   onBack,
+  errorMessage,
 }: CallMethodScreenProps) {
   return (
     <div className="flex flex-col gap-g3">
       <StepHeader title={t(language, "selectCallMethod")} />
+
+      {errorMessage && (
+        <p className="rounded-yobell-sm border border-yobell-danger/30 bg-yobell-danger/5 px-g3 py-g2 text-center text-lg text-yobell-danger">
+          {errorMessage}
+        </p>
+      )}
 
       <div className="grid grid-cols-1 gap-g2">
         {OPTIONS.map(({ method, titleKey, subtitleKey, icon }) => (

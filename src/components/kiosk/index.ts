@@ -6,3 +6,5 @@ export { StepHeader } from "./StepHeader";
 export { KioskActionBar } from "./KioskActionBar";
 export { KioskStepTransition } from "./KioskStepTransition";
 export { StaffCard } from "./StaffCard";
+export { PremiumSpinner } from "./PremiumSpinner";
+export { KioskErrorState } from "./KioskErrorState";

@@ -518,6 +518,33 @@ body {
   transform: scale(0.97);
 }
 
+.premium-card-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(200, 162, 70, 0.28) 50%,
+    transparent 65%
+  );
+  animation: premiumCardSweep 500ms ease-out forwards;
+  pointer-events: none;
+  z-index: 3;
+}
+
+@keyframes premiumCardSweep {
+  from {
+    transform: translateX(-120%);
+    opacity: 0.2;
+  }
+  to {
+    transform: translateX(120%);
+    opacity: 0.85;
+  }
+}
+
 .premium-card-icon {
   @apply flex items-center justify-center rounded-yobell-sm shadow-glass;
 }
@@ -539,13 +566,13 @@ body {
 }
 
 .kiosk-step-enter {
-  animation: kioskStepEnter 260ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: kioskStepEnter 300ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes kioskStepEnter {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -1210,5 +1237,238 @@ body {
 
   .admin-main {
     @apply ml-60;
+  }
+}
+
+/* ─── Micro-interactions polish (Stage 8) ─── */
+.premium-spinner {
+  @apply flex flex-col items-center justify-center gap-g2 text-center;
+}
+
+.premium-spinner-label {
+  @apply text-sm font-medium text-yobell-muted;
+}
+
+.kiosk-submit-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-yobell-navy/35 backdrop-blur-sm;
+}
+
+.kiosk-error-state {
+  @apply flex flex-col items-center justify-center gap-g3 px-g4 py-g6 text-center;
+  animation: kioskStepEnter 300ms ease-out forwards;
+}
+
+.kiosk-error-icon {
+  @apply flex h-16 w-16 items-center justify-center rounded-full text-3xl font-black text-white;
+  background: linear-gradient(135deg, var(--yobell-danger), #b83838);
+}
+
+.kiosk-error-title {
+  @apply text-2xl font-bold text-yobell-navy;
+}
+
+.kiosk-error-message {
+  @apply max-w-md text-lg text-yobell-muted;
+}
+
+.kiosk-skeleton {
+  @apply animate-pulse rounded-yobell-sm bg-yobell-border/60;
+}
+
+.waiting-pulse-success .waiting-pulse-core svg {
+  animation: waitingCheckPop 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.waiting-success-check {
+  animation: waitingCheckPop 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.waiting-pulse-muted .waiting-pulse-ring {
+  animation: waitingCalmFade 3.5s ease-in-out infinite;
+}
+
+.waiting-pulse-muted .waiting-pulse-ring-2 {
+  animation-delay: 1.2s;
+}
+
+.waiting-pulse-muted .waiting-pulse-ring-3 {
+  animation-delay: 2.4s;
+}
+
+.waiting-progress-row {
+  animation: waitingFadeIn 320ms ease-out backwards;
+}
+
+.waiting-progress-row:nth-child(1) {
+  animation-delay: 40ms;
+}
+
+.waiting-progress-row:nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.waiting-progress-row:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.waiting-progress-success .waiting-progress-icon svg {
+  animation: waitingCheckPop 400ms ease-out forwards;
+}
+
+@keyframes waitingCheckPop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes waitingCalmFade {
+  0%,
+  100% {
+    transform: scale(0.88);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+}
+
+.staff-visit-card {
+  @apply overflow-hidden rounded-yobell border-2 bg-yobell-surface shadow-glass-lg;
+  border-color: rgba(200, 162, 70, 0.35);
+  animation: kioskStepEnter 320ms ease-out forwards;
+}
+
+.staff-visit-card-new {
+  animation: staffVisitHighlight 2.4s ease-out forwards;
+}
+
+@keyframes staffVisitHighlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(200, 162, 70, 0.55);
+    border-color: var(--yobell-gold);
+    transform: translateY(-4px);
+  }
+  40% {
+    box-shadow: 0 12px 40px rgba(200, 162, 70, 0.28);
+  }
+  100% {
+    box-shadow: var(--yobell-shadow-glass-lg);
+    border-color: rgba(200, 162, 70, 0.35);
+    transform: translateY(0);
+  }
+}
+
+.staff-response-btn {
+  @apply relative py-5 text-lg font-bold transition-all duration-fast;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.staff-response-btn:hover:not(:disabled) {
+  filter: brightness(0.98);
+}
+
+.staff-response-btn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.staff-response-btn:disabled {
+  @apply cursor-wait opacity-70;
+}
+
+.staff-response-btn-loading::after {
+  content: "";
+  @apply absolute inset-x-0 bottom-0 h-0.5;
+  background: currentColor;
+  animation: staffBtnProgress 1.2s ease-in-out infinite;
+}
+
+@keyframes staffBtnProgress {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  51% {
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+.staff-history-row {
+  @apply flex items-center justify-between rounded-yobell-sm border border-yobell-border bg-yobell-surface px-g3 py-g2;
+  animation: waitingFadeIn 280ms ease-out backwards;
+}
+
+.gate-loading {
+  @apply flex min-h-screen flex-col items-center justify-center gap-g2 bg-yobell-bg text-yobell-muted;
+}
+
+.admin-toast {
+  animation: adminToastIn 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes adminToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-section-enter {
+  animation: adminSectionEnter 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes adminSectionEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-btn-loading {
+  @apply inline-flex items-center gap-2;
+}
+
+.health-panel-enter {
+  animation: kioskStepEnter 300ms ease-out forwards;
+}
+
+.health-status-pulse {
+  animation: healthPulse 2s ease-in-out infinite;
+}
+
+@keyframes healthPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
   }
 }

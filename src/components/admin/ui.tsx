@@ -114,16 +114,22 @@ export function Btn({
   children,
   variant = "primary",
   size = "md",
+  loading = false,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary" | "danger" | "ghost";
   size?: "sm" | "md" | "lg";
+  loading?: boolean;
 }) {
   return (
     <button
       {...props}
-      className={`admin-btn admin-btn-${variant} admin-btn-${size} ${props.className ?? ""}`}
+      disabled={loading || props.disabled}
+      className={`admin-btn admin-btn-${variant} admin-btn-${size} ${
+        loading ? "admin-btn-loading" : ""
+      } ${props.className ?? ""}`}
     >
+      {loading && <Loader2 className="h-4 w-4 animate-spin" />}
       {children}
     </button>
   );

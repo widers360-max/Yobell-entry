@@ -190,9 +190,9 @@ function WaitingPulse({ status }: { status: string }) {
       <span className="waiting-pulse-ring waiting-pulse-ring-1" />
       <span className="waiting-pulse-ring waiting-pulse-ring-2" />
       <span className="waiting-pulse-ring waiting-pulse-ring-3" />
-      <div className="waiting-pulse-core">
+      <div className={`waiting-pulse-core ${status === "accepted" ? "waiting-success-icon" : ""}`}>
         {status === "accepted" ? (
-          <Check className="h-12 w-12 text-white" strokeWidth={2.5} />
+          <Check className="h-12 w-12 text-white waiting-success-check" strokeWidth={2.5} />
         ) : status === "declined" || status === "no_response" ? (
           <X className="h-12 w-12 text-white" strokeWidth={2.5} />
         ) : (
@@ -214,7 +214,10 @@ function ProgressRow({
   const label = t(language, labelKey);
 
   return (
-    <li className={`waiting-progress-row waiting-progress-${step.state}`}>
+    <li
+      key={`${step.id}-${step.state}`}
+      className={`waiting-progress-row waiting-progress-${step.state}`}
+    >
       <span className="waiting-progress-icon" aria-hidden>
         {step.state === "success" ? (
           <Check className="h-5 w-5" strokeWidth={2.5} />

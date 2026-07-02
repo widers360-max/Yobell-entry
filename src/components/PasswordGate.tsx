@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 import { PasswordPrompt } from "./PasswordPrompt";
 import { isUnlocked, type AuthRole } from "@/lib/auth-session";
 import type { Language } from "@/lib/types";
@@ -38,22 +39,25 @@ export function PasswordGate({
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-500">
-        ...
+      <div className="gate-loading">
+        <Loader2 className="h-8 w-8 animate-spin text-yobell-gold" />
+        <p className="text-sm">読み込み中...</p>
       </div>
     );
   }
 
   if (!unlocked) {
     return (
-      <PasswordPrompt
-        role={role}
-        language={lang}
-        variant="page"
-        onSuccess={() => setUnlockedState(true)}
-      />
+      <div className="admin-section-enter">
+        <PasswordPrompt
+          role={role}
+          language={lang}
+          variant="page"
+          onSuccess={() => setUnlockedState(true)}
+        />
+      </div>
     );
   }
 
-  return <>{children}</>;
+  return <div className="admin-section-enter">{children}</div>;
 }
