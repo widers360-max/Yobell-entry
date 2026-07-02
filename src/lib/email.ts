@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { getInputMethodLabel, getVisitorTypeLabel } from "@/lib/admin-i18n";
+import { YOBELL_COLORS } from "@/lib/design-system";
 
 export interface VisitNotificationPayload {
   visitId: string;
@@ -115,7 +116,7 @@ function buildEmailHtml(
 <!DOCTYPE html>
 <html lang="ja">
 <head><meta charset="utf-8"></head>
-<body style="font-family: sans-serif; color: #1a2b4b; line-height: 1.6; max-width: 560px; margin: 0 auto; padding: 24px;">
+<body style="font-family: 'Noto Sans JP', sans-serif; color: ${YOBELL_COLORS.navy}; line-height: 1.6; max-width: 560px; margin: 0 auto; padding: 24px;">
   <h1 style="font-size: 20px; margin-bottom: 8px;">【YOBELL】来訪者の呼び出し</h1>
   <p style="margin-top: 0;">${payload.staffName} 様</p>
   <p>受付キオスクから来訪者の呼び出しがありました。</p>
@@ -177,12 +178,12 @@ export function buildRespondSuccessHtml(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>対応を送信しました</title>
   <style>
-    body { font-family: sans-serif; background: #f8fafc; color: #1a2b4b; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
-    .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.08); padding: 40px 32px; max-width: 420px; text-align: center; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: ${YOBELL_COLORS.background}; color: ${YOBELL_COLORS.navy}; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
+    .card { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(17, 40, 74, 0.1); padding: 40px 32px; max-width: 420px; text-align: center; }
     h1 { font-size: 24px; margin: 0 0 12px; }
-    p { color: #64748b; margin: 0 0 28px; line-height: 1.6; }
-    button { background: #1a2b4b; color: #fff; border: none; border-radius: 10px; padding: 14px 32px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    button:hover { background: #152238; }
+    p { color: ${YOBELL_COLORS.textMuted}; margin: 0 0 28px; line-height: 1.6; }
+    button { background: ${YOBELL_COLORS.navy}; color: #fff; border: none; border-radius: 24px; padding: 14px 32px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:hover { background: ${YOBELL_COLORS.navyDark}; }
   </style>
 </head>
 <body>

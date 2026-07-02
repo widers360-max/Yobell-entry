@@ -2,24 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── YOBELL Design System Tokens ─── */
 :root {
-  --yobell-navy: #1a2b4b;
-  --yobell-navy-light: #2a4570;
-  --yobell-gold: #c9a227;
-  --yobell-gold-light: #e8c84a;
-  --yobell-primary: #1a2b4b;
-  --yobell-primary-light: #2a4570;
-  --yobell-accent: #c9a227;
-  --yobell-accent-hover: #b08d1f;
-  --yobell-cream: #fdf8f3;
+  --yobell-navy: #11284a;
+  --yobell-navy-dark: #0d1f38;
+  --yobell-navy-light: #1a3860;
+  --yobell-gold: #c8a246;
+  --yobell-gold-hover: #b8923d;
+  --yobell-gold-light: #e0c06a;
+  --yobell-primary: #11284a;
+  --yobell-primary-light: #1a3860;
+  --yobell-accent: #c8a246;
+  --yobell-accent-hover: #b8923d;
+  --yobell-bg: #f7f6f3;
   --yobell-surface: #ffffff;
+  --yobell-cream: #f7f6f3;
   --yobell-card: #ffffff;
-  --yobell-text: #1a2332;
-  --yobell-muted: #64748b;
-  --yobell-border: #e2e8f0;
-  --yobell-danger: #ef4444;
-  --yobell-warning: #f59e0b;
-  --yobell-success: #10b981;
+  --yobell-text: #11284a;
+  --yobell-muted: #5c6b7a;
+  --yobell-border: #e5e2dc;
+  --yobell-success: #1f8a4c;
+  --yobell-danger: #d64545;
+  --yobell-warning: #c8a246;
+  --yobell-radius: 24px;
+  --yobell-radius-sm: 12px;
+  --yobell-duration-fast: 200ms;
+  --yobell-duration-normal: 300ms;
+  --yobell-duration-slow: 500ms;
+  --yobell-shadow-glass: 0 4px 24px rgba(17, 40, 74, 0.06),
+    0 1px 3px rgba(17, 40, 74, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --yobell-shadow-glass-lg: 0 8px 40px rgba(17, 40, 74, 0.1),
+    0 2px 8px rgba(17, 40, 74, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 * {
@@ -33,9 +46,9 @@ html {
 
 body {
   color: var(--yobell-text);
-  background: var(--yobell-surface);
-  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP",
-    "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  background: var(--yobell-bg);
+  font-family: var(--font-inter), var(--font-noto-sans-jp), "Hiragino Sans",
+    "Yu Gothic", system-ui, sans-serif;
   overflow-x: hidden;
 }
 
@@ -48,84 +61,148 @@ body {
 }
 
 @layer components {
-  .kiosk-btn {
-    @apply flex items-center justify-center rounded-2xl font-bold transition-all duration-200 active:scale-[0.97] select-none;
+  /* ─── Buttons ─── */
+  .yobell-btn {
+    @apply inline-flex items-center justify-center font-bold select-none transition-all duration-fast ease-yobell active:scale-[0.97];
+  }
+
+  .yobell-btn-lg {
+    @apply yobell-btn rounded-yobell px-g4 py-g3 text-xl shadow-glass;
     min-height: 5rem;
-    font-size: 1.5rem;
-    padding: 1.25rem 2rem;
+  }
+
+  .yobell-btn-md {
+    @apply yobell-btn rounded-yobell-sm px-g3 py-g2 text-base shadow-glass;
+    min-height: 3rem;
+  }
+
+  .yobell-btn-sm {
+    @apply yobell-btn rounded-yobell-sm px-g2 py-g1 text-sm;
+    min-height: 2.25rem;
+  }
+
+  .yobell-btn-primary {
+    @apply text-white;
+    background: linear-gradient(
+      135deg,
+      var(--yobell-navy),
+      var(--yobell-navy-light)
+    );
+  }
+
+  .yobell-btn-primary:hover {
+    background: linear-gradient(
+      135deg,
+      var(--yobell-navy-dark),
+      var(--yobell-navy)
+    );
+    box-shadow: 0 8px 28px rgba(17, 40, 74, 0.28);
+  }
+
+  .yobell-btn-secondary {
+    @apply border-2 bg-yobell-surface text-yobell-text;
+    border-color: var(--yobell-border);
+  }
+
+  .yobell-btn-secondary:hover {
+    border-color: var(--yobell-gold);
+    background: var(--yobell-bg);
+  }
+
+  .yobell-btn-danger {
+    @apply bg-yobell-danger text-white hover:opacity-90;
+  }
+
+  .yobell-btn-success {
+    @apply bg-yobell-success text-white hover:opacity-90;
+  }
+
+  /* ─── Cards ─── */
+  .yobell-card {
+    @apply rounded-yobell border bg-yobell-surface shadow-glass transition-all duration-normal ease-yobell;
+    border-color: var(--yobell-border);
+  }
+
+  .yobell-card-premium {
+    @apply yobell-card shadow-glass-premium backdrop-blur-md;
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .yobell-card-selected {
+    @apply yobell-card shadow-glass-selected;
+    border-color: var(--yobell-gold);
+  }
+
+  .yobell-card-interactive {
+    @apply yobell-card cursor-pointer active:scale-[0.98];
+  }
+
+  .yobell-card-interactive:hover {
+    border-color: var(--yobell-gold);
+    box-shadow: var(--yobell-shadow-glass-lg);
+  }
+
+  /* ─── Kiosk (aliases → design system) ─── */
+  .kiosk-btn {
+    @apply yobell-btn-lg;
   }
 
   .kiosk-btn-primary {
-    @apply kiosk-btn text-white shadow-lg;
-    background: linear-gradient(135deg, var(--yobell-navy), var(--yobell-navy-light));
-  }
-
-  .kiosk-btn-primary:hover {
-    background: linear-gradient(135deg, #152238, var(--yobell-navy));
-    box-shadow: 0 8px 25px rgba(26, 43, 75, 0.35);
+    @apply yobell-btn-primary;
   }
 
   .kiosk-btn-secondary {
-    @apply kiosk-btn border-2 bg-white;
-    border-color: var(--yobell-border);
-    color: var(--yobell-text);
-  }
-
-  .kiosk-btn-secondary:hover {
-    border-color: var(--yobell-gold);
-    background: var(--yobell-cream);
+    @apply yobell-btn-secondary;
   }
 
   .kiosk-card {
-    @apply rounded-3xl border bg-white shadow-sm transition-all duration-200;
-    border-color: var(--yobell-border);
+    @apply yobell-card;
   }
 
   .kiosk-card-interactive {
-    @apply kiosk-card cursor-pointer active:scale-[0.98];
-  }
-
-  .kiosk-card-interactive:hover {
-    border-color: var(--yobell-gold);
-    box-shadow: 0 8px 30px rgba(26, 43, 75, 0.12);
+    @apply yobell-card-interactive;
   }
 
   .kiosk-input {
-    @apply w-full rounded-xl border-2 bg-white px-5 py-4 text-xl outline-none transition-colors;
+    @apply w-full rounded-yobell-sm border-2 bg-yobell-surface px-g3 py-g2 text-xl outline-none transition-colors duration-fast;
     border-color: var(--yobell-border);
     min-height: 4rem;
   }
 
   .kiosk-input:focus {
     border-color: var(--yobell-gold);
-    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.15);
+    box-shadow: 0 0 0 3px rgba(200, 162, 70, 0.18);
   }
 
   .kiosk-heading {
-    @apply font-bold tracking-tight;
-    color: var(--yobell-navy);
+    @apply font-bold tracking-tight text-yobell-navy;
   }
 
+  /* ─── Admin ─── */
   .admin-input {
-    @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-amber-500;
-    border-color: var(--yobell-border);
+    @apply w-full rounded-yobell-sm border border-yobell-border bg-yobell-surface px-g2 py-g1 text-sm text-yobell-text outline-none transition-colors duration-fast focus:border-yobell-navy focus:ring-2 focus:ring-yobell-navy/10;
   }
 
   .admin-btn {
-    @apply rounded-lg px-4 py-2 text-sm font-medium transition-colors;
+    @apply yobell-btn-sm rounded-yobell-sm font-semibold;
   }
 
   .admin-btn-primary {
-    @apply admin-btn bg-[var(--yobell-navy)] text-white hover:opacity-90;
+    @apply admin-btn yobell-btn-primary shadow-glass;
   }
 
   .admin-btn-danger {
-    @apply admin-btn bg-red-500 text-white hover:bg-red-600;
+    @apply admin-btn yobell-btn-danger;
   }
 
   .admin-btn-secondary {
-    @apply admin-btn border bg-white hover:bg-gray-50;
-    border-color: var(--yobell-border);
+    @apply admin-btn yobell-btn-secondary;
+  }
+
+  /* ─── Glass panel utility ─── */
+  .yobell-glass {
+    @apply backdrop-blur-md shadow-glass;
+    background: rgba(255, 255, 255, 0.78);
   }
 }
 
@@ -156,7 +233,7 @@ body {
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.35s ease-out forwards;
+  animation: fadeInUp var(--yobell-duration-normal) ease-out forwards;
 }
 
 .animate-pulse-ring {

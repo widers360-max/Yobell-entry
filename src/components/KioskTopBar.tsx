@@ -25,11 +25,11 @@ export function KioskTopBar({ language }: KioskTopBarProps) {
 
   return (
     <>
-      <div className="flex shrink-0 items-center justify-end gap-1 border-b border-slate-200/80 bg-slate-50/90 px-4 py-1.5 backdrop-blur-sm">
+      <div className="flex shrink-0 items-center justify-end gap-1 border-b border-yobell-border/80 bg-yobell-bg/90 px-g2 py-g1 backdrop-blur-sm">
         <button
           type="button"
           onClick={() => setModalRole("admin")}
-          className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-white hover:text-[var(--yobell-navy,#1a2b4b)]"
+          className="flex items-center gap-1 rounded-yobell-sm px-g2 py-g1 text-xs font-medium text-yobell-muted transition-colors duration-fast hover:bg-yobell-surface hover:text-yobell-navy"
         >
           <Settings className="h-3 w-3" strokeWidth={1.75} />
           {t(language, "nav_admin")}
@@ -38,7 +38,7 @@ export function KioskTopBar({ language }: KioskTopBarProps) {
         <button
           type="button"
           onClick={() => setModalRole("staff")}
-          className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-white hover:text-[var(--yobell-navy,#1a2b4b)]"
+          className="flex items-center gap-1 rounded-yobell-sm px-g2 py-g1 text-xs font-medium text-yobell-muted transition-colors duration-fast hover:bg-yobell-surface hover:text-yobell-navy"
         >
           <Users className="h-3 w-3" strokeWidth={1.75} />
           {t(language, "nav_staff")}

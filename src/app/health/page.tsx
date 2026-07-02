@@ -48,8 +48,8 @@ export default function HealthPage() {
   const healthy = data?.status === "healthy";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 p-8">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-yobell-bg p-g4">
+      <div className="yobell-card-premium w-full max-w-lg p-g4">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-[var(--yobell-primary)]">
             YOBELL Entry Health

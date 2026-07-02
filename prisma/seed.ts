@@ -119,8 +119,8 @@ async function main() {
       heroSubtitle: "快適なオフィス環境を、すべての人に。",
       heroImageUrl: null,
       heroVideoUrl: null,
-      primaryColor: "#1a2b4b",
-      accentColor: "#c9a227",
+      primaryColor: "#11284A",
+      accentColor: "#C8A246",
     },
   });
 

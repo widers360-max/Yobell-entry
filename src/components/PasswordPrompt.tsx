@@ -53,20 +53,20 @@ export function PasswordPrompt({
   const form = (
     <form onSubmit={handleSubmit} className="w-full max-w-md">
       <div
-        className={`rounded-2xl border bg-white shadow-xl ${
-          isPage ? "border-slate-200 p-8 sm:p-10" : "border-slate-200 p-6 sm:p-8"
+        className={`yobell-card-premium ${
+          isPage ? "p-g4 sm:p-g5" : "p-g3 sm:p-g4"
         }`}
       >
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a2b4b]/10 text-[#1a2b4b]">
+        <div className="mb-g3 flex flex-col items-center text-center">
+          <div className="mb-g2 flex h-14 w-14 items-center justify-center rounded-yobell-sm bg-yobell-navy/10 text-yobell-navy">
             <Lock className="h-7 w-7" strokeWidth={1.75} />
           </div>
-          <h2 className="text-xl font-bold text-slate-800 sm:text-2xl">
+          <h2 className="text-xl font-bold text-yobell-text sm:text-2xl">
             {t(language, titleKey)}
           </h2>
         </div>
 
-        <label className="mb-2 block text-sm font-semibold text-slate-600">
+        <label className="mb-g1 block text-sm font-semibold text-yobell-muted">
           {t(language, "auth_passwordLabel")}
         </label>
         <input
@@ -77,23 +77,23 @@ export function PasswordPrompt({
             setError("");
           }}
           autoFocus
-          className="mb-4 w-full rounded-xl border border-slate-200 px-4 py-4 text-lg outline-none transition-colors focus:border-[#1a2b4b] focus:ring-2 focus:ring-[#1a2b4b]/10"
+          className="admin-input mb-g2 w-full py-g2 text-lg"
           placeholder="••••"
         />
 
         {error && (
-          <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          <p className="mb-g2 rounded-yobell-sm bg-yobell-danger/10 px-g2 py-g2 text-sm font-medium text-yobell-danger">
             {error}
           </p>
         )}
 
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col gap-g2 sm:flex-row">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
               disabled={submitting}
-              className="min-h-[52px] flex-1 rounded-xl border border-slate-200 bg-white px-6 py-3 text-base font-bold text-slate-700 transition-colors hover:bg-slate-50 active:bg-slate-100 disabled:opacity-50"
+              className="yobell-btn-md yobell-btn-secondary min-h-[52px] flex-1"
             >
               {t(language, "auth_cancel")}
             </button>
@@ -101,7 +101,7 @@ export function PasswordPrompt({
           <button
             type="submit"
             disabled={submitting || !password}
-            className="min-h-[52px] flex-1 rounded-xl bg-[#1a2b4b] px-6 py-3 text-base font-bold text-white shadow-sm transition-colors hover:bg-[#152238] active:bg-[#0f1a2e] disabled:opacity-50"
+            className="yobell-btn-md yobell-btn-primary min-h-[52px] flex-1 disabled:opacity-50"
           >
             {submitting ? "..." : t(language, "auth_confirm")}
           </button>
@@ -112,7 +112,7 @@ export function PasswordPrompt({
 
   if (isPage) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-100 px-4 py-10">
+      <div className="flex min-h-screen items-center justify-center bg-yobell-bg px-g2 py-g5">
         {form}
       </div>
     );

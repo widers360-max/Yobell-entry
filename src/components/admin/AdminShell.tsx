@@ -59,8 +59,8 @@ export function AdminShell({
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-slate-200 bg-[#1a2b4b] text-white">
+    <div className="flex min-h-screen bg-yobell-bg">
+      <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-yobell-border bg-yobell-navy text-white">
         <div className="border-b border-white/10 px-6 py-5">
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -110,12 +110,12 @@ export function AdminShell({
       </aside>
 
       <div className="ml-64 flex flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-8 py-4 backdrop-blur">
-          <h1 className="text-lg font-bold text-slate-800">
+        <header className="sticky top-0 z-20 border-b border-yobell-border bg-yobell-surface/90 px-g4 py-g2 backdrop-blur">
+          <h1 className="text-lg font-bold text-yobell-text">
             {t(ADMIN_NAV_I18N[section])}
           </h1>
         </header>
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 bg-yobell-bg p-g4">{children}</main>
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import { SystemSection } from "@/components/admin/SystemSection";
 import { NotificationSection } from "@/components/admin/NotificationSection";
 import { Toast } from "@/components/admin/ui";
 import { PasswordGate } from "@/components/PasswordGate";
+import { YOBELL_DEFAULT_ACCENT, YOBELL_DEFAULT_PRIMARY } from "@/lib/design-system";
 import type { KioskSettings, VisitorCardRecord } from "@/lib/types";
 import { useState, useEffect, useCallback } from "react";
 
@@ -28,8 +29,8 @@ const DEFAULT_SETTINGS: KioskSettings = {
   companyDisplayName: "株式会社YOBELL",
   heroTitle: "ようこそ、株式会社YOBELLへ",
   heroSubtitle: "快適なオフィス環境を、すべての人に。",
-  primaryColor: "#1a2b4b",
-  accentColor: "#c9a227",
+  primaryColor: YOBELL_DEFAULT_PRIMARY,
+  accentColor: YOBELL_DEFAULT_ACCENT,
   retentionDays: 30,
 };
 
