@@ -72,6 +72,7 @@ const config: Config = {
           "0 0 0 2px rgba(200, 162, 70, 0.45), 0 8px 32px rgba(17, 40, 74, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9)",
       },
       transitionDuration: {
+        touch: "180ms",
         fast: "200ms",
         normal: "300ms",
         slow: "500ms",

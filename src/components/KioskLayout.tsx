@@ -57,7 +57,7 @@ export function KioskLayout({
       </header>
 
       <main className="flex flex-1 flex-col items-center justify-center px-8 pb-10">
-        <div className="w-full max-w-5xl animate-fade-in-up">{children}</div>
+        <div className="w-full max-w-5xl">{children}</div>
       </main>
     </div>
   );

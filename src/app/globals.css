@@ -27,6 +27,7 @@
   --yobell-radius: 24px;
   --yobell-radius-sm: 12px;
   --yobell-duration-fast: 200ms;
+  --yobell-duration-touch: 180ms;
   --yobell-duration-normal: 300ms;
   --yobell-duration-slow: 500ms;
   --yobell-shadow-glass: 0 4px 24px rgba(17, 40, 74, 0.06),
@@ -307,4 +308,211 @@ body {
 .kiosk-purpose-card:hover {
   border-color: var(--yobell-gold);
   box-shadow: var(--yobell-shadow-glass-lg);
+}
+
+/* ─── Premium kiosk touch interactions (Stage 3) ─── */
+.touch-ripple-container {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.touch-ripple {
+  position: absolute;
+  width: 7.5rem;
+  height: 7.5rem;
+  margin-left: -3.75rem;
+  margin-top: -3.75rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(200, 162, 70, 0.42) 0%,
+    rgba(17, 40, 74, 0.18) 42%,
+    transparent 72%
+  );
+  animation: touchRippleExpand var(--yobell-duration-touch) ease-out forwards;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes touchRippleExpand {
+  from {
+    transform: scale(0.2);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.premium-btn {
+  @apply relative inline-flex items-center justify-center gap-g2 font-bold select-none;
+  transition:
+    transform var(--yobell-duration-touch) cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow var(--yobell-duration-touch) ease,
+    border-color var(--yobell-duration-touch) ease,
+    background var(--yobell-duration-touch) ease,
+    opacity var(--yobell-duration-touch) ease;
+  z-index: 2;
+}
+
+.premium-btn-lg {
+  @apply rounded-yobell px-g4 py-g3 text-xl shadow-glass;
+  min-height: 5rem;
+}
+
+.premium-btn-md {
+  @apply rounded-yobell-sm px-g3 py-g2 text-lg shadow-glass;
+  min-height: 4rem;
+}
+
+.premium-btn-sm {
+  @apply rounded-yobell-sm px-g2 py-g1 text-base;
+  min-height: 3rem;
+}
+
+.premium-btn-primary {
+  @apply text-white;
+  background: linear-gradient(135deg, var(--yobell-navy), var(--yobell-navy-light));
+}
+
+.premium-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--yobell-navy-dark), var(--yobell-navy));
+  box-shadow: 0 8px 28px rgba(17, 40, 74, 0.28);
+}
+
+.premium-btn-secondary {
+  @apply border-2 bg-yobell-surface text-yobell-text;
+  border-color: var(--yobell-border);
+}
+
+.premium-btn-secondary:hover:not(:disabled) {
+  border-color: var(--yobell-gold);
+  background: var(--yobell-bg);
+}
+
+.premium-btn-danger {
+  @apply bg-yobell-danger text-white;
+}
+
+.premium-btn-danger:hover:not(:disabled) {
+  box-shadow: 0 8px 24px rgba(214, 69, 69, 0.28);
+}
+
+.premium-btn-success {
+  @apply bg-yobell-success text-white;
+}
+
+.premium-btn-success:hover:not(:disabled) {
+  box-shadow: 0 8px 24px rgba(31, 138, 76, 0.28);
+}
+
+.premium-btn-selected {
+  box-shadow:
+    0 0 0 2px rgba(200, 162, 70, 0.55),
+    var(--yobell-shadow-glass-lg);
+}
+
+.premium-btn-pressed {
+  transform: scale(0.96);
+}
+
+.premium-btn-disabled {
+  @apply cursor-not-allowed opacity-50;
+  transform: none !important;
+}
+
+.premium-btn-icon {
+  @apply inline-flex shrink-0 items-center justify-center;
+}
+
+.premium-btn-label {
+  @apply inline-flex items-center justify-center;
+}
+
+.premium-card {
+  @apply relative rounded-yobell border bg-yobell-surface shadow-glass-premium backdrop-blur-md;
+  border-color: var(--yobell-border);
+  background: rgba(255, 255, 255, 0.92);
+  transition:
+    transform var(--yobell-duration-touch) cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow var(--yobell-duration-touch) ease,
+    border-color var(--yobell-duration-touch) ease;
+}
+
+.premium-card-vertical {
+  @apply flex w-full flex-col items-center justify-center gap-g1 p-g2 text-center;
+  min-height: 7.5rem;
+}
+
+.premium-card-horizontal {
+  @apply flex w-full items-center gap-g3 p-g3 text-left;
+  min-height: 8.75rem;
+}
+
+.premium-card-horizontal:not(:has(.premium-card-icon)) {
+  @apply px-g4 py-g4;
+}
+
+.premium-card-interactive {
+  @apply cursor-pointer;
+}
+
+.premium-card-interactive:hover {
+  border-color: var(--yobell-gold);
+  box-shadow: var(--yobell-shadow-glass-lg);
+}
+
+.premium-card-selected {
+  border-color: var(--yobell-gold);
+  box-shadow: var(--yobell-shadow-glass-selected);
+}
+
+.premium-card-pressed {
+  transform: scale(0.97);
+}
+
+.premium-card-icon {
+  @apply flex items-center justify-center rounded-yobell-sm shadow-glass;
+}
+
+.premium-card-icon-lg {
+  @apply h-20 w-20 rounded-yobell-sm;
+}
+
+.premium-card-vertical .premium-card-icon:not(.premium-card-icon-lg) {
+  @apply h-12 w-12;
+}
+
+.premium-card-badge {
+  @apply inline-flex shrink-0 items-center rounded-full bg-yobell-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-yobell-navy;
+}
+
+.kiosk-step-header {
+  animation: kioskStepHeaderIn var(--yobell-duration-normal) ease-out forwards;
+}
+
+.kiosk-step-enter {
+  animation: kioskStepEnter 260ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes kioskStepEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kioskStepHeaderIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

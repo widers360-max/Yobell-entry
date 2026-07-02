@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
+import { KioskActionBar, StepHeader } from "@/components/kiosk";
 import { t, type TranslationKey } from "@/lib/i18n";
 import type { Language } from "@/lib/types";
 
@@ -23,6 +24,7 @@ export function CameraCapture({
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isBusinessCard = mode === "business_card";
   const titleKey: TranslationKey = isBusinessCard
@@ -104,26 +106,24 @@ export function CameraCapture({
   }
 
   function confirm() {
-    if (preview) {
-      onCapture(preview);
-    }
+    if (!preview) return;
+    setIsSubmitting(true);
+    onCapture(preview);
   }
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      <h2 className="kiosk-heading text-center text-4xl">
-        {t(language, titleKey)}
-      </h2>
-      <p className="max-w-2xl text-center text-xl text-[var(--yobell-muted)]">
-        {t(language, instructionKey)}
-      </p>
+    <div className="flex flex-col items-center gap-g3">
+      <StepHeader
+        title={t(language, titleKey)}
+        subtitle={t(language, instructionKey)}
+      />
 
       {error ? (
-        <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 px-8 py-6 text-center text-xl text-amber-800">
+        <div className="rounded-yobell border-2 border-yobell-gold/40 bg-yobell-bg px-g4 py-g3 text-center text-xl text-yobell-navy">
           {error}
         </div>
       ) : (
-        <div className="relative overflow-hidden rounded-3xl border-4 border-[var(--yobell-border)] bg-black shadow-2xl">
+        <div className="relative overflow-hidden rounded-yobell-lg border-4 border-yobell-border bg-black shadow-glass-lg">
           {preview ? (
             <img
               src={preview}
@@ -148,34 +148,25 @@ export function CameraCapture({
         </div>
       )}
 
-      <div className="flex w-full max-w-2xl flex-col gap-4">
+      <div className="w-full max-w-2xl">
         {preview ? (
-          <>
-            <button type="button" onClick={confirm} className="kiosk-btn-primary">
-              {isBusinessCard ? t(language, "callHost") : t(language, "next")}
-            </button>
-            <button
-              type="button"
-              onClick={retake}
-              className="kiosk-btn-secondary"
-            >
-              {t(language, "retakePhoto")}
-            </button>
-          </>
+          <KioskActionBar
+            primaryLabel={isBusinessCard ? t(language, "callHost") : t(language, "next")}
+            onPrimary={confirm}
+            primaryLoading={isSubmitting}
+            secondaryLabel={t(language, "retakePhoto")}
+            onSecondary={retake}
+            layout="stack"
+          />
         ) : (
-          <>
-            <button
-              type="button"
-              onClick={takePhoto}
-              disabled={!cameraReady || !!error}
-              className="kiosk-btn-primary disabled:opacity-50"
-            >
-              {t(language, "takePhoto")}
-            </button>
-            <button type="button" onClick={onSkip} className="kiosk-btn-secondary">
-              {t(language, skipKey)}
-            </button>
-          </>
+          <KioskActionBar
+            primaryLabel={t(language, "takePhoto")}
+            onPrimary={takePhoto}
+            primaryDisabled={!cameraReady || !!error}
+            secondaryLabel={t(language, skipKey)}
+            onSecondary={onSkip}
+            layout="stack"
+          />
         )}
       </div>
     </div>
