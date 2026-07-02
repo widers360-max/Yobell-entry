@@ -36,7 +36,9 @@ export async function GET() {
       }),
       prisma.visit.count({ where: { status: "pending" } }),
       prisma.visit.count({
-        where: { status: { not: "pending" } },
+        where: {
+          status: { in: ["accepted", "please_wait", "completed"] },
+        },
       }),
       prisma.visit.count({
         where: { createdAt: { gte: monthStart } },
